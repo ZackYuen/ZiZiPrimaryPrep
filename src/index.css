@@ -1,0 +1,61 @@
+:root {
+  --ink: #1b3a4b;
+  --ink-soft: #3d5f72;
+  --paper: #fff8ef;
+  --paper-2: #ffe8c8;
+  --sky: #9ad7ef;
+  --sky-deep: #5eb5d8;
+  --sun: #f5c84c;
+  --coral: #ff7a59;
+  --mint: #6bcb8b;
+  --white: #ffffff;
+  --shadow: 0 14px 36px rgba(27, 58, 75, 0.12);
+  --radius: 28px;
+  --font-display: 'Fredoka', 'Noto Sans TC', sans-serif;
+  --font-body: 'Noto Sans TC', 'Fredoka', sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: var(--font-body);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% -10%, rgba(154, 215, 239, 0.55), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 100% 0%, rgba(245, 200, 76, 0.35), transparent 50%),
+    linear-gradient(180deg, #e8f6fc 0%, var(--paper) 42%, #ffe9cf 100%);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+#root {
+  min-height: 100dvh;
+}
