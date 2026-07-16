@@ -109,6 +109,7 @@ export function PracticeSession({
     error: listenError,
     elapsedSec,
     sttAlive,
+    activeLang,
     start: startListening,
     stop: stopListening,
     reset: resetListening,
@@ -192,13 +193,14 @@ export function PracticeSession({
   }, [item, order])
 
   const speakFeedback = useMemo(() => {
-    if (item.kind !== 'speak' || !listenTranscript.trim()) return null
+    const heard = `${listenTranscript} ${listenInterim}`.trim()
+    if (item.kind !== 'speak' || !heard) return null
     const sample =
       listenLang === 'en-US'
         ? item.sampleEn || item.sampleZh
         : item.sampleZh || item.sampleEn
-    return softSpeakFeedback(listenTranscript, sample, listenLang === 'en-US' ? 'en' : 'zh')
-  }, [item, listenTranscript, listenLang])
+    return softSpeakFeedback(heard, sample, listenLang === 'en-US' ? 'en' : 'zh')
+  }, [item, listenTranscript, listenInterim, listenLang])
 
   useEffect(() => {
     if (reorderCorrect && !done) {
@@ -511,8 +513,9 @@ export function PracticeSession({
                   <div className="listen-panel__transcript" aria-live="polite">
                     {listening && (
                       <p className="listen-panel__live">
-                        ● 聽緊 {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
-                        {sttAlive ? '' : ' · 字可能稍後先出'}
+                        ● {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
+                        {sttAlive ? ' · 轉文字中' : ' · 準備轉文字'}
+                        <span className="listen-panel__lang"> · {activeLang}</span>
                       </p>
                     )}
                     {(listenTranscript || listenInterim) ? (
@@ -524,7 +527,7 @@ export function PracticeSession({
                       </p>
                     ) : (
                       <p className="listen-panel__placeholder">
-                        {listening ? '繼續大聲講… 講完撳 ■' : '撳 ● 開始講'}
+                        {listening ? '請大聲講… 字會顯示喺呢度' : '撳 ● 開始講'}
                       </p>
                     )}
                   </div>
@@ -544,7 +547,7 @@ export function PracticeSession({
                     </div>
                   )}
                   <p className="listen-panel__note">
-                    ● 保持聽直到 ■ · 字係練習 · ★ 由爸爸媽媽按
+                    ● 講完撳 ■ · 轉文字要網絡 · ★ 由爸爸媽媽按
                   </p>
                 </div>
               )}

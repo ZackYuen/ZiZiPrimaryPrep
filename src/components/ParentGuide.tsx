@@ -71,8 +71,7 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>電話聽講（練習提示）</h3>
           <p>
-            撳 ● 會開住麥克風（畫面有計時），直到撳 ■。電話轉文字只係加分，很多手機轉文字會閃一下就斷——唔影響練習。星星仍然由家長撳 ★。建議
-            Chrome／Safari，允許麥克風。
+            撳 ● 開始轉文字（要網絡；Chrome 通常最穩）。畫面會顯示聽到嘅字。講完撳 ■，星星仍然由家長撳 ★。
           </p>
         </article>
         <article className="parent__item">
