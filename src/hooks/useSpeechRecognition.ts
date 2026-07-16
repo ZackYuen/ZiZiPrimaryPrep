@@ -20,7 +20,6 @@ type SpeechRecognitionEventLike = {
   resultIndex: number
   results: ArrayLike<{
     isFinal: boolean
-    length: number
     0: { transcript: string }
   }>
 }
@@ -36,15 +35,10 @@ function getRecognitionCtor(): SpeechRecognitionCtor | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null
 }
 
-function isMobileUa(): boolean {
-  if (typeof navigator === 'undefined') return false
-  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-}
-
-/** Prefer real Cantonese / HK, then close Chinese variants. */
 function langFallbacks(lang: ListenLang): string[] {
   if (lang === 'en-US') return ['en-US', 'en-GB', 'en-HK', 'en']
-  return ['zh-HK', 'yue-HK', 'yue-Hant-HK', 'zh-TW', 'zh-CN']
+  // Put zh-TW / zh-CN early as they often work when zh-HK/yue fail on phones
+  return ['zh-HK', 'zh-TW', 'zh-CN', 'yue-HK', 'yue-Hant-HK']
 }
 
 function errorMessage(code: string): string {
@@ -55,109 +49,149 @@ function errorMessage(code: string): string {
     case 'audio-capture':
       return '搵唔到麥克風。請檢查電話咪高峰。'
     case 'network':
-      return '語音服務連線失敗。請用 Chrome／Safari、開網絡，或改由爸爸媽媽聽 ★。'
+      return '語音轉文字連線唔穩——唔緊要，繼續講，最後撳 ★。'
     case 'language-not-supported':
-      return '呢部電話唔支援呢個語言辨識。可試 EN，或改由爸爸媽媽聽 ★。'
+      return '轉文字語言唔支援——唔緊要，繼續講，最後撳 ★。'
     case 'no-speech':
-      return '未聽到聲音——再靠近咪、大聲少少。'
+      return ''
     case 'aborted':
       return ''
     default:
-      return '聽唔清楚——唔緊要，請爸爸媽媽聽你講，撳 ★。'
+      return ''
   }
 }
 
-async function warmMic(): Promise<MediaStream | null> {
-  if (!navigator.mediaDevices?.getUserMedia) return null
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-      },
-      video: false,
-    })
-    return stream
-  } catch {
-    return null
-  }
+function detach(rec: BrowserSpeechRecognition | null) {
+  if (!rec) return
+  rec.onstart = null
+  rec.onresult = null
+  rec.onerror = null
+  rec.onend = null
 }
 
 function stopTracks(stream: MediaStream | null) {
-  stream?.getTracks().forEach((t) => t.stop())
+  stream?.getTracks().forEach((t) => {
+    try {
+      t.stop()
+    } catch {
+      /* ignore */
+    }
+  })
 }
 
+function pickRecorderMime(): string | undefined {
+  if (typeof MediaRecorder === 'undefined') return undefined
+  const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/aac', 'audio/ogg']
+  return candidates.find((t) => MediaRecorder.isTypeSupported(t))
+}
+
+/**
+ * Mic session is owned by getUserMedia + MediaRecorder (stays open until ■).
+ * Web Speech STT is best-effort only — many phones kill it in <1s ("flash").
+ */
 export function useSpeechRecognition() {
   const [supported, setSupported] = useState(false)
   const [listening, setListening] = useState(false)
   const [transcript, setTranscript] = useState('')
   const [interim, setInterim] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [elapsedSec, setElapsedSec] = useState(0)
+  const [sttAlive, setSttAlive] = useState(false)
 
+  const sessionId = useRef(0)
+  const streamRef = useRef<MediaStream | null>(null)
+  const recorderRef = useRef<MediaRecorder | null>(null)
   const recRef = useRef<BrowserSpeechRecognition | null>(null)
   const wantListen = useRef(false)
   const langIdx = useRef(0)
   const langsRef = useRef<string[]>(['zh-HK'])
-  const micStream = useRef<MediaStream | null>(null)
-  const restartTimer = useRef<number | null>(null)
+  const tickTimer = useRef<number | null>(null)
+  const sttRestartTimer = useRef<number | null>(null)
+  const startedAt = useRef(0)
+
+  const clearTimers = () => {
+    if (tickTimer.current) {
+      window.clearInterval(tickTimer.current)
+      tickTimer.current = null
+    }
+    if (sttRestartTimer.current) {
+      window.clearTimeout(sttRestartTimer.current)
+      sttRestartTimer.current = null
+    }
+  }
+
+  const hardStopStt = () => {
+    const rec = recRef.current
+    detach(rec)
+    try {
+      rec?.abort()
+    } catch {
+      /* ignore */
+    }
+    recRef.current = null
+    setSttAlive(false)
+  }
+
+  const hardStopSession = useCallback(() => {
+    wantListen.current = false
+    clearTimers()
+    hardStopStt()
+    try {
+      if (recorderRef.current && recorderRef.current.state !== 'inactive') {
+        recorderRef.current.stop()
+      }
+    } catch {
+      /* ignore */
+    }
+    recorderRef.current = null
+    stopTracks(streamRef.current)
+    streamRef.current = null
+    setListening(false)
+    setInterim('')
+    setElapsedSec(0)
+  }, [])
 
   useEffect(() => {
-    setSupported(!!getRecognitionCtor())
+    const hasMic = typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia
+    const hasStt = !!getRecognitionCtor()
+    // Supported if we can at least open a mic session (STT optional)
+    setSupported(hasMic || hasStt)
     return () => {
-      wantListen.current = false
-      if (restartTimer.current) window.clearTimeout(restartTimer.current)
-      try {
-        recRef.current?.abort()
-      } catch {
-        /* ignore */
-      }
-      recRef.current = null
-      stopTracks(micStream.current)
-      micStream.current = null
+      sessionId.current += 1
+      hardStopSession()
     }
-  }, [])
+  }, [hardStopSession])
 
   const reset = useCallback(() => {
     setTranscript('')
     setInterim('')
     setError(null)
+    setElapsedSec(0)
   }, [])
-
-  const clearRestart = () => {
-    if (restartTimer.current) {
-      window.clearTimeout(restartTimer.current)
-      restartTimer.current = null
-    }
-  }
 
   const stop = useCallback(() => {
-    wantListen.current = false
-    clearRestart()
-    setListening(false)
-    setInterim('')
-    try {
-      recRef.current?.stop()
-    } catch {
-      try {
-        recRef.current?.abort()
-      } catch {
-        /* ignore */
-      }
-    }
-    // Keep mic warm briefly is fine; release to free indicator
-    stopTracks(micStream.current)
-    micStream.current = null
-  }, [])
+    sessionId.current += 1
+    hardStopSession()
+  }, [hardStopSession])
 
-  const attachHandlers = useCallback((rec: BrowserSpeechRecognition) => {
+  const startStt = useCallback((sid: number) => {
+    const Ctor = getRecognitionCtor()
+    if (!Ctor || !wantListen.current || sid !== sessionId.current) return
+
+    hardStopStt()
+    const rec = new Ctor()
+    rec.continuous = true
+    rec.interimResults = true
+    rec.maxAlternatives = 1
+    rec.lang = langsRef.current[langIdx.current] ?? langsRef.current[0]
+
     rec.onstart = () => {
-      if (wantListen.current) {
-        setListening(true)
-        setError(null)
-      }
+      if (sid !== sessionId.current || !wantListen.current) return
+      setSttAlive(true)
     }
 
     rec.onresult = (event) => {
+      if (sid !== sessionId.current || !wantListen.current) return
       let finalChunk = ''
       let interimChunk = ''
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -172,108 +206,125 @@ export function useSpeechRecognition() {
     }
 
     rec.onerror = (event) => {
+      if (sid !== sessionId.current) return
       const code = event.error
-      // Try next language in the fallback list
+      if (code === 'aborted') return
       if (
         wantListen.current &&
         (code === 'language-not-supported' || code === 'network') &&
         langIdx.current < langsRef.current.length - 1
       ) {
         langIdx.current += 1
-        // Keep wantListen; onend / manual restart will pick new lang
         return
       }
       const msg = errorMessage(code)
+      // Soft: never kill the mic session for STT errors
       if (msg) setError(msg)
-      if (code === 'aborted') return
-      if (code === 'no-speech') {
-        // Stay in listening mode; onend restart will continue
-        return
-      }
-      wantListen.current = false
-      setListening(false)
+      setSttAlive(false)
     }
 
     rec.onend = () => {
-      setInterim('')
-      if (!wantListen.current) {
-        setListening(false)
-        return
-      }
-      // Mobile: continuous:false ends often — restart while user still wants mic
-      clearRestart()
-      restartTimer.current = window.setTimeout(() => {
-        if (!wantListen.current || !recRef.current) return
-        try {
-          recRef.current.lang = langsRef.current[langIdx.current] ?? langsRef.current[0]
-          recRef.current.start()
-          setListening(true)
-        } catch {
-          // InvalidStateError if already started — ignore
-        }
-      }, 280)
+      if (sid !== sessionId.current) return
+      setSttAlive(false)
+      if (!wantListen.current) return
+      // Soft restart STT while mic session still open
+      if (sttRestartTimer.current) window.clearTimeout(sttRestartTimer.current)
+      sttRestartTimer.current = window.setTimeout(() => {
+        if (sid !== sessionId.current || !wantListen.current) return
+        startStt(sid)
+      }, 400)
+    }
+
+    recRef.current = rec
+    try {
+      rec.start()
+    } catch {
+      setSttAlive(false)
+      // Retry once shortly
+      sttRestartTimer.current = window.setTimeout(() => {
+        if (sid !== sessionId.current || !wantListen.current) return
+        startStt(sid)
+      }, 500)
     }
   }, [])
 
   const start = useCallback(
     async (lang: ListenLang = 'zh-HK') => {
-      const Ctor = getRecognitionCtor()
-      if (!Ctor) {
-        setError('呢部電話／瀏覽器暫唔支援語音辨識。請爸爸媽媽聽完撳 ★。')
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setError('呢部電話唔支援麥克風。請爸爸媽媽聽完撳 ★。')
         return
       }
 
-      clearRestart()
-      wantListen.current = false
-      try {
-        recRef.current?.abort()
-      } catch {
-        /* ignore */
-      }
+      // End any previous session cleanly
+      sessionId.current += 1
+      const sid = sessionId.current
+      hardStopSession()
+      wantListen.current = true
 
       setError(null)
       setInterim('')
       setTranscript('')
+      setElapsedSec(0)
+      setSttAlive(false)
       langsRef.current = langFallbacks(lang)
       langIdx.current = 0
+      startedAt.current = Date.now()
 
-      // Warm mic first (permission + first-tap reliability), then release tracks
-      // so SpeechRecognition can own the mic (avoids some Android conflicts).
-      stopTracks(micStream.current)
-      const stream = await warmMic()
-      if (!stream) {
+      let stream: MediaStream
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+          },
+          video: false,
+        })
+      } catch {
+        wantListen.current = false
         setError(errorMessage('not-allowed'))
         setListening(false)
         return
       }
-      stopTracks(stream)
-      micStream.current = null
 
-      const rec = new Ctor()
-      // continuous:true is flaky on mobile Chrome/iOS — use false + restart loop
-      rec.continuous = !isMobileUa()
-      rec.interimResults = true
-      rec.maxAlternatives = 1
-      rec.lang = langsRef.current[0]
-      attachHandlers(rec)
-      recRef.current = rec
+      if (sid !== sessionId.current || !wantListen.current) {
+        stopTracks(stream)
+        return
+      }
 
-      wantListen.current = true
+      streamRef.current = stream
       setListening(true)
 
-      // Small delay after abort/getUserMedia so engine is ready
-      await new Promise((r) => setTimeout(r, 120))
-      if (!wantListen.current || recRef.current !== rec) return
-
+      // Keep mic owned by MediaRecorder so the session doesn't "flash" when STT dies
       try {
-        rec.start()
+        const mime = pickRecorderMime()
+        const recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream)
+        recorderRef.current = recorder
+        // We discard audio blobs — recorder exists to hold the mic session open
+        recorder.ondataavailable = () => {}
+        recorder.start(1000)
       } catch {
-        setError('開咪失敗——請再撳 ●，或改由爸爸媽媽聽 ★。')
-        wantListen.current = false
-        setListening(false)
+        // Even without MediaRecorder, keeping the stream open holds the mic
+        recorderRef.current = null
       }
+
+      tickTimer.current = window.setInterval(() => {
+        if (sid !== sessionId.current || !wantListen.current) return
+        const sec = Math.floor((Date.now() - startedAt.current) / 1000)
+        setElapsedSec(sec)
+        // Auto-stop after 45s so mic doesn't hang forever
+        if (sec >= 45) {
+          sessionId.current += 1
+          hardStopSession()
+        }
+      }, 250)
+
+      // Best-effort STT (may fail/flash on some phones — session still stays open)
+      window.setTimeout(() => {
+        if (sid !== sessionId.current || !wantListen.current) return
+        startStt(sid)
+      }, 200)
     },
-    [attachHandlers],
+    [hardStopSession, startStt],
   )
 
   return {
@@ -282,6 +333,8 @@ export function useSpeechRecognition() {
     transcript,
     interim,
     error,
+    elapsedSec,
+    sttAlive,
     start,
     stop,
     reset,
