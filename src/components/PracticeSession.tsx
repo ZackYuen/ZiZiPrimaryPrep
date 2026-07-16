@@ -47,6 +47,9 @@ export function PracticeSession({
   const [order, setOrder] = useState<string[]>([])
   const [pool, setPool] = useState<string[]>([])
   const [checkedFields, setCheckedFields] = useState<Record<string, boolean>>({})
+  const [sortSelected, setSortSelected] = useState<string | null>(null)
+  const [sortPlacement, setSortPlacement] = useState<Record<string, string>>({})
+  const [sortChecked, setSortChecked] = useState(false)
   const { speak, stop } = useSpeech()
 
   const item = items[index]
@@ -55,9 +58,19 @@ export function PracticeSession({
   const levelMeta = levels.find((l) => l.level === item.level)
   const solvedChoice = picked !== null && !!item.choices?.[picked]?.correct
 
-  const mascotMood = justStar || mathResult === 'ok' || solvedChoice
+  const sortCorrect = useMemo(() => {
+    if (item.kind !== 'sort' || !item.sortItems?.length) return false
+    return item.sortItems.every((s) => sortPlacement[s.text] === s.bucket)
+  }, [item, sortPlacement])
+
+  const sortComplete = useMemo(() => {
+    if (item.kind !== 'sort' || !item.sortItems?.length) return false
+    return item.sortItems.every((s) => !!sortPlacement[s.text])
+  }, [item, sortPlacement])
+
+  const mascotMood = justStar || mathResult === 'ok' || solvedChoice || (sortChecked && sortCorrect)
     ? 'cheer'
-    : mathResult === 'no' || wrongAttempts > 0
+    : mathResult === 'no' || wrongAttempts > 0 || (sortChecked && !sortCorrect)
       ? 'think'
       : 'happy'
 
@@ -72,8 +85,15 @@ export function PracticeSession({
     setMathInput('')
     setMathResult(null)
     setCheckedFields({})
+    setSortSelected(null)
+    setSortPlacement({})
+    setSortChecked(false)
     if (_activity.kind === 'reorder' && _activity.fragments) {
       const shuffled = [..._activity.fragments].sort(() => Math.random() - 0.5)
+      setPool(shuffled)
+      setOrder([])
+    } else if (_activity.kind === 'sort' && _activity.sortItems) {
+      const shuffled = [..._activity.sortItems.map((s) => s.text)].sort(() => Math.random() - 0.5)
       setPool(shuffled)
       setOrder([])
     } else {
@@ -129,6 +149,7 @@ export function PracticeSession({
     if (item.kind === 'choice') return solvedChoice
     if (item.kind === 'math') return mathResult === 'ok'
     if (item.kind === 'reorder') return reorderCorrect
+    if (item.kind === 'sort') return sortChecked && sortCorrect
     if (item.kind === 'prompt') {
       if (!item.fields?.length) return true
       return item.fields.every((f) => checkedFields[f])
@@ -142,6 +163,7 @@ export function PracticeSession({
       return isSolved() || revealAnswer
     }
     if (item.kind === 'reorder') return reorderCorrect
+    if (item.kind === 'sort') return (sortChecked && sortCorrect) || revealAnswer
     if (item.kind === 'prompt') return isSolved()
     return showSample || done
   }
@@ -379,6 +401,136 @@ export function PracticeSession({
               )}
               {revealAnswer && mathResult !== 'ok' && item.answer && (
                 <p className="sample__tip">參考答案：{item.answer}</p>
+              )}
+            </div>
+          )}
+
+          {item.kind === 'sort' && item.sortItems && item.buckets && (
+            <div className="sort-box">
+              <p className="reorder__hint">
+                {sortSelected ? `已選「${sortSelected}」——再點圓圈放入` : '先點選下面的情緒詞'}
+              </p>
+              <div className="sort-buckets">
+                {item.buckets.map((bucket) => (
+                  <button
+                    key={bucket}
+                    type="button"
+                    className={`sort-bucket ${sortSelected ? 'is-ready' : ''}`}
+                    onClick={() => {
+                      if (!sortSelected || (sortChecked && sortCorrect)) return
+                      unlockAudio()
+                      playSfx('tap')
+                      setSortPlacement((prev) => ({ ...prev, [sortSelected]: bucket }))
+                      setSortSelected(null)
+                      setSortChecked(false)
+                      setCoachMsg(null)
+                    }}
+                  >
+                    <span className="sort-bucket__title">{bucket}</span>
+                    <div className="sort-bucket__items">
+                      {item.sortItems!
+                        .filter((s) => sortPlacement[s.text] === bucket)
+                        .map((s) => {
+                          const wrongHere =
+                            sortChecked && !revealAnswer && s.bucket !== bucket
+                          const showOk =
+                            (sortChecked && sortCorrect) || revealAnswer
+                              ? s.bucket === bucket
+                              : false
+                          return (
+                            <button
+                              key={s.text}
+                              type="button"
+                              className={[
+                                'chip chip--placed',
+                                wrongHere ? 'is-sort-wrong' : '',
+                                showOk ? 'is-sort-ok' : '',
+                              ]
+                                .filter(Boolean)
+                                .join(' ')}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                if (sortChecked && sortCorrect) return
+                                playSfx('tap')
+                                setSortPlacement((prev) => {
+                                  const next = { ...prev }
+                                  delete next[s.text]
+                                  return next
+                                })
+                                setSortChecked(false)
+                              }}
+                            >
+                              {s.text}
+                            </button>
+                          )
+                        })}
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <div className="reorder__pool">
+                {pool
+                  .filter((text) => !sortPlacement[text])
+                  .map((text) => (
+                    <button
+                      key={text}
+                      type="button"
+                      className={`chip ${sortSelected === text ? 'chip--active' : ''}`}
+                      onClick={() => {
+                        if (sortChecked && sortCorrect) return
+                        playSfx('tap')
+                        setSortSelected((cur) => (cur === text ? null : text))
+                      }}
+                    >
+                      {text}
+                    </button>
+                  ))}
+              </div>
+              <div className="session__actions">
+                <button
+                  type="button"
+                  className="pill-btn"
+                  disabled={!sortComplete || (sortChecked && sortCorrect)}
+                  onClick={() => {
+                    unlockAudio()
+                    setSortChecked(true)
+                    if (sortCorrect) {
+                      playSfx('correct')
+                      setCoachMsg('全部分對啦！好叻！')
+                      if (!done) {
+                        onMarkDone(item.id, moduleKey)
+                        setJustStar(true)
+                      }
+                    } else {
+                      playSfx('wrong')
+                      registerWrong(item.tip)
+                    }
+                  }}
+                >
+                  檢查分類
+                </button>
+                {!sortCorrect && !revealAnswer && wrongAttempts >= 2 && (
+                  <button
+                    type="button"
+                    className="pill-btn pill-btn--soft"
+                    onClick={() => {
+                      playSfx('flip')
+                      setRevealAnswer(true)
+                      const fixed: Record<string, string> = {}
+                      item.sortItems!.forEach((s) => {
+                        fixed[s.text] = s.bucket
+                      })
+                      setSortPlacement(fixed)
+                      setSortChecked(true)
+                      setCoachMsg(item.tip || '已顯示正確分類。')
+                    }}
+                  >
+                    睇睇答案
+                  </button>
+                )}
+              </div>
+              {coachMsg && (
+                <p className={`math-feedback ${sortCorrect ? 'is-ok' : 'is-no'}`}>{coachMsg}</p>
               )}
             </div>
           )}
