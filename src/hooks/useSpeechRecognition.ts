@@ -14,14 +14,20 @@ type BrowserSpeechRecognition = {
   onerror: ((event: { error: string }) => void) | null
   onend: (() => void) | null
   onstart: (() => void) | null
+  onspeechstart: (() => void) | null
+  onspeechend: (() => void) | null
 }
 
 type SpeechRecognitionEventLike = {
   resultIndex: number
-  results: ArrayLike<{
-    isFinal: boolean
-    0: { transcript: string }
-  }>
+  results: {
+    length: number
+    [index: number]: {
+      isFinal: boolean
+      length: number
+      [index: number]: { transcript: string; confidence: number }
+    }
+  }
 }
 
 type SpeechRecognitionCtor = new () => BrowserSpeechRecognition
@@ -40,10 +46,13 @@ function isMobileUa(): boolean {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 }
 
+/**
+ * Prefer tags Chromium's network recognizer actually accepts.
+ * Note: zh-CN alone can silently return nothing on some Chrome builds (use zh-Hans).
+ */
 function langFallbacks(lang: ListenLang): string[] {
   if (lang === 'en-US') return ['en-US', 'en-GB', 'en-HK', 'en']
-  // zh-TW / zh-CN often work when zh-HK / yue fail on phones
-  return ['zh-HK', 'zh-TW', 'zh-CN', 'yue-HK', 'yue-Hant-HK']
+  return ['zh-HK', 'yue-Hant-HK', 'zh-TW', 'zh-Hant', 'zh-Hans', 'cmn-Hans-CN', 'zh-CN']
 }
 
 function errorMessage(code: string): string {
@@ -54,11 +63,13 @@ function errorMessage(code: string): string {
     case 'audio-capture':
       return '搵唔到麥克風。請檢查電話咪高峰。'
     case 'network':
-      return '轉文字需要網絡（建議 Chrome）。可繼續講，最後撳 ★。'
+      return '轉文字要連網（建議用 Chrome）。可試 EN，或最後撳 ★。'
     case 'language-not-supported':
       return '呢個語言轉文字唔支援——可試 EN，或最後撳 ★。'
+    case 'no-speech':
+      return '聽唔到聲——請靠近咪高峰大聲講。'
     default:
-      return ''
+      return code ? `轉文字問題：${code}` : ''
   }
 }
 
@@ -68,12 +79,19 @@ function detach(rec: BrowserSpeechRecognition | null) {
   rec.onresult = null
   rec.onerror = null
   rec.onend = null
+  rec.onspeechstart = null
+  rec.onspeechend = null
+}
+
+function readTranscript(result: SpeechRecognitionEventLike['results'][number]): string {
+  const alt = result[0] ?? (result.length > 0 ? result[0] : null)
+  return (alt?.transcript ?? '').trim()
 }
 
 /**
- * Keep the listen UI/timer in React state.
- * SpeechRecognition must own the mic alone — holding getUserMedia/MediaRecorder
- * in parallel blocks transcripts (timer runs, no words).
+ * SpeechRecognition must be started inside the user-gesture call stack.
+ * Do not await getUserMedia / setTimeout before rec.start() — that often yields
+ * a "listening" UI with zero transcripts on mobile Chrome.
  */
 export function useSpeechRecognition() {
   const [supported, setSupported] = useState(false)
@@ -83,18 +101,23 @@ export function useSpeechRecognition() {
   const [error, setError] = useState<string | null>(null)
   const [elapsedSec, setElapsedSec] = useState(0)
   const [sttAlive, setSttAlive] = useState(false)
+  const [heardSpeech, setHeardSpeech] = useState(false)
   const [activeLang, setActiveLang] = useState('zh-HK')
+  const [statusHint, setStatusHint] = useState('')
 
   const sessionId = useRef(0)
   const recRef = useRef<BrowserSpeechRecognition | null>(null)
   const wantListen = useRef(false)
+  const runningRef = useRef(false)
   const langIdx = useRef(0)
   const langsRef = useRef<string[]>(['zh-HK'])
   const tickTimer = useRef<number | null>(null)
   const sttRestartTimer = useRef<number | null>(null)
+  const langRotateTimer = useRef<number | null>(null)
   const startedAt = useRef(0)
   const startingStt = useRef(false)
   const interimRef = useRef('')
+  const gotResultRef = useRef(false)
   const startSttRef = useRef<(sid: number) => void>(() => {})
 
   const clearTimers = () => {
@@ -106,6 +129,10 @@ export function useSpeechRecognition() {
       window.clearTimeout(sttRestartTimer.current)
       sttRestartTimer.current = null
     }
+    if (langRotateTimer.current) {
+      window.clearTimeout(langRotateTimer.current)
+      langRotateTimer.current = null
+    }
   }
 
   const flushInterim = useCallback(() => {
@@ -116,20 +143,23 @@ export function useSpeechRecognition() {
     setTranscript((prev) => `${prev}${chunk}`.trim())
   }, [])
 
-  const hardStopStt = (preferStop = false) => {
+  const clearRec = (mode: 'abort' | 'stop' | 'drop') => {
     const rec = recRef.current
     detach(rec)
-    try {
-      if (preferStop) rec?.stop()
-      else rec?.abort()
-    } catch {
+    if (rec && runningRef.current && mode !== 'drop') {
       try {
-        rec?.abort()
+        if (mode === 'stop') rec.stop()
+        else rec.abort()
       } catch {
-        /* ignore */
+        try {
+          rec.abort()
+        } catch {
+          /* ignore */
+        }
       }
     }
     recRef.current = null
+    runningRef.current = false
     startingStt.current = false
     setSttAlive(false)
   }
@@ -138,9 +168,11 @@ export function useSpeechRecognition() {
     wantListen.current = false
     clearTimers()
     flushInterim()
-    hardStopStt(true)
+    clearRec('stop')
     setListening(false)
     setElapsedSec(0)
+    setHeardSpeech(false)
+    setStatusHint('')
   }, [flushInterim])
 
   useEffect(() => {
@@ -157,6 +189,9 @@ export function useSpeechRecognition() {
     setInterim('')
     setError(null)
     setElapsedSec(0)
+    setHeardSpeech(false)
+    setStatusHint('')
+    gotResultRef.current = false
   }, [])
 
   const stop = useCallback(() => {
@@ -172,22 +207,42 @@ export function useSpeechRecognition() {
     }, delayMs)
   }, [])
 
+  const scheduleLangRotateIfSilent = useCallback(
+    (sid: number) => {
+      if (langRotateTimer.current) window.clearTimeout(langRotateTimer.current)
+      langRotateTimer.current = window.setTimeout(() => {
+        if (sid !== sessionId.current || !wantListen.current) return
+        if (gotResultRef.current) return
+        if (langIdx.current >= langsRef.current.length - 1) {
+          setStatusHint('未聽到字——可試 EN，或用 ★')
+          return
+        }
+        langIdx.current += 1
+        setStatusHint(`改用 ${langsRef.current[langIdx.current]} 再試…`)
+        setSttAlive(false)
+        clearRec('abort')
+        scheduleSttRestart(sid, 200)
+      }, 4500)
+    },
+    [scheduleSttRestart],
+  )
+
   const startStt = useCallback(
     (sid: number) => {
       const Ctor = getRecognitionCtor()
       if (!Ctor || !wantListen.current || sid !== sessionId.current) return
-      if (startingStt.current) return
+      if (startingStt.current || runningRef.current) return
 
-      // Restart: keep transcript; fold any dangling interim into it
       flushInterim()
-      hardStopStt(false)
+      // Previous instance already ended — drop without abort storm
+      clearRec('drop')
       startingStt.current = true
 
       const lang = langsRef.current[langIdx.current] ?? langsRef.current[0]
       setActiveLang(lang)
+      setStatusHint(`連線中（${lang}）…`)
 
       const rec = new Ctor()
-      // Mobile Chrome often ignores continuous and ends after a pause — we restart.
       rec.continuous = !isMobileUa()
       rec.interimResults = true
       rec.maxAlternatives = 1
@@ -196,7 +251,22 @@ export function useSpeechRecognition() {
       rec.onstart = () => {
         if (sid !== sessionId.current || !wantListen.current) return
         startingStt.current = false
+        runningRef.current = true
         setSttAlive(true)
+        setStatusHint('請大聲講…')
+        setError(null)
+        scheduleLangRotateIfSilent(sid)
+      }
+
+      rec.onspeechstart = () => {
+        if (sid !== sessionId.current || !wantListen.current) return
+        setHeardSpeech(true)
+        setStatusHint('聽到聲，轉文字中…')
+      }
+
+      rec.onspeechend = () => {
+        if (sid !== sessionId.current || !wantListen.current) return
+        if (!gotResultRef.current) setStatusHint('處理緊…')
       }
 
       rec.onresult = (event) => {
@@ -204,22 +274,42 @@ export function useSpeechRecognition() {
         let finalChunk = ''
         let interimChunk = ''
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          const piece = event.results[i]?.[0]?.transcript ?? ''
+          const piece = readTranscript(event.results[i])
+          if (!piece) continue
           if (event.results[i].isFinal) finalChunk += piece
           else interimChunk += piece
         }
-        if (finalChunk.trim()) {
+        // Android sometimes marks poorly — also accept any non-empty piece
+        if (!finalChunk && !interimChunk) {
+          for (let i = 0; i < event.results.length; i++) {
+            const piece = readTranscript(event.results[i])
+            if (!piece) continue
+            if (event.results[i].isFinal) finalChunk += piece
+            else interimChunk += piece
+          }
+        }
+        if (finalChunk || interimChunk) {
+          gotResultRef.current = true
+          setHeardSpeech(true)
+          setStatusHint('')
+          setError(null)
+          if (langRotateTimer.current) {
+            window.clearTimeout(langRotateTimer.current)
+            langRotateTimer.current = null
+          }
+        }
+        if (finalChunk) {
           setTranscript((prev) => `${prev}${finalChunk}`.trim())
         }
-        interimRef.current = interimChunk.trim()
-        setInterim(interimChunk.trim())
+        interimRef.current = interimChunk
+        setInterim(interimChunk)
         setSttAlive(true)
-        setError(null)
       }
 
       rec.onerror = (event) => {
         if (sid !== sessionId.current) return
         startingStt.current = false
+        runningRef.current = false
         const code = event.error
         if (code === 'aborted') return
 
@@ -229,47 +319,72 @@ export function useSpeechRecognition() {
           langIdx.current < langsRef.current.length - 1
         ) {
           langIdx.current += 1
+          setStatusHint(`改用 ${langsRef.current[langIdx.current]}…`)
           setSttAlive(false)
-          scheduleSttRestart(sid, 350)
+          scheduleSttRestart(sid, 300)
           return
         }
 
         const msg = errorMessage(code)
-        if (msg) setError(msg)
+        if (msg) {
+          // Soft: no-speech keeps listening via restart; show brief hint
+          if (code === 'no-speech') setStatusHint(msg)
+          else setError(msg)
+        }
         setSttAlive(false)
         if (wantListen.current && (code === 'no-speech' || code === 'network')) {
-          scheduleSttRestart(sid, 450)
+          scheduleSttRestart(sid, 400)
         }
       }
 
       rec.onend = () => {
         if (sid !== sessionId.current) return
         startingStt.current = false
+        runningRef.current = false
         setSttAlive(false)
-        // Phones often end without marking the last chunk final
         flushInterim()
         if (!wantListen.current) return
-        scheduleSttRestart(sid, 280)
+        scheduleSttRestart(sid, 250)
       }
 
       recRef.current = rec
       try {
+        // Must stay inside user-gesture stack on first start
         rec.start()
-      } catch {
+      } catch (err) {
         startingStt.current = false
+        runningRef.current = false
         setSttAlive(false)
-        scheduleSttRestart(sid, 500)
+        const name = err instanceof DOMException ? err.name : ''
+        if (name === 'InvalidStateError') {
+          scheduleSttRestart(sid, 400)
+          return
+        }
+        setError('開唔到語音辨識。請用 Chrome，或最後撳 ★。')
+        scheduleSttRestart(sid, 600)
       }
+
+      // If onstart never fires, unstick and retry
+      window.setTimeout(() => {
+        if (sid !== sessionId.current || !wantListen.current) return
+        if (startingStt.current) {
+          startingStt.current = false
+          setStatusHint('重試轉文字…')
+          clearRec('abort')
+          scheduleSttRestart(sid, 200)
+        }
+      }, 2500)
     },
-    [flushInterim, scheduleSttRestart],
+    [flushInterim, scheduleLangRotateIfSilent, scheduleSttRestart],
   )
 
   useEffect(() => {
     startSttRef.current = startStt
   }, [startStt])
 
+  /** Synchronous — call directly from click handlers. */
   const start = useCallback(
-    async (lang: ListenLang = 'zh-HK') => {
+    (lang: ListenLang = 'zh-HK') => {
       const Ctor = getRecognitionCtor()
       if (!Ctor) {
         setError('呢部電話／瀏覽器暫唔支援語音轉文字。請爸爸媽媽聽完撳 ★。')
@@ -280,6 +395,7 @@ export function useSpeechRecognition() {
       const sid = sessionId.current
       hardStopSession()
       wantListen.current = true
+      gotResultRef.current = false
 
       setError(null)
       interimRef.current = ''
@@ -287,26 +403,13 @@ export function useSpeechRecognition() {
       setTranscript('')
       setElapsedSec(0)
       setSttAlive(false)
+      setHeardSpeech(false)
       langsRef.current = langFallbacks(lang)
       langIdx.current = 0
       setActiveLang(langsRef.current[0])
       startedAt.current = Date.now()
       setListening(true)
-
-      // Warm permission, then RELEASE tracks so SpeechRecognition can open the mic alone
-      if (navigator.mediaDevices?.getUserMedia) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-          stream.getTracks().forEach((t) => t.stop())
-        } catch {
-          wantListen.current = false
-          setListening(false)
-          setError(errorMessage('not-allowed'))
-          return
-        }
-      }
-
-      if (sid !== sessionId.current || !wantListen.current) return
+      setStatusHint('啟動轉文字…')
 
       tickTimer.current = window.setInterval(() => {
         if (sid !== sessionId.current || !wantListen.current) return
@@ -318,11 +421,8 @@ export function useSpeechRecognition() {
         }
       }, 250)
 
-      // Brief pause after releasing getUserMedia so the OS mic is free
-      window.setTimeout(() => {
-        if (sid !== sessionId.current || !wantListen.current) return
-        startStt(sid)
-      }, 450)
+      // Immediate start — preserve user activation for mic + speech service
+      startStt(sid)
     },
     [hardStopSession, startStt],
   )
@@ -335,7 +435,9 @@ export function useSpeechRecognition() {
     error,
     elapsedSec,
     sttAlive,
+    heardSpeech,
     activeLang,
+    statusHint,
     start,
     stop,
     reset,
