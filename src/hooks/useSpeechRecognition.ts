@@ -274,8 +274,12 @@ export function useSpeechRecognition() {
       return
     }
 
-    setBusy(true)
-    setStatusHint('轉文字中（第一次要下載模型，可能要一分鐘）…')
+      setBusy(true)
+      setStatusHint(
+        listenLangRef.current === 'en-US'
+          ? '轉文字中（第一次要下載模型）…'
+          : '廣東話轉字中（第一次下載粵語模型較大，請用 Wi‑Fi）…',
+      )
     try {
       const text = await transcribeWithWhisper(
         blob,

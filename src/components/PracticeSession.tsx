@@ -539,7 +539,7 @@ export function PracticeSession({
                     {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
                     {engine === 'safari' && !listening && !listenTranscript ? (
                       <p className="listen-panel__hint">
-                        Safari：撳 ● 錄音 → 講完撳 ■ → 會自動轉字（第一次要下載模型，請開 Wi‑Fi）。之後可用 ★。
+                        Safari 廣東話：● 錄音 → ■ 轉字（專用粵語模型；第一次下載較大，請用 Wi‑Fi）。之後可用 ★。
                       </p>
                     ) : null}
                     {(listenTranscript || listenInterim) ? (
@@ -580,7 +580,7 @@ export function PracticeSession({
                   )}
                   <p className="listen-panel__note">
                     {engine === 'safari'
-                      ? '● 錄音 → ■ 轉字（要網絡下載模型）· ★ 由爸爸媽媽按'
+                      ? '● 錄音 → ■ 粵語轉字（要 Wi‑Fi 下載模型）· ★ 由爸爸媽媽按'
                       : '● 要網絡 · 講完撳 ■ · ★ 由爸爸媽媽按'}
                   </p>
                 </div>

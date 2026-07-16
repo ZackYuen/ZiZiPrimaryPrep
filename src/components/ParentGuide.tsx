@@ -71,8 +71,8 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>電話聽講（練習提示）</h3>
           <p>
-            Safari／iPhone：撳 ● 錄音，講完撳 ■，會用手機轉字（第一次要下載模型，建議 Wi‑Fi）。轉字唔穩時仍可由家長聽完撳
-            ★。麥克風被拒：網址列「aA」→ 網站設定 → 麥克風 → 允許。
+            Safari／iPhone：撳 ● 錄音，講完撳 ■，會用「廣東話」專用模型轉字（唔再當成普通話）。第一次下載較大，請用
+            Wi‑Fi。轉字唔穩時仍可由家長聽完撳 ★。
           </p>
         </article>
         <article className="parent__item">
