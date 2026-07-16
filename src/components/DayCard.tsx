@@ -105,7 +105,7 @@ export function DayCard({ day, doneCount, total, onOpen, delay = 0 }: Props) {
           <span style={{ width: `${pct}%` }} />
         </span>
         <span className="module-card__meta">
-          {doneCount}/{total} 完成 · 跟 PDF Day {day.day}
+          {doneCount}/{total} 完成
         </span>
       </span>
     </button>
