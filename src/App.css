@@ -585,9 +585,35 @@
   font-size: 0.95rem;
 }
 
-.pill-btn--soft {
-  background: rgba(27, 58, 75, 0.1);
-  color: var(--ink);
+.pill-btn,
+.primary-btn,
+.ghost-btn,
+.choice-hear {
+  font-variant-numeric: tabular-nums;
+}
+
+.pill-btn,
+.choice-hear,
+.numpad__key--go,
+.numpad__key--wide {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.primary-btn {
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.ghost-btn {
+  font-size: 1.35rem;
+  font-weight: 800;
+  min-width: 2.8rem;
+}
+
+.money-field__unit {
+  font-size: 1.45rem;
 }
 
 /* ---- Practice session ---- */
@@ -1033,11 +1059,26 @@
   margin-top: 1.15rem;
 }
 
+.choice-voice-tip {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 650;
+  line-height: 1.4;
+  color: #8a5520;
+}
+
+.choice-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.45rem;
+}
+
 .choice-btn {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   padding: 0.9rem 1rem;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.95);
@@ -1063,12 +1104,31 @@
   font-family: var(--font-display);
 }
 
-.choice-btn.is-correct {
+.choice-hear {
+  flex: 0 0 auto;
+  min-width: 3.4rem;
+  border: none;
+  border-radius: 18px;
+  background: #e8f6fb;
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(27, 58, 75, 0.1);
+}
+
+.choice-hear:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.choice-row.is-correct .choice-btn,
+.choice-row.is-selected .choice-btn {
   border-color: var(--mint);
   background: rgba(107, 203, 139, 0.18);
 }
 
-.choice-btn.is-wrong {
+.choice-row.is-wrong .choice-btn {
   border-color: var(--coral);
   background: rgba(255, 122, 89, 0.12);
   opacity: 0.72;
@@ -1078,7 +1138,7 @@
   cursor: default;
 }
 
-.choice-btn.is-wrong:disabled {
+.choice-row.is-wrong .choice-btn:disabled {
   transform: none;
 }
 
@@ -1113,8 +1173,9 @@
 .sort-bucket__title {
   display: block;
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.05rem;
+  font-weight: 900;
+  font-size: 2rem;
+  line-height: 1;
   margin-bottom: 0.45rem;
   color: var(--accent, var(--coral));
 }

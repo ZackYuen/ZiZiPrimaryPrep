@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getSfxMuted, playSfx, setSfxMuted, unlockAudio } from '../hooks/useSfx'
+import { KID } from '../lib/kidLabels'
 
 type Props = {
   className?: string
@@ -51,7 +52,7 @@ export function SoundToggle({ className = '' }: Props) {
           </svg>
         )}
       </span>
-      <span>{muted ? '音效關' : '音效開'}</span>
+      <span aria-hidden>{muted ? KID.soundOff : KID.soundOn}</span>
     </button>
   )
 }

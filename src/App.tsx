@@ -137,22 +137,22 @@ export default function App() {
             <Mascot mood="cheer" size={64} />
           </span>
           <span className="mock-cta__text">
-            <span className="mock-cta__label">開始模擬面試</span>
+            <span className="mock-cta__label">★ 面試</span>
             <span className="mock-cta__sub">精選中英問答 · 像真傾偈</span>
           </span>
         </button>
 
         <button type="button" className="vocab-cta" onClick={() => go({ name: 'vocab' })}>
           <span className="vocab-cta__badge" aria-hidden>
-            A文
+            A
           </span>
           <span>
-            <span className="vocab-cta__label">第一週字詞表</span>
+            <span className="vocab-cta__label">A 字詞</span>
             <span className="vocab-cta__sub">時間 · 人物 · 動作 · 地點（中英）</span>
           </span>
         </button>
 
-        <h2 className="section-label">每日練習</h2>
+        <h2 className="section-label">Day</h2>
         <div className="module-grid">
           {days.map((d, i) => (
             <DayCard
@@ -167,7 +167,7 @@ export default function App() {
         </div>
 
         <button type="button" className="parent-link" onClick={() => go({ name: 'parent' })}>
-          家長指引與金句
+          P 家長
         </button>
       </main>
     </div>
