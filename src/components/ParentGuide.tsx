@@ -71,8 +71,8 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>電話聽講（練習提示）</h3>
           <p>
-            Safari／iPhone：鍵盤有「粵」只係打字；網頁轉字要「設定 → 一般 → 鍵盤 → 聽寫」打開並下載「廣東話」。Notes
-            入面聽寫得，網頁有時仍然唔穩——若無字，請家長聽完撳 ★。App 而家會保持錄音直到你撳 ■，唔應再一閃就停。
+            Safari／iPhone：即使麥克風已「允許」，網頁聽寫都可能無字（同 Notes 鍵盤聽寫唔同系統）。請確認「設定 → 一般 →
+            鍵盤 → 聽寫 → 廣東話」。App 而家會一直試聽寫，唔再落入淨錄音模式。無字就用 ★。
           </p>
         </article>
         <article className="parent__item">

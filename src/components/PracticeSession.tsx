@@ -528,7 +528,7 @@ export function PracticeSession({
                             ? ' · 聽到聲'
                             : ' · 聽寫中'
                           : engine === 'safari'
-                            ? ' · 錄音中'
+                            ? ' · 連接聽寫'
                             : ' · 啟動中'}
                         <span className="listen-panel__lang">
                           {' '}
@@ -539,8 +539,8 @@ export function PracticeSession({
                     {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
                     {engine === 'safari' && !listening && !listenTranscript ? (
                       <p className="listen-panel__hint">
-                        重要：鍵盤有「粵」≠ 聽寫有「廣東話」。請去 設定→一般→鍵盤→聽寫→下載「廣東話」。Notes
-                        聽寫得唔代表網頁一定得——網頁會再試。
+                        麥克風允許之後，仲要：設定→一般→鍵盤→聽寫→下載「廣東話」。鍵盤「粵」同 Notes
+                        聽寫得，網頁都可能仍無字——無字就用 ★。
                       </p>
                     ) : null}
                     {(listenTranscript || listenInterim) ? (
@@ -581,7 +581,7 @@ export function PracticeSession({
                   )}
                   <p className="listen-panel__note">
                     {engine === 'safari'
-                      ? '● 唔會閃退到主畫面 · 要「聽寫→廣東話」· 鍵盤粵唔夠 · ★ 由爸爸媽媽按'
+                      ? '● 保持到 ■ · 麥克風允許仍可能無字（網頁聽寫限制）· ★ 由爸爸媽媽按'
                       : '● 要網絡 · 講完撳 ■ · ★ 由爸爸媽媽按'}
                   </p>
                 </div>
