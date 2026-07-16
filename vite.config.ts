@@ -1,11 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Served from docs/ while Pages source is still "main / (root)".
-// After you switch Pages → /docs or GitHub Actions, you can change
-// this back to '/ZiZiPrimaryPrep/'.
+// GitHub Actions deploys the `docs/` build as the site root:
+// https://zackyuen.github.io/ZiZiPrimaryPrep/
 export default defineConfig({
-  base: '/ZiZiPrimaryPrep/docs/',
+  base: '/ZiZiPrimaryPrep/',
   plugins: [react()],
   build: {
     outDir: 'docs',
