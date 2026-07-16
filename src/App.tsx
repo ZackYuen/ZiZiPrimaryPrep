@@ -152,8 +152,7 @@ export default function App() {
           </span>
         </button>
 
-        <h2 className="section-label">名校模擬面試 · Day 1–6</h2>
-        <p className="section-note">練習順序同教材 PDF：每日詞匯 → 主練習 → 延伸／數學</p>
+        <h2 className="section-label">每日練習</h2>
         <div className="module-grid">
           {days.map((d, i) => (
             <DayCard
