@@ -11,7 +11,4 @@ export default defineConfig({
     outDir: 'docs',
     emptyOutDir: true,
   },
-  optimizeDeps: {
-    exclude: ['@xenova/transformers'],
-  },
 })

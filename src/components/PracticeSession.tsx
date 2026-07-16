@@ -539,7 +539,7 @@ export function PracticeSession({
                     {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
                     {engine === 'safari' && !listening && !listenTranscript ? (
                       <p className="listen-panel__hint">
-                        Safari：● 錄音（約 10 秒）→ ■ 轉字。電話用輕量模型避免當機；字唔準時以爸爸媽媽 ★ 為準。
+                        真正廣東話：設定 → 一般 → 鍵盤 → 聽寫 → 打開，並下載「廣東話」。然後撳 ● 講，字會即時出。
                       </p>
                     ) : null}
                     {(listenTranscript || listenInterim) ? (
@@ -553,12 +553,12 @@ export function PracticeSession({
                       <p className="listen-panel__placeholder">
                         {listening
                           ? engine === 'safari'
-                            ? '請大聲講… 講完撳 ■ 就出字'
+                            ? '請用廣東話大聲講… 字會顯示喺呢度'
                             : '請大聲講… 字會顯示喺呢度'
                           : listenBusy
                             ? '轉文字中，請稍等…'
                             : engine === 'safari'
-                              ? '撳 ● 開始錄音（講完 ■ 轉字）'
+                              ? '撳 ● 開始（要已下載廣東話聽寫）'
                               : '撳 ● 開始講（要用網絡）'}
                       </p>
                     )}
@@ -580,7 +580,7 @@ export function PracticeSession({
                   )}
                   <p className="listen-panel__note">
                     {engine === 'safari'
-                      ? '● 短講 → ■ 轉字 · 電話輕量模式防當機 · ★ 由爸爸媽媽按'
+                      ? '● Safari 聽寫＝系統廣東話 · 要下載「廣東話」· 講完撳 ■ · ★ 由爸爸媽媽按'
                       : '● 要網絡 · 講完撳 ■ · ★ 由爸爸媽媽按'}
                   </p>
                 </div>
