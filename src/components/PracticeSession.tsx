@@ -539,7 +539,8 @@ export function PracticeSession({
                     {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
                     {engine === 'safari' && !listening && !listenTranscript ? (
                       <p className="listen-panel__hint">
-                        真正廣東話：設定 → 一般 → 鍵盤 → 聽寫 → 打開，並下載「廣東話」。然後撳 ● 講，字會即時出。
+                        重要：鍵盤有「粵」≠ 聽寫有「廣東話」。請去 設定→一般→鍵盤→聽寫→下載「廣東話」。Notes
+                        聽寫得唔代表網頁一定得——網頁會再試。
                       </p>
                     ) : null}
                     {(listenTranscript || listenInterim) ? (
@@ -553,12 +554,12 @@ export function PracticeSession({
                       <p className="listen-panel__placeholder">
                         {listening
                           ? engine === 'safari'
-                            ? '請用廣東話大聲講… 字會顯示喺呢度'
+                            ? '請用廣東話大聲講…（保持到撳 ■）'
                             : '請大聲講… 字會顯示喺呢度'
                           : listenBusy
                             ? '轉文字中，請稍等…'
                             : engine === 'safari'
-                              ? '撳 ● 開始（要已下載廣東話聽寫）'
+                              ? '撳 ● 開始（要聽寫「廣東話」）'
                               : '撳 ● 開始講（要用網絡）'}
                       </p>
                     )}
@@ -580,7 +581,7 @@ export function PracticeSession({
                   )}
                   <p className="listen-panel__note">
                     {engine === 'safari'
-                      ? '● Safari 聽寫＝系統廣東話 · 要下載「廣東話」· 講完撳 ■ · ★ 由爸爸媽媽按'
+                      ? '● 唔會閃退到主畫面 · 要「聽寫→廣東話」· 鍵盤粵唔夠 · ★ 由爸爸媽媽按'
                       : '● 要網絡 · 講完撳 ■ · ★ 由爸爸媽媽按'}
                   </p>
                 </div>
