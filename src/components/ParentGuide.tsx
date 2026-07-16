@@ -54,6 +54,16 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         ))}
       </div>
 
+      <h3 className="parent__h3">答錯點樣教</h3>
+      <div className="parent__list">
+        <article className="parent__item">
+          <h3>唔會一次錯就揭曉</h3>
+          <p>
+            選擇題／數學：第一次答錯只會鼓勵「再試一次」，唔顯示正確答案。第二次錯先出小提示；碩孜按「睇睇答案」先揭曉。答啱先有星星。
+          </p>
+        </article>
+      </div>
+
       <h3 className="parent__h3">家長金句</h3>
       <div className="parent__list">
         {parentQuotes.map((q) => (

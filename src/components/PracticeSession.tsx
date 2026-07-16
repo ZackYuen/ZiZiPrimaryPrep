@@ -38,6 +38,10 @@ export function PracticeSession({
   const [justStar, setJustStar] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
   const [picked, setPicked] = useState<number | null>(null)
+  const [wrongPicks, setWrongPicks] = useState<number[]>([])
+  const [wrongAttempts, setWrongAttempts] = useState(0)
+  const [revealAnswer, setRevealAnswer] = useState(false)
+  const [coachMsg, setCoachMsg] = useState<string | null>(null)
   const [mathInput, setMathInput] = useState('')
   const [mathResult, setMathResult] = useState<'ok' | 'no' | null>(null)
   const [order, setOrder] = useState<string[]>([])
@@ -49,22 +53,27 @@ export function PracticeSession({
   const isLast = index >= items.length - 1
   const done = completed[item.id]
   const levelMeta = levels.find((l) => l.level === item.level)
+  const solvedChoice = picked !== null && !!item.choices?.[picked]?.correct
 
-  const mascotMood = justStar || mathResult === 'ok' || (picked !== null && item.choices?.[picked]?.correct)
+  const mascotMood = justStar || mathResult === 'ok' || solvedChoice
     ? 'cheer'
-    : mathResult === 'no' || (picked !== null && item.choices && !item.choices[picked]?.correct)
+    : mathResult === 'no' || wrongAttempts > 0
       ? 'think'
       : 'happy'
 
-  const resetInteraction = (activity: Activity) => {
+  const resetInteraction = (_activity: Activity) => {
     setShowSample(false)
     setJustStar(false)
     setPicked(null)
+    setWrongPicks([])
+    setWrongAttempts(0)
+    setRevealAnswer(false)
+    setCoachMsg(null)
     setMathInput('')
     setMathResult(null)
     setCheckedFields({})
-    if (activity.kind === 'reorder' && activity.fragments) {
-      const shuffled = [...activity.fragments].sort(() => Math.random() - 0.5)
+    if (_activity.kind === 'reorder' && _activity.fragments) {
+      const shuffled = [..._activity.fragments].sort(() => Math.random() - 0.5)
       setPool(shuffled)
       setOrder([])
     } else {
@@ -116,16 +125,39 @@ export function PracticeSession({
     }
   }
 
-  const canProceed = (): boolean => {
-    if (done) return true
-    if (item.kind === 'choice') return picked !== null && !!item.choices?.[picked]?.correct
+  const isSolved = (): boolean => {
+    if (item.kind === 'choice') return solvedChoice
     if (item.kind === 'math') return mathResult === 'ok'
     if (item.kind === 'reorder') return reorderCorrect
     if (item.kind === 'prompt') {
       if (!item.fields?.length) return true
       return item.fields.every((f) => checkedFields[f])
     }
+    return showSample
+  }
+
+  const canProceed = (): boolean => {
+    if (done) return true
+    if (item.kind === 'choice' || item.kind === 'math') {
+      return isSolved() || revealAnswer
+    }
+    if (item.kind === 'reorder') return reorderCorrect
+    if (item.kind === 'prompt') return isSolved()
     return showSample || done
+  }
+
+  const registerWrong = (extraTip?: string) => {
+    setWrongAttempts((n) => {
+      const next = n + 1
+      if (next === 1) {
+        setCoachMsg('唔緊要，再試一次！你可以嘅！')
+      } else if (next === 2) {
+        setCoachMsg(extraTip || item.tip || '再諗一諗。需要可以請爸爸媽媽一齊傾。')
+      } else {
+        setCoachMsg('想睇答案都得——勇敢嘗試已經好叻！')
+      }
+      return next
+    })
   }
 
   const handlePrimary = () => {
@@ -137,7 +169,8 @@ export function PracticeSession({
       return
     }
     if (!canProceed() && !done) return
-    if (!done) awardAndMaybeNext(true)
+    // Only award a star when Seth actually solved it (not only peeked answer)
+    if (!done && isSolved()) awardAndMaybeNext(true)
     else goNext()
   }
 
@@ -222,25 +255,28 @@ export function PracticeSession({
             <div className="choice-list">
               {item.choices.map((c, i) => {
                 const selected = picked === i
-                const reveal = picked !== null
-                const ok = c.correct
+                const triedWrong = wrongPicks.includes(i)
+                const showCorrect = (solvedChoice || revealAnswer) && c.correct
+                const locked = solvedChoice || revealAnswer
                 return (
                   <button
                     key={c.text}
                     type="button"
                     className={[
                       'choice-btn',
-                      selected ? 'is-selected' : '',
-                      reveal && ok ? 'is-correct' : '',
-                      selected && !ok ? 'is-wrong' : '',
+                      selected && c.correct ? 'is-selected' : '',
+                      showCorrect ? 'is-correct' : '',
+                      triedWrong && !c.correct ? 'is-wrong' : '',
                     ]
                       .filter(Boolean)
                       .join(' ')}
+                    disabled={locked || triedWrong}
                     onClick={() => {
                       unlockAudio()
-                      if (picked !== null && item.choices![picked].correct) return
-                      setPicked(i)
+                      if (locked || triedWrong) return
                       if (c.correct) {
+                        setPicked(i)
+                        setCoachMsg('答對啦！你好努力！')
                         playSfx('correct')
                         if (!done) {
                           onMarkDone(item.id, moduleKey)
@@ -248,6 +284,9 @@ export function PracticeSession({
                         }
                       } else {
                         playSfx('wrong')
+                        setWrongPicks((prev) => (prev.includes(i) ? prev : [...prev, i]))
+                        registerWrong()
+                        setPicked(null)
                       }
                     }}
                   >
@@ -256,6 +295,22 @@ export function PracticeSession({
                   </button>
                 )
               })}
+              {coachMsg && <p className={`math-feedback ${solvedChoice ? 'is-ok' : 'is-no'}`}>{coachMsg}</p>}
+              {!solvedChoice && !revealAnswer && wrongAttempts >= 2 && (
+                <button
+                  type="button"
+                  className="pill-btn pill-btn--soft"
+                  onClick={() => {
+                    playSfx('flip')
+                    setRevealAnswer(true)
+                    setCoachMsg('答案喺綠色嗰個。下次再試都得！')
+                    const correctIdx = item.choices!.findIndex((x) => x.correct)
+                    if (correctIdx >= 0) setPicked(correctIdx)
+                  }}
+                >
+                  睇睇答案
+                </button>
+              )}
             </div>
           )}
 
@@ -276,27 +331,54 @@ export function PracticeSession({
                   placeholder="輸入答案"
                   inputMode="text"
                   autoComplete="off"
+                  disabled={mathResult === 'ok'}
                 />
                 <button
                   type="button"
                   className="pill-btn"
+                  disabled={mathResult === 'ok'}
                   onClick={() => {
                     unlockAudio()
                     const ok = checkMath(item, mathInput)
-                    setMathResult(ok ? 'ok' : 'no')
-                    playSfx(ok ? 'correct' : 'wrong')
-                    if (ok && !done) {
-                      onMarkDone(item.id, moduleKey)
-                      setJustStar(true)
+                    if (ok) {
+                      setMathResult('ok')
+                      setCoachMsg('答對啦！好努力！')
+                      playSfx('correct')
+                      if (!done) {
+                        onMarkDone(item.id, moduleKey)
+                        setJustStar(true)
+                      }
+                    } else {
+                      setMathResult('no')
+                      playSfx('wrong')
+                      registerWrong(item.tip)
                     }
                   }}
                 >
                   檢查
                 </button>
               </div>
-              {mathResult === 'ok' && <p className="math-feedback is-ok">答對啦！好努力！</p>}
-              {mathResult === 'no' && (
-                <p className="math-feedback is-no">唔緊要，再試一次！可以請家長一齊諗。</p>
+              {(coachMsg || mathResult === 'ok') && (
+                <p className={`math-feedback ${mathResult === 'ok' ? 'is-ok' : 'is-no'}`}>
+                  {mathResult === 'ok' ? '答對啦！好努力！' : coachMsg}
+                </p>
+              )}
+              {mathResult !== 'ok' && !revealAnswer && wrongAttempts >= 2 && (
+                <button
+                  type="button"
+                  className="pill-btn pill-btn--soft"
+                  style={{ marginTop: '0.55rem' }}
+                  onClick={() => {
+                    playSfx('flip')
+                    setRevealAnswer(true)
+                    setCoachMsg(`參考答案：${item.answer ?? ''}${item.tip ? `（${item.tip}）` : ''}`)
+                  }}
+                >
+                  睇睇答案
+                </button>
+              )}
+              {revealAnswer && mathResult !== 'ok' && item.answer && (
+                <p className="sample__tip">參考答案：{item.answer}</p>
               )}
             </div>
           )}

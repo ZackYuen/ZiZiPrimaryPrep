@@ -915,6 +915,15 @@
 .choice-btn.is-wrong {
   border-color: var(--coral);
   background: rgba(255, 122, 89, 0.12);
+  opacity: 0.72;
+}
+
+.choice-btn:disabled {
+  cursor: default;
+}
+
+.choice-btn.is-wrong:disabled {
+  transform: none;
 }
 
 .math-box {
