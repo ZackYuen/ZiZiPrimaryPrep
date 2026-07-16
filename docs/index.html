@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/ZiZiPrimaryPrep/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/ZiZiPrimaryPrep/docs/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="孜孜升小面試準備 — 為五歲小朋友設計的小學面試練習 App" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,8 +12,18 @@
       rel="stylesheet"
     />
     <title>孜孜升小面試 · ZiZi Prep</title>
-    <script type="module" crossorigin src="/ZiZiPrimaryPrep/assets/index-Dqm5xPSl.js"></script>
-    <link rel="stylesheet" crossorigin href="/ZiZiPrimaryPrep/assets/index-sAhOjl1v.css">
+    <script>
+      // GitHub Pages is currently set to serve repo root (source files).
+      // Production build lives in /docs — redirect only on github.io.
+      if (location.hostname.endsWith('github.io')) {
+        var target = '/ZiZiPrimaryPrep/docs/'
+        if (!location.pathname.startsWith(target)) {
+          location.replace(target)
+        }
+      }
+    </script>
+    <script type="module" crossorigin src="/ZiZiPrimaryPrep/docs/assets/index-Dqm5xPSl.js"></script>
+    <link rel="stylesheet" crossorigin href="/ZiZiPrimaryPrep/docs/assets/index-sAhOjl1v.css">
   </head>
   <body>
     <div id="root"></div>
