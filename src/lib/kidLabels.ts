@@ -13,6 +13,7 @@ export const KID = {
   starOk: '★',
   mic: '●',
   micStop: '■',
+  micLabel: '●',
   cantonese: '粵',
   english: 'EN',
   parentHint: 'P',

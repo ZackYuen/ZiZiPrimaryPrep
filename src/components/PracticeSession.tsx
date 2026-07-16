@@ -487,11 +487,11 @@ export function PracticeSession({
                         unlockAudio()
                         stop()
                         playSfx('tap')
-                        startListening(listenLang)
+                        void startListening(listenLang)
                       }}
-                      aria-label="用電話聽你講"
+                      aria-label="開始聽你講"
                     >
-                      {KID.mic} 講
+                      {KID.mic}
                     </button>
                   ) : (
                     <button
@@ -516,7 +516,9 @@ export function PracticeSession({
                         ) : null}
                       </p>
                     ) : (
-                      <p className="listen-panel__placeholder">電話聽到嘅字會顯示喺度</p>
+                      <p className="listen-panel__placeholder">
+                        {listening ? '…' : '撳 ● 開始講'}
+                      </p>
                     )}
                   </div>
                   {listenError && <p className="listen-panel__error">{listenError}</p>}

@@ -71,7 +71,8 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>電話聽講（練習提示）</h3>
           <p>
-            說話題可按「試下用電話聽你講」睇電話聽到咩字，並有溫柔重點提示。童聲粵語未必準——星星仍然由家長按「我講完啦」決定，唔會自動判錯。
+            撳 ● 會先問麥克風權限，再聽碩孜講（粵語優先，失敗會自動試其他中文）。童聲未必準——星星仍然由家長撳 ★，唔會自動判錯。建議用
+            Chrome 或 Safari，並保持網絡開啟。
           </p>
         </article>
         <article className="parent__item">
