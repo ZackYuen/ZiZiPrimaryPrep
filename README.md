@@ -27,17 +27,18 @@ npm run preview
 
 ## GitHub Pages
 
-網站：https://zackyuen.github.io/ZiZiPrimaryPrep/
+網站：https://zackyuen.github.io/ZiZiPrimaryPrep/  
+（會自動導向建置後的 `/docs/`）
 
-原因說明：Pages 不能直接跑 Vite 原始碼（`src/main.tsx`），必須先 `npm run build`。
+原因：Pages 若直接伺服 repo 根目錄，會載入 Vite 原始碼（`src/main.tsx`），瀏覽器無法執行，畫面空白。
 
-此專案會：
-1. 把建置結果輸出到 `docs/`（`vite.config.ts` 已設 `base: '/ZiZiPrimaryPrep/'`）
-2. 用 GitHub Actions 自動部署（`.github/workflows/deploy-pages.yml`）
+目前做法（無需改 Settings 也能看）：
+1. `npm run build` 輸出到 `docs/`，`base` 設為 `/ZiZiPrimaryPrep/docs/`
+2. 根目錄 `index.html` 在 `github.io` 上會導向 `/docs/`
 
-若 Settings → Pages 仍是 **Deploy from a branch**，請改成其中一種：
-- **GitHub Actions**（建議），或
-- Branch `main` / folder **`/docs`**
+建議之後在 **Settings → Pages** 改成：
+- **GitHub Actions**，或
+- Branch `main` + folder **`/docs`**（那時可把 `base` 改回 `/ZiZiPrimaryPrep/`）
 
 ## 個人化
 

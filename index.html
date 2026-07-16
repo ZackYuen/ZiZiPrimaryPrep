@@ -12,6 +12,16 @@
       rel="stylesheet"
     />
     <title>孜孜升小面試 · ZiZi Prep</title>
+    <script>
+      // GitHub Pages is currently set to serve repo root (source files).
+      // Production build lives in /docs — redirect only on github.io.
+      if (location.hostname.endsWith('github.io')) {
+        var target = '/ZiZiPrimaryPrep/docs/'
+        if (!location.pathname.startsWith(target)) {
+          location.replace(target)
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
