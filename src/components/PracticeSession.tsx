@@ -6,6 +6,11 @@ import {
   type DayId,
 } from '../data/content'
 import { useSpeech } from '../hooks/useSpeech'
+import { playSfx, unlockAudio } from '../hooks/useSfx'
+import { SceneArt } from './SceneArt'
+import { Confetti } from './Confetti'
+import { Mascot } from './Mascot'
+import { SoundToggle } from './SoundToggle'
 
 type Props = {
   title: string
@@ -31,6 +36,7 @@ export function PracticeSession({
   const [index, setIndex] = useState(0)
   const [showSample, setShowSample] = useState(false)
   const [justStar, setJustStar] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
   const [picked, setPicked] = useState<number | null>(null)
   const [mathInput, setMathInput] = useState('')
   const [mathResult, setMathResult] = useState<'ok' | 'no' | null>(null)
@@ -43,6 +49,12 @@ export function PracticeSession({
   const isLast = index >= items.length - 1
   const done = completed[item.id]
   const levelMeta = levels.find((l) => l.level === item.level)
+
+  const mascotMood = justStar || mathResult === 'ok' || (picked !== null && item.choices?.[picked]?.correct)
+    ? 'cheer'
+    : mathResult === 'no' || (picked !== null && item.choices && !item.choices[picked]?.correct)
+      ? 'think'
+      : 'happy'
 
   const resetInteraction = (activity: Activity) => {
     setShowSample(false)
@@ -62,19 +74,36 @@ export function PracticeSession({
   }
 
   useEffect(() => {
+    playSfx('whoosh')
     resetInteraction(item)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item.id])
+
+  useEffect(() => {
+    if (justStar) {
+      playSfx('star')
+      setShowConfetti(true)
+    }
+  }, [justStar])
 
   const reorderCorrect = useMemo(() => {
     if (item.kind !== 'reorder' || !item.correctOrder) return false
     return order.length === item.correctOrder.length && order.every((w, i) => w === item.correctOrder![i])
   }, [item, order])
 
+  useEffect(() => {
+    if (reorderCorrect && !done) {
+      playSfx('correct')
+    }
+  }, [reorderCorrect, done])
+
   const goNext = () => {
     stop()
-    if (isLast) onBack()
-    else setIndex((i) => i + 1)
+    playSfx('whoosh')
+    if (isLast) {
+      if (celebrate) playSfx('celebrate')
+      onBack()
+    } else setIndex((i) => i + 1)
   }
 
   const awardAndMaybeNext = (autoNext = false) => {
@@ -83,7 +112,7 @@ export function PracticeSession({
       setJustStar(true)
     }
     if (autoNext || celebrate || isLast) {
-      setTimeout(goNext, done ? 0 : 450)
+      setTimeout(goNext, done ? 0 : 550)
     }
   }
 
@@ -96,13 +125,15 @@ export function PracticeSession({
       if (!item.fields?.length) return true
       return item.fields.every((f) => checkedFields[f])
     }
-    // speak: allow after showing sample or anytime (encourage practice)
     return showSample || done
   }
 
   const handlePrimary = () => {
+    unlockAudio()
+    playSfx('tap')
     if (item.kind === 'speak' && !showSample && !done) {
       setShowSample(true)
+      playSfx('flip')
       return
     }
     if (!canProceed() && !done) return
@@ -112,12 +143,15 @@ export function PracticeSession({
 
   return (
     <section className="session" style={{ '--accent': accent } as CSSProperties}>
+      <Confetti show={showConfetti} onDone={() => setShowConfetti(false)} />
+
       <header className="session__top">
         <button
           type="button"
           className="ghost-btn"
           onClick={() => {
             stop()
+            playSfx('tap')
             onBack()
           }}
         >
@@ -132,222 +166,272 @@ export function PracticeSession({
             <div style={{ width: `${((index + 1) / items.length) * 100}%` }} />
           </div>
         </div>
+        <SoundToggle />
       </header>
 
-      <div className="session__card" key={item.id}>
-        <div className="session__badges">
-          <p className="session__cue">{item.cue}</p>
-          {levelMeta && (
-            <p className="session__level" style={{ background: levelMeta.color }}>
-              Lv.{item.level} {levelMeta.name}
-            </p>
-          )}
+      <div className="session__layout">
+        <div className="session__buddy" aria-hidden>
+          <Mascot mood={mascotMood} size={120} />
         </div>
 
-        <h2 className="session__q">{item.promptZh}</h2>
-        {item.promptEn && <p className="session__q-en">{item.promptEn}</p>}
+        <div className="session__card" key={item.id}>
+          <div className="session__badges">
+            <p className="session__cue">{item.cue}</p>
+            {levelMeta && (
+              <p className="session__level" style={{ background: levelMeta.color }}>
+                Lv.{item.level} {levelMeta.name}
+              </p>
+            )}
+          </div>
 
-        <div className="session__actions">
-          <button type="button" className="pill-btn" onClick={() => speak(item.promptZh, 'zh-HK')}>
-            聽題目
-          </button>
-          {item.promptEn && (
+          {item.scene && <SceneArt scene={item.scene} />}
+
+          <h2 className="session__q">{item.promptZh}</h2>
+          {item.promptEn && <p className="session__q-en">{item.promptEn}</p>}
+
+          <div className="session__actions">
             <button
               type="button"
-              className="pill-btn pill-btn--soft"
-              onClick={() => speak(item.promptEn!, 'en-US')}
+              className="pill-btn"
+              onClick={() => {
+                unlockAudio()
+                playSfx('tap')
+                speak(item.promptZh, 'zh-HK')
+              }}
             >
-              Hear EN
+              聽題目
             </button>
-          )}
-        </div>
+            {item.promptEn && (
+              <button
+                type="button"
+                className="pill-btn pill-btn--soft"
+                onClick={() => {
+                  unlockAudio()
+                  playSfx('tap')
+                  speak(item.promptEn!, 'en-US')
+                }}
+              >
+                Hear EN
+              </button>
+            )}
+          </div>
 
-        {item.kind === 'choice' && item.choices && (
-          <div className="choice-list">
-            {item.choices.map((c, i) => {
-              const selected = picked === i
-              const reveal = picked !== null
-              const ok = c.correct
-              return (
+          {item.kind === 'choice' && item.choices && (
+            <div className="choice-list">
+              {item.choices.map((c, i) => {
+                const selected = picked === i
+                const reveal = picked !== null
+                const ok = c.correct
+                return (
+                  <button
+                    key={c.text}
+                    type="button"
+                    className={[
+                      'choice-btn',
+                      selected ? 'is-selected' : '',
+                      reveal && ok ? 'is-correct' : '',
+                      selected && !ok ? 'is-wrong' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    onClick={() => {
+                      unlockAudio()
+                      if (picked !== null && item.choices![picked].correct) return
+                      setPicked(i)
+                      if (c.correct) {
+                        playSfx('correct')
+                        if (!done) {
+                          onMarkDone(item.id, moduleKey)
+                          setJustStar(true)
+                        }
+                      } else {
+                        playSfx('wrong')
+                      }
+                    }}
+                  >
+                    <span className="choice-btn__mark">{String.fromCharCode(65 + i)}</span>
+                    <span>{c.text}</span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          {item.kind === 'math' && (
+            <div className="math-box">
+              <label className="math-box__label" htmlFor="math-answer">
+                你的答案
+              </label>
+              <div className="math-box__row">
+                <input
+                  id="math-answer"
+                  className="math-input"
+                  value={mathInput}
+                  onChange={(e) => {
+                    setMathInput(e.target.value)
+                    setMathResult(null)
+                  }}
+                  placeholder="輸入答案"
+                  inputMode="text"
+                  autoComplete="off"
+                />
                 <button
-                  key={c.text}
                   type="button"
-                  className={[
-                    'choice-btn',
-                    selected ? 'is-selected' : '',
-                    reveal && ok ? 'is-correct' : '',
-                    selected && !ok ? 'is-wrong' : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
+                  className="pill-btn"
                   onClick={() => {
-                    if (picked !== null && item.choices![picked].correct) return
-                    setPicked(i)
-                    if (c.correct && !done) {
+                    unlockAudio()
+                    const ok = checkMath(item, mathInput)
+                    setMathResult(ok ? 'ok' : 'no')
+                    playSfx(ok ? 'correct' : 'wrong')
+                    if (ok && !done) {
                       onMarkDone(item.id, moduleKey)
                       setJustStar(true)
                     }
                   }}
                 >
-                  <span className="choice-btn__mark">{String.fromCharCode(65 + i)}</span>
-                  <span>{c.text}</span>
+                  檢查
                 </button>
-              )
-            })}
-          </div>
-        )}
-
-        {item.kind === 'math' && (
-          <div className="math-box">
-            <label className="math-box__label" htmlFor="math-answer">
-              你的答案
-            </label>
-            <div className="math-box__row">
-              <input
-                id="math-answer"
-                className="math-input"
-                value={mathInput}
-                onChange={(e) => {
-                  setMathInput(e.target.value)
-                  setMathResult(null)
-                }}
-                placeholder="輸入答案"
-                inputMode="text"
-                autoComplete="off"
-              />
-              <button
-                type="button"
-                className="pill-btn"
-                onClick={() => {
-                  const ok = checkMath(item, mathInput)
-                  setMathResult(ok ? 'ok' : 'no')
-                  if (ok && !done) {
-                    onMarkDone(item.id, moduleKey)
-                    setJustStar(true)
-                  }
-                }}
-              >
-                檢查
-              </button>
+              </div>
+              {mathResult === 'ok' && <p className="math-feedback is-ok">答對啦！好努力！</p>}
+              {mathResult === 'no' && (
+                <p className="math-feedback is-no">唔緊要，再試一次！可以請家長一齊諗。</p>
+              )}
             </div>
-            {mathResult === 'ok' && <p className="math-feedback is-ok">答對啦！好努力！</p>}
-            {mathResult === 'no' && (
-              <p className="math-feedback is-no">唔緊要，再試一次！可以請家長一齊諗。</p>
-            )}
-          </div>
-        )}
+          )}
 
-        {item.kind === 'reorder' && (
-          <div className="reorder">
-            <p className="reorder__hint">點選詞語組成句子</p>
-            <div className="reorder__sentence">
-              {order.length === 0 && <span className="reorder__placeholder">句子會出現在這裏</span>}
-              {order.map((w, i) => (
+          {item.kind === 'reorder' && (
+            <div className="reorder">
+              <p className="reorder__hint">點選詞語組成句子</p>
+              <div className="reorder__sentence">
+                {order.length === 0 && <span className="reorder__placeholder">句子會出現在這裏</span>}
+                {order.map((w, i) => (
+                  <button
+                    key={`${w}-${i}`}
+                    type="button"
+                    className="chip chip--placed"
+                    onClick={() => {
+                      playSfx('tap')
+                      setOrder((prev) => prev.filter((_, idx) => idx !== i))
+                      setPool((prev) => [...prev, w])
+                    }}
+                  >
+                    {w}
+                  </button>
+                ))}
+              </div>
+              <div className="reorder__pool">
+                {pool.map((w, i) => (
+                  <button
+                    key={`${w}-p-${i}`}
+                    type="button"
+                    className="chip"
+                    onClick={() => {
+                      playSfx('tap')
+                      setPool((prev) => prev.filter((_, idx) => idx !== i))
+                      setOrder((prev) => [...prev, w])
+                    }}
+                  >
+                    {w}
+                  </button>
+                ))}
+              </div>
+              {order.length > 0 && (
+                <p className={`math-feedback ${reorderCorrect ? 'is-ok' : ''}`}>
+                  {reorderCorrect ? '句子正確！好叻！' : '繼續調一調順序吧'}
+                </p>
+              )}
+              {reorderCorrect && !done && (
                 <button
-                  key={`${w}-${i}`}
                   type="button"
-                  className="chip chip--placed"
+                  className="primary-btn"
+                  style={{ marginTop: '0.75rem' }}
                   onClick={() => {
-                    setOrder((prev) => prev.filter((_, idx) => idx !== i))
-                    setPool((prev) => [...prev, w])
+                    playSfx('tap')
+                    awardAndMaybeNext(false)
                   }}
                 >
-                  {w}
+                  收下星星
                 </button>
+              )}
+            </div>
+          )}
+
+          {item.kind === 'prompt' && (
+            <div className="prompt-fields">
+              <p className="reorder__hint">和家長一起完成，打勾就可以</p>
+              {(item.fields ?? ['我已經試過']).map((f) => (
+                <label key={f} className="check-row">
+                  <input
+                    type="checkbox"
+                    checked={!!checkedFields[f]}
+                    onChange={(e) => {
+                      playSfx(e.target.checked ? 'tap' : 'flip')
+                      setCheckedFields((prev) => ({ ...prev, [f]: e.target.checked }))
+                    }}
+                  />
+                  <span>{f}</span>
+                </label>
               ))}
             </div>
-            <div className="reorder__pool">
-              {pool.map((w, i) => (
+          )}
+
+          {(item.kind === 'speak' || item.sampleZh || item.sampleEn || item.tip) && (
+            <div className="session__coach">
+              {item.kind === 'speak' && <p className="session__coach-label">先自己試答，再看參考</p>}
+              {item.kind === 'speak' && !showSample ? (
                 <button
-                  key={`${w}-p-${i}`}
                   type="button"
-                  className="chip"
+                  className="primary-btn"
                   onClick={() => {
-                    setPool((prev) => prev.filter((_, idx) => idx !== i))
-                    setOrder((prev) => [...prev, w])
+                    playSfx('flip')
+                    setShowSample(true)
                   }}
                 >
-                  {w}
+                  看參考答案
                 </button>
-              ))}
+              ) : (
+                (showSample || item.kind !== 'speak') &&
+                (item.sampleZh || item.sampleEn || item.tip) && (
+                  <div className="sample">
+                    {item.sampleZh && <p className="sample__zh">{item.sampleZh}</p>}
+                    {item.sampleEn && item.sampleEn !== item.sampleZh && (
+                      <p className="sample__en">{item.sampleEn}</p>
+                    )}
+                    {item.tip && <p className="sample__tip">小提示：{item.tip}</p>}
+                    {(item.sampleZh || item.sampleEn) && (
+                      <div className="session__actions">
+                        {item.sampleZh && (
+                          <button
+                            type="button"
+                            className="pill-btn"
+                            onClick={() => {
+                              playSfx('tap')
+                              speak(item.sampleZh!, 'zh-HK')
+                            }}
+                          >
+                            聽參考
+                          </button>
+                        )}
+                        {item.sampleEn && (
+                          <button
+                            type="button"
+                            className="pill-btn pill-btn--soft"
+                            onClick={() => {
+                              playSfx('tap')
+                              speak(item.sampleEn!, 'en-US')
+                            }}
+                          >
+                            Listen EN
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )
+              )}
             </div>
-            {order.length > 0 && (
-              <p className={`math-feedback ${reorderCorrect ? 'is-ok' : ''}`}>
-                {reorderCorrect ? '句子正確！好叻！' : '繼續調一調順序吧'}
-              </p>
-            )}
-            {reorderCorrect && !done && (
-              <button
-                type="button"
-                className="primary-btn"
-                style={{ marginTop: '0.75rem' }}
-                onClick={() => awardAndMaybeNext(false)}
-              >
-                收下星星
-              </button>
-            )}
-          </div>
-        )}
-
-        {item.kind === 'prompt' && (
-          <div className="prompt-fields">
-            <p className="reorder__hint">和家長一起完成，打勾就可以</p>
-            {(item.fields ?? ['我已經試過']).map((f) => (
-              <label key={f} className="check-row">
-                <input
-                  type="checkbox"
-                  checked={!!checkedFields[f]}
-                  onChange={(e) => setCheckedFields((prev) => ({ ...prev, [f]: e.target.checked }))}
-                />
-                <span>{f}</span>
-              </label>
-            ))}
-          </div>
-        )}
-
-        {(item.kind === 'speak' || item.sampleZh || item.sampleEn || item.tip) && (
-          <div className="session__coach">
-            {item.kind === 'speak' && <p className="session__coach-label">先自己試答，再看參考</p>}
-            {item.kind === 'speak' && !showSample ? (
-              <button type="button" className="primary-btn" onClick={() => setShowSample(true)}>
-                看參考答案
-              </button>
-            ) : (
-              (showSample || item.kind !== 'speak') &&
-              (item.sampleZh || item.sampleEn || item.tip) && (
-                <div className="sample">
-                  {item.sampleZh && <p className="sample__zh">{item.sampleZh}</p>}
-                  {item.sampleEn && item.sampleEn !== item.sampleZh && (
-                    <p className="sample__en">{item.sampleEn}</p>
-                  )}
-                  {item.tip && <p className="sample__tip">小提示：{item.tip}</p>}
-                  {(item.sampleZh || item.sampleEn) && (
-                    <div className="session__actions">
-                      {item.sampleZh && (
-                        <button
-                          type="button"
-                          className="pill-btn"
-                          onClick={() => speak(item.sampleZh!, 'zh-HK')}
-                        >
-                          聽參考
-                        </button>
-                      )}
-                      {item.sampleEn && (
-                        <button
-                          type="button"
-                          className="pill-btn pill-btn--soft"
-                          onClick={() => speak(item.sampleEn!, 'en-US')}
-                        >
-                          Listen EN
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <footer className="session__footer">
@@ -357,6 +441,7 @@ export function PracticeSession({
           disabled={index === 0}
           onClick={() => {
             stop()
+            playSfx('whoosh')
             setIndex((i) => Math.max(0, i - 1))
           }}
         >

@@ -12,6 +12,18 @@ export type Choice = {
   correct: boolean
 }
 
+export type SceneId =
+  | 'sleep'
+  | 'run-park'
+  | 'classroom-read'
+  | 'drink'
+  | 'eat'
+  | 'read-book'
+  | 'share-cookie'
+  | 'broken-vase'
+  | 'playground'
+  | 'intro'
+
 export type Activity = {
   id: string
   kind: ActivityKind
@@ -29,6 +41,7 @@ export type Activity = {
   fragments?: string[]
   correctOrder?: string[]
   fields?: string[]
+  scene?: SceneId
 }
 
 export type DayId = 'day1' | 'day2' | 'day3' | 'day4' | 'day5' | 'day6'
@@ -56,11 +69,14 @@ export type VocabCategory = {
 }
 
 export const CHILD = {
-  nameZh: '孜孜',
-  nameEn: 'ZiZi',
+  nameZh: '袁碩孜',
+  nameShort: '碩孜',
+  nameEn: 'Seth',
+  fullNameEn: 'Seth Yuen',
   age: 5,
   ageZh: '五',
-  kindergarten: '○○',
+  kindergarten: '藍田靈糧',
+  kindergartenEn: 'Lam Tin Ling Liang',
 }
 
 export const levels = [
@@ -125,7 +141,7 @@ export const parentTips = [
   },
   {
     title: '小朋友會感知你的緊張',
-    body: '練習時保持輕鬆，面試當天平常心。你的平靜，是孜孜最大的定心丸。',
+    body: '練習時保持輕鬆，面試當天平常心。你的平靜，是碩孜最大的定心丸。',
   },
   {
     title: '失敗不是壞事',
@@ -290,7 +306,7 @@ export const vocabCategories: VocabCategory[] = [
 ]
 
 const introZh = `老師好，我叫${CHILD.nameZh}，今年${CHILD.ageZh}歲，讀${CHILD.kindergarten}幼稚園。`
-const introEn = `Good morning teacher. My name is ${CHILD.nameEn}. I am ${CHILD.age} years old. I study in ${CHILD.kindergarten} Kindergarten.`
+const introEn = `Good morning teacher. My name is ${CHILD.fullNameEn}. I am ${CHILD.age} years old. I study in ${CHILD.kindergartenEn} Kindergarten.`
 
 export const days: DayPlan[] = [
   {
@@ -318,7 +334,8 @@ export const days: DayPlan[] = [
         cue: '中文 · 基本版',
         promptZh: '說出姓名、年齡、就讀幼稚園。',
         sampleZh: introZh,
-        tip: '請家長把幼稚園名稱換成真實校名。',
+        scene: 'intro',
+        tip: '望住老師笑，大聲清楚講出自己的名字。',
       },
       {
         id: 'd1-zh-like',
@@ -475,7 +492,8 @@ export const days: DayPlan[] = [
         kind: 'choice',
         level: 1,
         cue: '看圖選句',
-        promptZh: '圖意：弟弟在床上睡覺，窗外有月亮。請先讀出選項，再選正確句子。',
+        scene: 'sleep',
+        promptZh: '看看圖畫：弟弟在做什麼？請先讀出選項，再選正確句子。',
         choices: [
           { text: '弟弟在睡覺', correct: true },
           { text: '弟弟在收拾書包', correct: false },
@@ -487,7 +505,8 @@ export const days: DayPlan[] = [
         kind: 'choice',
         level: 1,
         cue: '看圖選句',
-        promptZh: '圖意：妹妹在陽光公園裏跑步。請先讀出選項，再選正確句子。',
+        scene: 'run-park',
+        promptZh: '看看圖畫：妹妹在哪裏？在做什麼？請先讀出選項，再選正確句子。',
         choices: [
           { text: '妹妹在公園玩耍', correct: false },
           { text: '妹妹在教室裏跑步', correct: false },
@@ -499,7 +518,8 @@ export const days: DayPlan[] = [
         kind: 'choice',
         level: 1,
         cue: '看圖選句',
-        promptZh: '圖意：學生們在課室專心看書。請先讀出選項，再選正確句子。',
+        scene: 'classroom-read',
+        promptZh: '看看圖畫：學生們在課室做什麼？請先讀出選項，再選正確句子。',
         choices: [
           { text: '學生在教室睡覺', correct: false },
           { text: '學生在教室寫字', correct: false },
@@ -511,7 +531,8 @@ export const days: DayPlan[] = [
         kind: 'choice',
         level: 2,
         cue: 'Picture (EN)',
-        promptZh: '圖意：小男孩正在喝水。',
+        scene: 'drink',
+        promptZh: 'Look at the picture. What is he doing?',
         promptEn: 'Read the options, then choose.',
         choices: [
           { text: 'He is drinking water.', correct: true },
@@ -524,7 +545,8 @@ export const days: DayPlan[] = [
         kind: 'choice',
         level: 2,
         cue: 'Picture (EN)',
-        promptZh: '圖意：小女孩在吃早餐／麵。',
+        scene: 'eat',
+        promptZh: 'Look at the picture. What is she doing?',
         choices: [
           { text: 'She is eating noodles.', correct: true },
           { text: 'She is drinking milk.', correct: false },
@@ -537,7 +559,8 @@ export const days: DayPlan[] = [
         kind: 'choice',
         level: 2,
         cue: 'Picture (EN)',
-        promptZh: '圖意：女孩在看書做功課。',
+        scene: 'read-book',
+        promptZh: 'Look at the picture. What is she doing?',
         choices: [
           { text: 'She is writing her homework.', correct: false },
           { text: 'She is reading a book.', correct: true },
@@ -559,7 +582,7 @@ export const days: DayPlan[] = [
         kind: 'prompt',
         level: 3,
         cue: '聽指令 · 做相反',
-        promptZh: '家長讀指令，孜孜做「相反」動作。試試：舉起右手；踏前一步；企起身拍兩下手。',
+        promptZh: `家長讀指令，${CHILD.nameShort}做「相反」動作。試試：舉起右手；踏前一步；企起身拍兩下手。`,
         tip: '進階：單數拍手、雙數跳一下——但要做相反。家長說 3 → 跳；說 4 → 拍手。',
         fields: ['做完第 1 個指令', '做完第 2 個指令', '做完第 3 個指令'],
       },
@@ -676,6 +699,7 @@ export const days: DayPlan[] = [
         kind: 'prompt',
         level: 2,
         cue: '分享經歷',
+        scene: 'playground',
         promptZh: '分享一次玩耍的經歷。按提示講：時間、人物、地點、事情、為何、心情。',
         sampleZh: '上星期六，我和媽媽去公園玩滑梯。因為天氣很好，我們玩得很開心。',
         fields: ['時間', '人物', '地點', '事情', '為何', '心情'],
@@ -894,6 +918,7 @@ export const days: DayPlan[] = [
         kind: 'speak',
         level: 2,
         cue: '四格圖 · 分享',
+        scene: 'share-cookie',
         promptZh:
           '故事：小明本來想自己吃曲奇，見到妹妹也想吃，就把曲奇分給妹妹。兩人都開心。你學到什麼？',
         sampleZh: '分享會令快樂加倍。小明把曲奇給妹妹，妹妹開心，小明自己也開心。',
@@ -903,6 +928,7 @@ export const days: DayPlan[] = [
         kind: 'speak',
         level: 3,
         cue: '四格圖 · 誠實',
+        scene: 'broken-vase',
         promptZh:
           '故事：小明踢球弄破花瓶，很害怕，最後鼓起勇氣向媽媽說對不起。媽媽讚他誠實。你學到什麼？',
         sampleZh: '做錯事不要緊，最緊要肯承認和承擔。誠實很重要。',

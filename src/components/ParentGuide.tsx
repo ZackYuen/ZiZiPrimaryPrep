@@ -13,7 +13,7 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <button type="button" className="ghost-btn" onClick={onBack}>
           ← 返回
         </button>
-        <p className="parent__stars">孜孜已收集 {stars} 顆星</p>
+        <p className="parent__stars">碩孜已收集 {stars} 顆星</p>
       </header>
 
       <h2 className="parent__title">家長指引</h2>
@@ -67,9 +67,9 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
       <div className="parent__note">
         <h3>個人化</h3>
         <p>
-          在 <code>src/data/content.ts</code> 修改 <code>CHILD</code>（姓名、幼稚園）。答案可按家庭真實情況改寫。
+          已設定為 <strong>袁碩孜（Seth Yuen）</strong>、藍田靈糧幼稚園。喜好／志願答案仍可按碩孜真實情況改寫。
         </p>
-        <p>PDF 原稿已放在倉庫根目錄，方便對照練習。Level 4 唔係必須完成——敢嘗試已經值得讚！</p>
+        <p>PDF 原稿在倉庫根目錄。Level 4 唔係必須完成——敢嘗試已經值得讚！</p>
       </div>
 
       <button
