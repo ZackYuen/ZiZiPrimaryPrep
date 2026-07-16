@@ -5,7 +5,15 @@
 
 export type Level = 1 | 2 | 3 | 4
 
-export type ActivityKind = 'speak' | 'choice' | 'math' | 'reorder' | 'prompt' | 'sort'
+export type ActivityKind =
+  | 'speak'
+  | 'choice'
+  | 'math'
+  | 'reorder'
+  | 'prompt'
+  | 'sort'
+  | 'clock'
+  | 'money'
 
 export type SortItem = {
   text: string
@@ -16,6 +24,9 @@ export type Choice = {
   text: string
   correct: boolean
 }
+
+/** Hong Kong coin face values in dollars (0.1 = 1 角) */
+export type CoinValue = 10 | 5 | 2 | 1 | 0.5 | 0.2 | 0.1
 
 export type SceneId =
   | 'sleep'
@@ -55,6 +66,17 @@ export type Activity = {
   sortItems?: SortItem[]
   /** Bucket labels in display order */
   buckets?: string[]
+  /** Analog clock face for clock-reading activities */
+  clock?: { hour: number; minute: number }
+  /** Coins shown in a purse for money-counting activities */
+  coins?: CoinValue[]
+  /** Owner label under the purse, e.g. 小宇 */
+  purseOwner?: string
+  /** Expected 元 / 角 for money activities */
+  moneyYuan?: string
+  moneyJiao?: string
+  /** Highlight a June date on the mini calendar (1–30) */
+  calendarDay?: number
 }
 
 export type DayId = 'day1' | 'day2' | 'day3' | 'day4' | 'day5' | 'day6'
@@ -811,7 +833,7 @@ export const days: DayPlan[] = [
     id: 'day4',
     day: 4,
     title: 'Day 4 情緒與時間',
-    subtitle: '情緒分類 · 情境解難 · 英文短文 · 時間',
+    subtitle: '情緒分類 · 讀鐘面 · 日曆 · 時間運算',
     sections: [
       '詞匯學習',
       '配對遊戲',
@@ -820,7 +842,9 @@ export const days: DayPlan[] = [
       '情緒分類',
       '近義詞延伸',
       '英文短文閱讀',
+      '讀鐘面',
       '時間運算',
+      '星期詞匯',
       '日曆應用',
     ],
     color: '#FF9B7A',
@@ -962,42 +986,172 @@ export const days: DayPlan[] = [
         tip: 'Bonus：你失望／擔心時會怎樣做？',
       },
       {
+        id: 'd4-clk1',
+        kind: 'clock',
+        level: 1,
+        section: '讀鐘面',
+        cue: '讀鐘',
+        promptZh: '看看鐘面，現在是幾點幾分？用數字打，例如 7:30。',
+        clock: { hour: 7, minute: 30 },
+        answer: '7:30',
+        answers: ['7:30', '07:30', '730'],
+      },
+      {
+        id: 'd4-clk2',
+        kind: 'clock',
+        level: 1,
+        section: '讀鐘面',
+        cue: '讀鐘',
+        promptZh: '看看鐘面，現在是幾點幾分？',
+        clock: { hour: 10, minute: 0 },
+        answer: '10:00',
+        answers: ['10:00', '10:0', '1000', '10'],
+        tip: '分針指住 12，就是整點。可以打 10:00。',
+      },
+      {
+        id: 'd4-clk3',
+        kind: 'clock',
+        level: 1,
+        section: '讀鐘面',
+        cue: '讀鐘',
+        promptZh: '看看鐘面，現在是幾點幾分？',
+        clock: { hour: 12, minute: 30 },
+        answer: '12:30',
+        answers: ['12:30', '1230'],
+      },
+      {
+        id: 'd4-clk4',
+        kind: 'clock',
+        level: 1,
+        section: '讀鐘面',
+        cue: '讀鐘',
+        promptZh: '看看鐘面，現在是幾點幾分？',
+        clock: { hour: 3, minute: 0 },
+        answer: '3:00',
+        answers: ['3:00', '03:00', '300', '3'],
+      },
+      {
+        id: 'd4-clk5',
+        kind: 'clock',
+        level: 1,
+        section: '讀鐘面',
+        cue: '讀鐘',
+        promptZh: '看看鐘面，現在是幾點幾分？',
+        clock: { hour: 4, minute: 30 },
+        answer: '4:30',
+        answers: ['4:30', '04:30', '430'],
+      },
+      {
+        id: 'd4-clk6',
+        kind: 'clock',
+        level: 1,
+        section: '讀鐘面',
+        cue: '讀鐘',
+        promptZh: '看看鐘面，現在是幾點幾分？',
+        clock: { hour: 12, minute: 0 },
+        answer: '12:00',
+        answers: ['12:00', '1200', '12'],
+      },
+      {
         id: 'd4-t1',
         kind: 'math',
         level: 1,
-        cue: '時間',
+        section: '時間運算',
+        cue: '小時',
         promptZh: '現在是 3 時，2 小時後是幾點？',
         answer: '5',
         answers: ['5', '5時', '5點'],
       },
       {
-        id: 'd4-t2',
+        id: 'd4-t1b',
         kind: 'math',
+        level: 1,
+        section: '時間運算',
+        cue: '小時',
+        promptZh: '現在是 11 時，3 小時後是幾點？（24 小時制數字）',
+        answer: '14',
+        answers: ['14', '14時', '2時', '下午2時', '下午2點'],
+        tip: '11 + 3 = 14。打 14 就得。',
+      },
+      {
+        id: 'd4-t2',
+        kind: 'clock',
         level: 2,
-        cue: '時間',
-        promptZh: '現在是 2 時 30 分，30 分鐘後是幾點？（打數字，例如 3）',
-        answer: '3',
-        answers: ['3', '3時', '3:00', '3時0分', '3時00分'],
+        section: '時間運算',
+        cue: '分鐘',
+        promptZh: '現在是 2:30，30 分鐘後是幾點幾分？打時間，例如 3:00。',
+        clock: { hour: 2, minute: 30 },
+        answer: '3:00',
+        answers: ['3:00', '03:00', '3', '300'],
+      },
+      {
+        id: 'd4-t2b',
+        kind: 'clock',
+        level: 2,
+        section: '時間運算',
+        cue: '分鐘',
+        promptZh: '現在是 10:45，20 分鐘後是幾點幾分？',
+        clock: { hour: 10, minute: 45 },
+        answer: '11:05',
+        answers: ['11:05', '1105'],
+        tip: '45 + 20 = 65 分 → 多 1 小時，剩 5 分 → 11:05。',
+      },
+      {
+        id: 'd4-week',
+        kind: 'speak',
+        level: 1,
+        section: '星期詞匯',
+        cue: '星期',
+        promptZh: '跟著讀：星期一、星期二、星期三、星期四、星期五、星期六、星期日',
+        sampleZh: '星期一。星期二。星期三。星期四。星期五。星期六。星期日。',
       },
       {
         id: 'd4-cal',
         kind: 'math',
         level: 2,
+        section: '日曆應用',
         cue: '日曆',
         promptZh: '今天是 6 月 8 日，明天是幾月幾日？用數字打「月/日」，例如 6/9。',
         answer: '6/9',
         answers: ['6/9', '6月9日', '六月九日', '6月9號'],
         tip: '按數字鍵：6 → / → 9。唔使打中文。',
+        calendarDay: 8,
+      },
+      {
+        id: 'd4-cal3',
+        kind: 'math',
+        level: 2,
+        section: '日曆應用',
+        cue: '日曆',
+        promptZh: '今天是 6 月 8 日，3 天後是幾月幾日？打「月/日」。',
+        answer: '6/11',
+        answers: ['6/11', '6月11日', '六月十一日'],
+        calendarDay: 8,
+        tip: '8 → 9 → 10 → 11。打 6/11。',
+      },
+      {
+        id: 'd4-cal4',
+        kind: 'math',
+        level: 2,
+        section: '日曆應用',
+        cue: '日曆',
+        promptZh: '今天是 6 月 8 日，5 天前是幾月幾日？打「月/日」。',
+        answer: '6/3',
+        answers: ['6/3', '6月3日', '六月三日'],
+        calendarDay: 8,
+        tip: '8 減 5 = 3。打 6/3。',
       },
       {
         id: 'd4-cal2',
         kind: 'math',
         level: 3,
+        section: '日曆應用',
         cue: '跨月',
         promptZh: '今天是 6 月 28 日，5 天後是幾月幾日？（六月有 30 天）用數字打「月/日」。',
         answer: '7/3',
         answers: ['7/3', '7月3日', '七月三日', '7月3號'],
         tip: '6 月剩餘 2 天，再加 3 天 → 7 月 3 日。打 7/3。',
+        calendarDay: 28,
       },
     ],
   },
@@ -1005,8 +1159,8 @@ export const days: DayPlan[] = [
     id: 'day5',
     day: 5,
     title: 'Day 5 家人故事',
-    subtitle: '家人職業／喜好 · 四格圖故事 · 金錢',
-    sections: ['家人詞匯', '職業介紹', '家人喜好', '四格圖故事', '金錢／購物應用'],
+    subtitle: '家人職業／喜好 · 四格圖故事 · 數硬幣 · 購物',
+    sections: ['家人詞匯', '職業介紹', '家人喜好', '四格圖故事', '數硬幣錢包', '金錢／購物應用'],
     color: '#F4A4B8',
     accent: '#8A2F4A',
     icon: '5',
@@ -1057,6 +1211,86 @@ export const days: DayPlan[] = [
         promptZh:
           '故事：小明踢球弄破花瓶，很害怕，最後鼓起勇氣向媽媽說對不起。媽媽讚他誠實。你學到什麼？',
         sampleZh: '做錯事不要緊，最緊要肯承認和承擔。誠實很重要。',
+      },
+      {
+        id: 'd5-purse-yu',
+        kind: 'money',
+        level: 1,
+        section: '數硬幣錢包',
+        cue: '小宇錢包',
+        promptZh: '數一數圖裡的硬幣：小宇的錢包有幾多元、幾多角？',
+        purseOwner: '小宇',
+        coins: [10, 1, 0.2, 0.1],
+        moneyYuan: '11',
+        moneyJiao: '3',
+        tip: '10 + 1 = 11 元；2 角 + 1 角 = 3 角。',
+      },
+      {
+        id: 'd5-purse-qi',
+        kind: 'money',
+        level: 1,
+        section: '數硬幣錢包',
+        cue: '小琪錢包',
+        promptZh: '數一數圖裡的硬幣：小琪的錢包有幾多元、幾多角？',
+        purseOwner: '小琪',
+        coins: [5, 2, 2, 1, 0.5, 0.1],
+        moneyYuan: '10',
+        moneyJiao: '6',
+        tip: '5+2+2+1 = 10 元；5 角 + 1 角 = 6 角。',
+      },
+      {
+        id: 'd5-purse-si',
+        kind: 'money',
+        level: 1,
+        section: '數硬幣錢包',
+        cue: '小思錢包',
+        promptZh: '數一數圖裡的硬幣：小思的錢包有幾多元、幾多角？',
+        purseOwner: '小思',
+        coins: [5, 5, 0.1, 0.2, 0.5],
+        moneyYuan: '10',
+        moneyJiao: '8',
+        tip: '5+5 = 10 元；1+2+5 角 = 8 角。',
+      },
+      {
+        id: 'd5-purse-hao',
+        kind: 'money',
+        level: 1,
+        section: '數硬幣錢包',
+        cue: '小豪錢包',
+        promptZh: '數一數圖裡的硬幣：小豪的錢包有幾多元、幾多角？',
+        purseOwner: '小豪',
+        coins: [10, 10, 0.2, 0.2],
+        moneyYuan: '20',
+        moneyJiao: '4',
+        tip: '10+10 = 20 元；2+2 角 = 4 角。',
+      },
+      {
+        id: 'd5-purse-most',
+        kind: 'choice',
+        level: 1,
+        section: '數硬幣錢包',
+        cue: '比較',
+        promptZh: '邊個有的錢最多？（小宇 11.3、小琪 10.6、小思 10.8、小豪 20.4）',
+        choices: [
+          { text: '小豪', correct: true },
+          { text: '小宇', correct: false },
+          { text: '小琪', correct: false },
+          { text: '小思', correct: false },
+        ],
+      },
+      {
+        id: 'd5-purse-least',
+        kind: 'choice',
+        level: 1,
+        section: '數硬幣錢包',
+        cue: '比較',
+        promptZh: '邊個有的錢最少？（小宇 11.3、小琪 10.6、小思 10.8、小豪 20.4）',
+        choices: [
+          { text: '小琪', correct: true },
+          { text: '小豪', correct: false },
+          { text: '小宇', correct: false },
+          { text: '小思', correct: false },
+        ],
       },
       {
         id: 'd5-$1',
@@ -1336,4 +1570,43 @@ export function checkMath(activity: Activity, input: string): boolean {
   }
 
   return false
+}
+
+/** Normalize kid time input: 7:30 / 730 / 7 → 7:30 / 7:00 */
+export function normalizeTimeAnswer(s: string): string {
+  let t = normalizeAnswer(s)
+    .replace(/時|点|點/g, ':')
+    .replace(/分/g, '')
+    .replace(/:+/g, ':')
+    .replace(/^:|:$/g, '')
+
+  if (/^\d{1,2}:\d{1,2}$/.test(t)) {
+    const [h, m] = t.split(':')
+    return `${Number(h)}:${m.padStart(2, '0')}`
+  }
+  if (/^\d{3}$/.test(t)) {
+    return `${Number(t[0])}:${t.slice(1)}`
+  }
+  if (/^\d{4}$/.test(t)) {
+    return `${Number(t.slice(0, 2))}:${t.slice(2)}`
+  }
+  if (/^\d{1,2}$/.test(t)) {
+    return `${Number(t)}:00`
+  }
+  return t
+}
+
+export function checkClock(activity: Activity, input: string): boolean {
+  const accepted = (activity.answers ?? (activity.answer ? [activity.answer] : [])).map(normalizeTimeAnswer)
+  const got = normalizeTimeAnswer(input)
+  if (!got || accepted.length === 0) return false
+  return accepted.includes(got)
+}
+
+export function checkMoney(activity: Activity, yuan: string, jiao: string): boolean {
+  if (activity.moneyYuan == null || activity.moneyJiao == null) return false
+  return (
+    normalizeAnswer(yuan) === normalizeAnswer(activity.moneyYuan) &&
+    normalizeAnswer(jiao) === normalizeAnswer(activity.moneyJiao)
+  )
 }

@@ -1102,6 +1102,242 @@
   color: white;
 }
 
+.session__method--clock,
+.session__method--money {
+  background: rgba(255, 214, 102, 0.95);
+}
+
+.analog-clock {
+  margin: 1rem auto 0.25rem;
+  width: min(100%, 260px);
+}
+
+.analog-clock__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 8px 16px rgba(27, 58, 75, 0.12));
+}
+
+.analog-clock__rim {
+  fill: #d8eef6;
+  stroke: #1b6b8a;
+  stroke-width: 4;
+}
+
+.analog-clock__face {
+  fill: #fffdf8;
+}
+
+.analog-clock__num {
+  font-size: 14px;
+  font-weight: 800;
+  fill: #17384a;
+  font-family: var(--font-body);
+}
+
+.analog-clock__tick {
+  stroke: rgba(27, 58, 75, 0.25);
+  stroke-width: 1.5;
+}
+
+.analog-clock__tick--major {
+  stroke: #17384a;
+  stroke-width: 2.5;
+}
+
+.analog-clock__hand {
+  stroke-linecap: round;
+}
+
+.analog-clock__hand--hour {
+  stroke: #17384a;
+  stroke-width: 6;
+}
+
+.analog-clock__hand--minute {
+  stroke: #c45c26;
+  stroke-width: 4;
+}
+
+.analog-clock__pin {
+  fill: #c45c26;
+}
+
+.coin-purse {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.coin-purse__bag {
+  margin: 0 auto;
+  max-width: 340px;
+  min-height: 160px;
+  padding: 1.1rem 1rem 1.3rem;
+  border-radius: 40% 40% 28% 28% / 55% 55% 35% 35%;
+  background: linear-gradient(180deg, #f3c27a 0%, #e0a45a 55%, #c88a3e 100%);
+  border: 4px solid #8a5520;
+  box-shadow: inset 0 -18px 0 rgba(0, 0, 0, 0.08);
+}
+
+.coin-purse__coins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.hk-coin {
+  width: 4.1rem;
+  height: 4.1rem;
+  border-radius: 50%;
+  border: 3px solid rgba(27, 58, 75, 0.2);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+  transition: transform 0.12s ease, outline 0.12s ease;
+}
+
+.hk-coin:active {
+  transform: translateY(2px);
+}
+
+.hk-coin.is-tapped {
+  outline: 3px solid #1f6b3a;
+  transform: scale(1.05);
+}
+
+.hk-coin__value {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.hk-coin--silver {
+  background: radial-gradient(circle at 30% 30%, #f7f7f7, #b8bdc4 70%);
+  color: #222;
+}
+
+.hk-coin--ten {
+  background: radial-gradient(circle at 35% 30%, #ffe9a8, #d4a017 45%, #c0c4cc 46%, #8e949c);
+  color: #222;
+}
+
+.hk-coin--two {
+  background: radial-gradient(circle at 30% 30%, #f2f2f2, #b0b5bc);
+  color: #222;
+  border-radius: 42%;
+}
+
+.hk-coin--gold,
+.hk-coin--twenty {
+  background: radial-gradient(circle at 30% 30%, #ffe6a8, #d4a24c 70%);
+  color: #5a3510;
+}
+
+.hk-coin--twenty {
+  border-radius: 40%;
+}
+
+.coin-purse__owner {
+  margin: 0.65rem 0 0.15rem;
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+
+.coin-purse__hint {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.money-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.money-field {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 3.4rem;
+  border-radius: 18px;
+  border: 2px solid rgba(27, 58, 75, 0.15);
+  background: white;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.money-field.is-active {
+  border-color: var(--sky-deep, #1b6b8a);
+  outline: 3px solid rgba(126, 200, 227, 0.45);
+}
+
+.money-field__value {
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+
+.money-field__unit {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.june-cal {
+  margin: 1rem auto 0.25rem;
+  max-width: 320px;
+  padding: 0.75rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 2px solid rgba(27, 58, 75, 0.1);
+}
+
+.june-cal__title {
+  margin: 0 0 0.45rem;
+  text-align: center;
+  font-weight: 800;
+}
+
+.june-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.june-cal__head,
+.june-cal__cell {
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.28rem 0;
+}
+
+.june-cal__head {
+  color: var(--ink-soft);
+}
+
+.june-cal__cell {
+  border-radius: 8px;
+  background: rgba(126, 200, 227, 0.12);
+}
+
+.june-cal__cell.is-empty {
+  background: transparent;
+}
+
+.june-cal__cell.is-highlight {
+  background: #ffb86b;
+  color: #17384a;
+  font-weight: 900;
+}
+
 .math-feedback {
   margin-top: 0.65rem;
   font-weight: 700;
