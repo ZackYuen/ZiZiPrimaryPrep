@@ -822,6 +822,11 @@
   line-height: 1.45;
 }
 
+.listen-panel__lang {
+  font-weight: 700;
+  opacity: 0.75;
+}
+
 .listen-panel__interim {
   color: var(--ink-soft);
   font-weight: 600;
