@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+# Built site is committed for GitHub Pages (/docs)
+# docs/
 *.local
 
 # Editor directories and files

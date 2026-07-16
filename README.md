@@ -25,6 +25,20 @@ npm run build
 npm run preview
 ```
 
+## GitHub Pages
+
+網站：https://zackyuen.github.io/ZiZiPrimaryPrep/
+
+原因說明：Pages 不能直接跑 Vite 原始碼（`src/main.tsx`），必須先 `npm run build`。
+
+此專案會：
+1. 把建置結果輸出到 `docs/`（`vite.config.ts` 已設 `base: '/ZiZiPrimaryPrep/'`）
+2. 用 GitHub Actions 自動部署（`.github/workflows/deploy-pages.yml`）
+
+若 Settings → Pages 仍是 **Deploy from a branch**，請改成其中一種：
+- **GitHub Actions**（建議），或
+- Branch `main` / folder **`/docs`**
+
 ## 個人化
 
 編輯 `src/data/content.ts` 的 `CHILD`（姓名、年齡、幼稚園）。
