@@ -107,6 +107,8 @@ export function PracticeSession({
     transcript: listenTranscript,
     interim: listenInterim,
     error: listenError,
+    elapsedSec,
+    sttAlive,
     start: startListening,
     stop: stopListening,
     reset: resetListening,
@@ -503,11 +505,16 @@ export function PracticeSession({
                       }}
                       aria-label="停止聽"
                     >
-                      {KID.micStop}
+                      {KID.micStop} {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
                     </button>
                   )}
                   <div className="listen-panel__transcript" aria-live="polite">
-                    {listening && <p className="listen-panel__live">● …</p>}
+                    {listening && (
+                      <p className="listen-panel__live">
+                        ● 聽緊 {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
+                        {sttAlive ? '' : ' · 字可能稍後先出'}
+                      </p>
+                    )}
                     {(listenTranscript || listenInterim) ? (
                       <p className="listen-panel__text">
                         {listenTranscript}
@@ -517,7 +524,7 @@ export function PracticeSession({
                       </p>
                     ) : (
                       <p className="listen-panel__placeholder">
-                        {listening ? '…' : '撳 ● 開始講'}
+                        {listening ? '繼續大聲講… 講完撳 ■' : '撳 ● 開始講'}
                       </p>
                     )}
                   </div>
@@ -536,7 +543,9 @@ export function PracticeSession({
                       )}
                     </div>
                   )}
-                  <p className="listen-panel__note">● 聽只係練習 · ★ 由爸爸媽媽按</p>
+                  <p className="listen-panel__note">
+                    ● 保持聽直到 ■ · 字係練習 · ★ 由爸爸媽媽按
+                  </p>
                 </div>
               )}
 
