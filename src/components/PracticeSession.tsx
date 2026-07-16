@@ -534,8 +534,7 @@ export function PracticeSession({
                     {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
                     {engine === 'safari' && !listening && !listenTranscript ? (
                       <p className="listen-panel__hint">
-                        Safari：撳 ● 會開始錄音（頂部橙色點）。若轉唔到字，繼續講俾爸爸媽媽聽，完成撳 ★。聽寫：設定 →
-                        一般 → 鍵盤 → 聽寫
+                        Safari：撳 ● 錄音練習（頂部橙色點）。呢度唔轉字——講俾爸爸媽媽聽，完成撳 ★。
                       </p>
                     ) : null}
                     {(listenTranscript || listenInterim) ? (
@@ -548,9 +547,11 @@ export function PracticeSession({
                     ) : (
                       <p className="listen-panel__placeholder">
                         {listening
-                          ? '請大聲講… 字會顯示喺呢度'
+                          ? engine === 'safari'
+                            ? '請大聲講…（Safari 唔顯示字，爸爸媽媽聽）'
+                            : '請大聲講… 字會顯示喺呢度'
                           : engine === 'safari'
-                            ? '撳 ● 開始（Safari 聽寫）'
+                            ? '撳 ● 開始錄音練習'
                             : '撳 ● 開始講（要用網絡）'}
                       </p>
                     )}
@@ -572,7 +573,7 @@ export function PracticeSession({
                   )}
                   <p className="listen-panel__note">
                     {engine === 'safari'
-                      ? '● Safari 先試聽寫，唔得會改錄音 · 講完撳 ■ · ★ 由爸爸媽媽按'
+                      ? '● Safari 只錄音唔轉字 · 講完撳 ■ · ★ 由爸爸媽媽按'
                       : '● 要網絡 · 講完撳 ■ · ★ 由爸爸媽媽按'}
                   </p>
                 </div>
