@@ -71,8 +71,8 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>電話聽講（練習提示）</h3>
           <p>
-            Safari：第一次撳 ● 請允許麥克風。若之前拒絕過，撳網址列「aA」→ 網站設定 → 麥克風 → 允許。並去「設定 →
-            一般 → 鍵盤 → 聽寫」打開聽寫、下載廣東話／中文。講完撳 ■，星星由家長撳 ★。
+            Safari：撳 ● 會開麥克風練習。若畫面無字，唔緊要——繼續講俾家長聽，撳 ★。想轉字可去「設定 → 一般 → 鍵盤 →
+            聽寫」打開並下載廣東話／中文。若麥克風被拒：網址列「aA」→ 網站設定 → 麥克風 → 允許。
           </p>
         </article>
         <article className="parent__item">

@@ -522,7 +522,9 @@ export function PracticeSession({
                           ? heardSpeech
                             ? ' · 聽到聲'
                             : ' · 聽寫中'
-                          : ' · 啟動中'}
+                          : engine === 'safari'
+                            ? ' · 錄音中'
+                            : ' · 啟動中'}
                         <span className="listen-panel__lang">
                           {' '}
                           · {engine === 'safari' ? 'Safari' : 'Chrome'} · {activeLang}
@@ -532,8 +534,8 @@ export function PracticeSession({
                     {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
                     {engine === 'safari' && !listening && !listenTranscript ? (
                       <p className="listen-panel__hint">
-                        第一次撳 ● 會問麥克風——請撳「允許」。若已拒絕：網址列「aA」→ 網站設定 → 麥克風 →
-                        允許。並打開：設定 → 一般 → 鍵盤 → 聽寫
+                        Safari：撳 ● 會開始錄音（頂部橙色點）。若轉唔到字，繼續講俾爸爸媽媽聽，完成撳 ★。聽寫：設定 →
+                        一般 → 鍵盤 → 聽寫
                       </p>
                     ) : null}
                     {(listenTranscript || listenInterim) ? (
@@ -570,7 +572,7 @@ export function PracticeSession({
                   )}
                   <p className="listen-panel__note">
                     {engine === 'safari'
-                      ? '● Safari 聽寫 · 要開「聽寫」同語言包 · 講完撳 ■ · ★ 由爸爸媽媽按'
+                      ? '● Safari 先試聽寫，唔得會改錄音 · 講完撳 ■ · ★ 由爸爸媽媽按'
                       : '● 要網絡 · 講完撳 ■ · ★ 由爸爸媽媽按'}
                   </p>
                 </div>
