@@ -882,7 +882,7 @@ export const days: DayPlan[] = [
         cue: '日曆',
         promptZh: '今天是 6 月 8 日，明天是幾月幾日？',
         answer: '6月9日',
-        answers: ['6月9日', '6/9', '九月', '9日'],
+        answers: ['6月9日', '6/9', '六月九日', '6月9號'],
       },
       {
         id: 'd4-cal2',
@@ -891,7 +891,7 @@ export const days: DayPlan[] = [
         cue: '跨月',
         promptZh: '今天是 6 月 28 日，5 天後是幾月幾日？（六月有 30 天）',
         answer: '7月3日',
-        answers: ['7月3日', '7/3', '七月三日'],
+        answers: ['7月3日', '7/3', '七月三日', '7月3號'],
       },
     ],
   },
@@ -1095,7 +1095,7 @@ export const days: DayPlan[] = [
         cue: '複習 Lv1',
         promptZh: '現在是 10 時，3 小時後是幾時？',
         answer: '13',
-        answers: ['13', '1', '13時', '1時', '下午1時'],
+        answers: ['13', '13時', '下午1時', '下午一時', '下午1點'],
         tip: '也可以說下午 1 時。',
       },
       {
@@ -1114,7 +1114,7 @@ export const days: DayPlan[] = [
         cue: '複習 Lv2',
         promptZh: '一班 14 人，二班 9 人，哪班多？多幾多？',
         answer: '一班多5',
-        answers: ['一班', '5', '一班多5', '多5'],
+        answers: ['一班多5', '一班多5人', '一班多五', '多5', '多5人'],
       },
       {
         id: 'd6-r4',
@@ -1148,12 +1148,47 @@ export function getDay(id: DayId): DayPlan | undefined {
 }
 
 export function normalizeAnswer(s: string): string {
-  return s.trim().toLowerCase().replace(/\s+/g, '').replace(/元角/g, '')
+  return s
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/：/g, ':')
+    .replace(/／/g, '/')
+}
+
+const UNIT = '(粒|本|元|角|時|點|個|人|分|日)'
+
+/** True for values like 13 / 13粒 / 5.7 / 20元 — not 下午1時 or 小明多6. */
+function isNumberOrNumberWithUnit(s: string): boolean {
+  return new RegExp(`^\\d+(\\.\\d+)?(${UNIT})?$`).test(s)
+}
+
+function stripTrailingUnit(s: string): string {
+  return s.replace(new RegExp(`${UNIT}$`), '')
 }
 
 export function checkMath(activity: Activity, input: string): boolean {
   const accepted = (activity.answers ?? (activity.answer ? [activity.answer] : [])).map(normalizeAnswer)
   const got = normalizeAnswer(input)
   if (!got || accepted.length === 0) return false
-  return accepted.some((a) => a.includes(got) || got.includes(a))
+
+  // Exact match only — never substring (e.g. "1" must not match "13" / "150")
+  if (accepted.includes(got)) return true
+
+  // Allow "13粒" ↔ "13", "20元" ↔ "20" when both sides are number(+unit)
+  if (isNumberOrNumberWithUnit(got)) {
+    const gotNum = stripTrailingUnit(got)
+    return accepted.some((a) => {
+      if (!isNumberOrNumberWithUnit(a)) return false
+      return stripTrailingUnit(a) === gotNum
+    })
+  }
+
+  // Allow "3:00" ↔ "3時"
+  if (/^\d+:\d{2}$/.test(got)) {
+    const hour = got.split(':')[0]
+    return accepted.some((a) => a === hour || a === `${hour}時` || a === `${hour}點` || a === got)
+  }
+
+  return false
 }
