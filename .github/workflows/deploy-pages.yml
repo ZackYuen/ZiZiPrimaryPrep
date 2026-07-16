@@ -1,18 +1,10 @@
-name: Deploy to GitHub Pages
+name: Build check
 
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
   build:
@@ -33,21 +25,11 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Keep docs/.nojekyll
-        run: touch docs/.nojekyll
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      # GitHub Pages is "Deploy from a branch → main / (root)".
+      # The committed docs/ folder is what gets served at /ZiZiPrimaryPrep/docs/.
+      # Do NOT use actions/deploy-pages here — it publishes docs as site root and blanks the app.
+      - name: Ensure docs/.nojekyll exists after build
+        run: |
+          test -f docs/index.html
+          test -d docs/assets
+          touch docs/.nojekyll
