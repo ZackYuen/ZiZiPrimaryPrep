@@ -113,6 +113,7 @@ export function PracticeSession({
     activeLang,
     statusHint,
     engine,
+    busy: listenBusy,
     start: startListening,
     stop: stopListening,
     reset: resetListening,
@@ -486,7 +487,7 @@ export function PracticeSession({
                       {KID.english}
                     </button>
                   </div>
-                  {!listening ? (
+                  {!listening && !listenBusy ? (
                     <button
                       type="button"
                       className="primary-btn primary-btn--wide"
@@ -505,13 +506,17 @@ export function PracticeSession({
                     <button
                       type="button"
                       className="primary-btn primary-btn--wide listen-panel__stop"
+                      disabled={listenBusy && !listening}
                       onClick={() => {
+                        if (listenBusy && !listening) return
                         stopListening()
                         playSfx('tap')
                       }}
-                      aria-label="停止聽"
+                      aria-label={listenBusy && !listening ? '轉文字中' : '停止聽'}
                     >
-                      {KID.micStop} {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
+                      {listenBusy && !listening
+                        ? `… ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`
+                        : `${KID.micStop} ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`}
                     </button>
                   )}
                   <div className="listen-panel__transcript" aria-live="polite">
@@ -534,7 +539,7 @@ export function PracticeSession({
                     {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
                     {engine === 'safari' && !listening && !listenTranscript ? (
                       <p className="listen-panel__hint">
-                        Safari：撳 ● 錄音練習（頂部橙色點）。呢度唔轉字——講俾爸爸媽媽聽，完成撳 ★。
+                        Safari：撳 ● 錄音 → 講完撳 ■ → 會自動轉字（第一次要下載模型，請開 Wi‑Fi）。之後可用 ★。
                       </p>
                     ) : null}
                     {(listenTranscript || listenInterim) ? (
@@ -548,11 +553,13 @@ export function PracticeSession({
                       <p className="listen-panel__placeholder">
                         {listening
                           ? engine === 'safari'
-                            ? '請大聲講…（Safari 唔顯示字，爸爸媽媽聽）'
+                            ? '請大聲講… 講完撳 ■ 就出字'
                             : '請大聲講… 字會顯示喺呢度'
-                          : engine === 'safari'
-                            ? '撳 ● 開始錄音練習'
-                            : '撳 ● 開始講（要用網絡）'}
+                          : listenBusy
+                            ? '轉文字中，請稍等…'
+                            : engine === 'safari'
+                              ? '撳 ● 開始錄音（講完 ■ 轉字）'
+                              : '撳 ● 開始講（要用網絡）'}
                       </p>
                     )}
                   </div>
@@ -573,7 +580,7 @@ export function PracticeSession({
                   )}
                   <p className="listen-panel__note">
                     {engine === 'safari'
-                      ? '● Safari 只錄音唔轉字 · 講完撳 ■ · ★ 由爸爸媽媽按'
+                      ? '● 錄音 → ■ 轉字（要網絡下載模型）· ★ 由爸爸媽媽按'
                       : '● 要網絡 · 講完撳 ■ · ★ 由爸爸媽媽按'}
                   </p>
                 </div>
