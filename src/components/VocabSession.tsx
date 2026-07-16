@@ -1,6 +1,10 @@
 import { useState } from 'react'
-import { vocabCategories } from '../data/content'
+import { CHILD, vocabCategories } from '../data/content'
 import { useSpeech } from '../hooks/useSpeech'
+import { playSfx, unlockAudio } from '../hooks/useSfx'
+import { Mascot } from './Mascot'
+import { SoundToggle } from './SoundToggle'
+import { Confetti } from './Confetti'
 
 type Props = {
   completed: Record<string, boolean>
@@ -11,6 +15,8 @@ type Props = {
 export function VocabSession({ completed, onMarkDone, onBack }: Props) {
   const [catIndex, setCatIndex] = useState(0)
   const [itemIndex, setItemIndex] = useState(0)
+  const [flipped, setFlipped] = useState(false)
+  const [burst, setBurst] = useState(false)
   const { speak, stop } = useSpeech()
 
   const cat = vocabCategories[catIndex]
@@ -20,7 +26,13 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
 
   const next = () => {
     stop()
-    if (!done) onMarkDone(cardId, 'vocab')
+    unlockAudio()
+    playSfx(done ? 'whoosh' : 'star')
+    if (!done) {
+      onMarkDone(cardId, 'vocab')
+      setBurst(true)
+    }
+    setFlipped(false)
     if (itemIndex < cat.items.length - 1) {
       setItemIndex((i) => i + 1)
       return
@@ -30,17 +42,20 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
       setItemIndex(0)
       return
     }
+    playSfx('celebrate')
     onBack()
   }
 
   return (
     <section className="session">
+      <Confetti show={burst} onDone={() => setBurst(false)} />
       <header className="session__top">
         <button
           type="button"
           className="ghost-btn"
           onClick={() => {
             stop()
+            playSfx('tap')
             onBack()
           }}
         >
@@ -52,20 +67,51 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
             {cat.title} · {itemIndex + 1}/{cat.items.length}
           </span>
         </div>
+        <SoundToggle />
       </header>
 
-      <div className="vocab-card" key={cardId}>
-        <p className="vocab-card__cat">{cat.title}</p>
-        <p className="vocab-card__zh">{item.zh}</p>
-        <p className="vocab-card__en">{item.en}</p>
-        <div className="session__actions">
-          <button type="button" className="pill-btn" onClick={() => speak(item.zh, 'zh-HK')}>
-            聽中文
-          </button>
-          <button type="button" className="pill-btn pill-btn--soft" onClick={() => speak(item.en, 'en-US')}>
-            Hear English
-          </button>
-        </div>
+      <div className="vocab-stage">
+        <Mascot mood={flipped ? 'cheer' : 'wave'} size={100} className="vocab-stage__mascot" />
+        <button
+          type="button"
+          className={`vocab-card ${flipped ? 'is-flipped' : ''}`}
+          key={cardId}
+          onClick={() => {
+            unlockAudio()
+            playSfx('flip')
+            setFlipped((f) => !f)
+          }}
+        >
+          <p className="vocab-card__cat">{cat.title}</p>
+          <p className="vocab-card__zh">{item.zh}</p>
+          <p className={`vocab-card__en ${flipped ? 'is-show' : ''}`}>{item.en}</p>
+          <p className="vocab-card__hint">{flipped ? '再點一下可翻面' : `點卡片給 ${CHILD.nameShort} 看英文`}</p>
+        </button>
+      </div>
+
+      <div className="session__actions" style={{ justifyContent: 'center' }}>
+        <button
+          type="button"
+          className="pill-btn"
+          onClick={() => {
+            unlockAudio()
+            playSfx('tap')
+            speak(item.zh, 'zh-HK')
+          }}
+        >
+          聽中文
+        </button>
+        <button
+          type="button"
+          className="pill-btn pill-btn--soft"
+          onClick={() => {
+            unlockAudio()
+            playSfx('tap')
+            speak(item.en, 'en-US')
+          }}
+        >
+          Hear English
+        </button>
       </div>
 
       <div className="vocab-cats">
@@ -76,8 +122,10 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
             className={`chip ${i === catIndex ? 'chip--active' : ''}`}
             onClick={() => {
               stop()
+              playSfx('tap')
               setCatIndex(i)
               setItemIndex(0)
+              setFlipped(false)
             }}
           >
             {c.title.replace('時間 · ', '').replace('人物 · ', '')}
@@ -92,6 +140,8 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
           disabled={catIndex === 0 && itemIndex === 0}
           onClick={() => {
             stop()
+            playSfx('whoosh')
+            setFlipped(false)
             if (itemIndex > 0) setItemIndex((i) => i - 1)
             else if (catIndex > 0) {
               const prev = vocabCategories[catIndex - 1]
