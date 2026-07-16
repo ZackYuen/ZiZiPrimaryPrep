@@ -112,6 +112,7 @@ export function PracticeSession({
     heardSpeech,
     activeLang,
     statusHint,
+    engine,
     start: startListening,
     stop: stopListening,
     reset: resetListening,
@@ -520,12 +521,20 @@ export function PracticeSession({
                         {sttAlive
                           ? heardSpeech
                             ? ' · 聽到聲'
-                            : ' · 轉文字中'
+                            : ' · 聽寫中'
                           : ' · 啟動中'}
-                        <span className="listen-panel__lang"> · {activeLang}</span>
+                        <span className="listen-panel__lang">
+                          {' '}
+                          · {engine === 'safari' ? 'Safari' : 'Chrome'} · {activeLang}
+                        </span>
                       </p>
                     )}
                     {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
+                    {engine === 'safari' && !listening && !listenTranscript ? (
+                      <p className="listen-panel__hint">
+                        Safari：設定 → 一般 → 鍵盤 → 聽寫 → 打開，並下載「廣東話」或「中文」
+                      </p>
+                    ) : null}
                     {(listenTranscript || listenInterim) ? (
                       <p className="listen-panel__text">
                         {listenTranscript}
@@ -535,7 +544,11 @@ export function PracticeSession({
                       </p>
                     ) : (
                       <p className="listen-panel__placeholder">
-                        {listening ? '請大聲講… 字會顯示喺呢度' : '撳 ● 開始講（要用 Chrome + 網絡）'}
+                        {listening
+                          ? '請大聲講… 字會顯示喺呢度'
+                          : engine === 'safari'
+                            ? '撳 ● 開始（Safari 聽寫）'
+                            : '撳 ● 開始講（要用網絡）'}
                       </p>
                     )}
                   </div>
@@ -555,7 +568,9 @@ export function PracticeSession({
                     </div>
                   )}
                   <p className="listen-panel__note">
-                    ● 要 Chrome + 網絡 · 講完撳 ■ · ★ 由爸爸媽媽按
+                    {engine === 'safari'
+                      ? '● Safari 聽寫 · 要開「聽寫」同語言包 · 講完撳 ■ · ★ 由爸爸媽媽按'
+                      : '● 要網絡 · 講完撳 ■ · ★ 由爸爸媽媽按'}
                   </p>
                 </div>
               )}
