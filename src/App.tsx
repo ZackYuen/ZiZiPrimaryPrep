@@ -147,7 +147,7 @@ export default function App() {
             A文
           </span>
           <span>
-            <span className="vocab-cta__label">第一周字詞表</span>
+            <span className="vocab-cta__label">第一週字詞表</span>
             <span className="vocab-cta__sub">時間 · 人物 · 動作 · 地點（中英）</span>
           </span>
         </button>

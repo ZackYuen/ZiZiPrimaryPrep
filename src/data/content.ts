@@ -1,6 +1,6 @@
 /** Content digitized from:
  *  - 名校模擬面試 Day 1-6 r.pdf（第二週練習）
- *  - 名校模擬面試 第一周字詞表.pdf
+ *  - 名校模擬面試 第一週字詞表.pdf
  */
 
 export type Level = 1 | 2 | 3 | 4
@@ -155,7 +155,7 @@ export const parentTips = [
   },
   {
     title: '最好的準備，是「唔驚」',
-    body: '學術可以短時間催谷，但自信、禮貌、面對困難的態度需要長時間培養。目標不是「識晒」，而是「唔驚」。',
+    body: '學術可以短時間催谷，但自信、禮貌、面對困難的態度需要長時間培養。目標不是「識曬」，而是「唔驚」。',
   },
   {
     title: '四個難度級別',
@@ -163,7 +163,7 @@ export const parentTips = [
   },
 ]
 
-/** 第一周字詞表 */
+/** 第一週字詞表 */
 export const vocabCategories: VocabCategory[] = [
   {
     id: 'weekdays',
@@ -176,7 +176,7 @@ export const vocabCategories: VocabCategory[] = [
       { zh: '星期五', en: 'Friday' },
       { zh: '星期六', en: 'Saturday' },
       { zh: '星期日', en: 'Sunday' },
-      { zh: '周末', en: 'Weekend' },
+      { zh: '週末', en: 'Weekend' },
       { zh: '平日', en: 'Weekday' },
       { zh: '今天', en: 'Today' },
       { zh: '明天', en: 'Tomorrow' },
@@ -295,7 +295,7 @@ export const vocabCategories: VocabCategory[] = [
     id: 'places',
     title: '地點',
     items: [
-      { zh: '家裏', en: 'Home' },
+      { zh: '家裡', en: 'Home' },
       { zh: '學校', en: 'School' },
       { zh: '公園', en: 'Park' },
       { zh: '消防站', en: 'Fire station' },
@@ -516,11 +516,11 @@ export const days: DayPlan[] = [
         section: '看圖選句（中文）',
         cue: '看圖選句',
         scene: 'run-park',
-        promptZh: '看看圖畫：妹妹在哪裏？在做什麼？請先讀出選項，再選正確句子。',
+        promptZh: '看看圖畫：妹妹在哪裡？在做什麼？請先讀出選項，再選正確句子。',
         choices: [
           { text: '妹妹在公園玩耍', correct: false },
-          { text: '妹妹在教室裏跑步', correct: false },
-          { text: '妹妹在公園裏跑步', correct: true },
+          { text: '妹妹在教室裡跑步', correct: false },
+          { text: '妹妹在公園裡跑步', correct: true },
         ],
       },
       {
@@ -708,8 +708,8 @@ export const days: DayPlan[] = [
         level: 4,
         cue: '重組 Lv4',
         promptZh: '把詞語排成完整句子。',
-        fragments: ['在房間裏', '溫習', '認真地', '快到考試，', '哥哥', '課本。'],
-        correctOrder: ['快到考試，', '哥哥', '在房間裏', '認真地', '溫習', '課本。'],
+        fragments: ['在房間裡', '溫習', '認真地', '快到考試，', '哥哥', '課本。'],
+        correctOrder: ['快到考試，', '哥哥', '在房間裡', '認真地', '溫習', '課本。'],
       },
       {
         id: 'd3-share',
@@ -808,7 +808,7 @@ export const days: DayPlan[] = [
         cue: '情境解難',
         promptZh: '同學搶你的玩具，你會說什麼？怎樣處理情緒？',
         sampleZh:
-          '首先，我會覺得不开心。但我不會打他。我會說：「可不可以輪流玩？」因為打人是不對的。',
+          '首先，我會覺得不開心。但我不會打他。我會說：「可不可以輪流玩？」因為打人是不對的。',
         tip: '先認情緒 → 不做傷害行為 → 講出解決方法。',
       },
       {

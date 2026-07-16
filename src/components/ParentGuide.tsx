@@ -18,7 +18,7 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
 
       <h2 className="parent__title">家長指引</h2>
       <p className="parent__lead">
-        內容來自《名校模擬面試》第一周字詞表與 Day 1–6。目標不是全部做對，而是建立勇氣、表達與不放棄。
+        內容來自《名校模擬面試》第一週字詞表與 Day 1–6。目標不是全部做對，而是建立勇氣、表達與不放棄。
       </p>
 
       <h3 className="parent__h3">三個核心能力</h3>

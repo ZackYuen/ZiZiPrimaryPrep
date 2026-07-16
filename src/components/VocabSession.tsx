@@ -62,7 +62,7 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
           ← 返回
         </button>
         <div className="session__progress">
-          <span className="session__title">第一周字詞表</span>
+          <span className="session__title">第一週字詞表</span>
           <span>
             {cat.title} · {itemIndex + 1}/{cat.items.length}
           </span>
