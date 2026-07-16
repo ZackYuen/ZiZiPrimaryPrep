@@ -1110,6 +1110,7 @@ export function PracticeSession({
           disabled={index === 0}
           onClick={() => {
             stop()
+            stopListening()
             playSfx('whoosh')
             setIndex((i) => Math.max(0, i - 1))
           }}
