@@ -176,7 +176,9 @@ export function PracticeSession({
 
         <div className="session__card" key={item.id}>
           <div className="session__badges">
-            <p className="session__cue">{item.cue}</p>
+            {(item.section || item.cue) && (
+              <p className="session__cue">{item.section || item.cue}</p>
+            )}
             {levelMeta && (
               <p className="session__level" style={{ background: levelMeta.color }}>
                 Lv.{item.level} {levelMeta.name}
@@ -184,7 +186,7 @@ export function PracticeSession({
             )}
           </div>
 
-          {item.scene && <SceneArt scene={item.scene} />}
+          {item.scene && <SceneArt scene={item.scene} alt={item.promptZh} />}
 
           <h2 className="session__q">{item.promptZh}</h2>
           {item.promptEn && <p className="session__q-en">{item.promptEn}</p>}

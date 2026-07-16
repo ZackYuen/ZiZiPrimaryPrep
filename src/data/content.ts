@@ -19,15 +19,19 @@ export type SceneId =
   | 'drink'
   | 'eat'
   | 'read-book'
+  | 'write-hw'
   | 'share-cookie'
   | 'broken-vase'
   | 'playground'
+  | 'sequence'
   | 'intro'
 
 export type Activity = {
   id: string
   kind: ActivityKind
   level: Level
+  /** PDF 小節名稱，例如「詞匯學習」「看圖選句」 */
+  section?: string
   cue: string
   promptZh: string
   promptEn?: string
@@ -51,6 +55,8 @@ export type DayPlan = {
   day: number
   title: string
   subtitle: string
+  /** PDF 內的單元順序說明 */
+  sections: string[]
   color: string
   accent: string
   icon: string
@@ -313,7 +319,8 @@ export const days: DayPlan[] = [
     id: 'day1',
     day: 1,
     title: 'Day 1 自我介紹',
-    subtitle: '中英自我介紹 · 加減運算',
+    subtitle: '詞匯 · 中英自我介紹 · 加減運算',
+    sections: ['詞匯學習', '中文自我介紹', '英文 Self-Introduction', '加減運算'],
     color: '#7EC8E3',
     accent: '#1B6B8A',
     icon: '1',
@@ -474,7 +481,8 @@ export const days: DayPlan[] = [
     id: 'day2',
     day: 2,
     title: 'Day 2 看圖與指令',
-    subtitle: '看圖選句 · 先後順序 · 聽指令',
+    subtitle: '看圖選句 · 先後順序 · 聽指令 · 應用題',
+    sections: ['詞匯學習', '看圖選句（中文）', '看圖選句（英文）', '先後順序', '聽指令做相反／Simon says', '列式應用題'],
     color: '#F5C84C',
     accent: '#8A6A12',
     icon: '2',
@@ -491,6 +499,7 @@ export const days: DayPlan[] = [
         id: 'd2-c1',
         kind: 'choice',
         level: 1,
+        section: '看圖選句（中文）',
         cue: '看圖選句',
         scene: 'sleep',
         promptZh: '看看圖畫：弟弟在做什麼？請先讀出選項，再選正確句子。',
@@ -504,6 +513,7 @@ export const days: DayPlan[] = [
         id: 'd2-c2',
         kind: 'choice',
         level: 1,
+        section: '看圖選句（中文）',
         cue: '看圖選句',
         scene: 'run-park',
         promptZh: '看看圖畫：妹妹在哪裏？在做什麼？請先讀出選項，再選正確句子。',
@@ -517,6 +527,7 @@ export const days: DayPlan[] = [
         id: 'd2-c3',
         kind: 'choice',
         level: 1,
+        section: '看圖選句（中文）',
         cue: '看圖選句',
         scene: 'classroom-read',
         promptZh: '看看圖畫：學生們在課室做什麼？請先讀出選項，再選正確句子。',
@@ -530,6 +541,7 @@ export const days: DayPlan[] = [
         id: 'd2-en1',
         kind: 'choice',
         level: 2,
+        section: '看圖選句（英文）',
         cue: 'Picture (EN)',
         scene: 'drink',
         promptZh: 'Look at the picture. What is he doing?',
@@ -545,25 +557,27 @@ export const days: DayPlan[] = [
         kind: 'choice',
         level: 2,
         cue: 'Picture (EN)',
+        section: '看圖選句（英文）',
         scene: 'eat',
         promptZh: 'Look at the picture. What is she doing?',
         choices: [
-          { text: 'She is eating noodles.', correct: true },
+          { text: 'She is eating noodles.', correct: false },
           { text: 'She is drinking milk.', correct: false },
-          { text: 'She is eating breakfast.', correct: false },
+          { text: 'She is eating breakfast.', correct: true },
         ],
-        tip: '若圖是早餐場景，亦可接受 eating breakfast——家長可按圖調整。',
+        tip: '圖中是吃早餐（多士／碗），選 She is eating breakfast。',
       },
       {
         id: 'd2-en3',
         kind: 'choice',
         level: 2,
         cue: 'Picture (EN)',
-        scene: 'read-book',
+        section: '看圖選句（英文）',
+        scene: 'write-hw',
         promptZh: 'Look at the picture. What is she doing?',
         choices: [
-          { text: 'She is writing her homework.', correct: false },
-          { text: 'She is reading a book.', correct: true },
+          { text: 'She is writing her homework.', correct: true },
+          { text: 'She is reading a book.', correct: false },
           { text: 'She is playing in the classroom.', correct: false },
         ],
       },
@@ -571,11 +585,13 @@ export const days: DayPlan[] = [
         id: 'd2-seq',
         kind: 'speak',
         level: 2,
+        section: '先後順序',
         cue: '先後順序',
-        promptZh: '看三格圖（起床 → 刷牙 → 上學），用「首先／然後／最後」說出來。',
+        scene: 'sequence',
+        promptZh: '看三格圖，用「首先／然後／最後」說出順序。',
         promptEn: 'First, ... Then, ... At last, ...',
-        sampleZh: '首先，小朋友起床。然後，他刷牙洗臉。最後，他背着書包上學。',
-        sampleEn: 'First, he gets up. Then, he brushes his teeth. At last, he goes to school.',
+        sampleZh: '首先，小弟弟起床。然後，他洗手洗臉。最後，他坐下來吃早餐。',
+        sampleEn: 'First, he wakes up. Then, he washes his hands. At last, he eats breakfast.',
       },
       {
         id: 'd2-opp',
@@ -644,7 +660,8 @@ export const days: DayPlan[] = [
     id: 'day3',
     day: 3,
     title: 'Day 3 重組與分享',
-    subtitle: '重組句子 · 玩耍經歷 · 倍數比較',
+    subtitle: '重組句子 · 分享經歷 · 英文問答 · 比較倍數',
+    sections: ['詞匯學習', '重組句子 Lv1–4', '分享一次玩耍的經歷', 'English Q&A', '誰比較多／倍數／平均'],
     color: '#6BCB8B',
     accent: '#1F6B3A',
     icon: '3',
@@ -758,7 +775,8 @@ export const days: DayPlan[] = [
     id: 'day4',
     day: 4,
     title: 'Day 4 情緒與時間',
-    subtitle: '情緒表達 · 英文短文 · 時間日曆',
+    subtitle: '情緒表達 · 英文短文閱讀 · 時間／日曆',
+    sections: ['情緒詞匯', '表達情緒', '情境解難', '英文短文閱讀', '時間運算', '日曆應用'],
     color: '#FF9B7A',
     accent: '#A0452A',
     icon: '4',
@@ -881,7 +899,8 @@ export const days: DayPlan[] = [
     id: 'day5',
     day: 5,
     title: 'Day 5 家人故事',
-    subtitle: '職業喜好 · 四格圖 · 金錢',
+    subtitle: '家人職業／喜好 · 四格圖故事 · 金錢',
+    sections: ['家人詞匯', '職業介紹', '家人喜好', '四格圖故事', '金錢／購物應用'],
     color: '#F4A4B8',
     accent: '#8A2F4A',
     icon: '5',
@@ -985,7 +1004,8 @@ export const days: DayPlan[] = [
     id: 'day6',
     day: 6,
     title: 'Day 6 閱讀複習',
-    subtitle: '中英短文 · 聆聽選擇 · 綜合複習',
+    subtitle: '中文短文 · 英文聆聽 · 綜合複習',
+    sections: ['中文短文閱讀', '英文聆聽選擇', '綜合複習 Lv1–3'],
     color: '#5AD1C9',
     accent: '#176660',
     icon: '6',
