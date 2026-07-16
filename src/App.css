@@ -698,6 +698,51 @@
   margin-top: 1rem;
 }
 
+.session__method {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #17384a;
+  background: rgba(255, 214, 102, 0.85);
+}
+
+.session__method--speak {
+  background: rgba(255, 184, 120, 0.95);
+}
+
+.session__method--math {
+  background: rgba(126, 200, 227, 0.95);
+}
+
+.session__method--choice,
+.session__method--reorder,
+.session__method--sort {
+  background: rgba(140, 212, 170, 0.95);
+}
+
+.session__method--prompt {
+  background: rgba(214, 196, 255, 0.95);
+}
+
+.speak-box {
+  margin-top: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.speak-box__guide {
+  margin: 0;
+  font-weight: 700;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
 .session__coach {
   margin-top: 1.4rem;
   padding-top: 1.2rem;
@@ -996,27 +1041,65 @@
   color: var(--ink-soft);
 }
 
-.math-box__row {
+.math-display {
+  min-height: 3.2rem;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1rem;
+  border-radius: 18px;
+  border: 2px solid rgba(27, 58, 75, 0.15);
+  background: white;
+  font-size: clamp(1.6rem, 6vw, 2rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+}
+
+.math-display__placeholder {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  letter-spacing: 0;
+}
+
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.55rem;
 }
 
-.math-input {
-  flex: 1;
-  min-width: 0;
-  padding: 0.75rem 0.9rem;
+.numpad__key {
+  min-height: 3.35rem;
+  border: none;
   border-radius: 16px;
-  border: 2px solid rgba(27, 58, 75, 0.15);
-  font-size: 1.15rem;
-  font-weight: 700;
-  font-family: var(--font-body);
+  background: #e8f6fb;
   color: var(--ink);
-  background: white;
+  font-size: 1.45rem;
+  font-weight: 800;
+  font-family: var(--font-body);
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(27, 58, 75, 0.12);
+  transition: transform 0.12s ease, background 0.12s ease;
 }
 
-.math-input:focus {
-  outline: 3px solid rgba(126, 200, 227, 0.45);
-  border-color: var(--sky-deep);
+.numpad__key:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.numpad__key:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.numpad__key--wide {
+  font-size: 1.15rem;
+}
+
+.numpad__key--go {
+  background: var(--accent, #1b6b8a);
+  color: white;
 }
 
 .math-feedback {
