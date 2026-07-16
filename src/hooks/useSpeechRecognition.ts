@@ -61,31 +61,12 @@ function langFallbacks(lang: ListenLang, apple: boolean): string[] {
   return ['zh-HK', 'zh-TW', 'zh-Hans', 'zh-CN', 'yue-HK']
 }
 
-function pickRecorderMime(): string | undefined {
-  if (typeof MediaRecorder === 'undefined') return undefined
-  return ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm'].find((t) =>
-    MediaRecorder.isTypeSupported(t),
-  )
-}
-
-function stopTracks(stream: MediaStream | null) {
-  stream?.getTracks().forEach((t) => {
-    try {
-      t.stop()
-    } catch {
-      /* ignore */
-    }
-  })
-}
-
 /**
- * Chrome: live Web Speech with mobile restart.
- * Safari: MediaRecorder owns the ●/■ session (stops “flash”), while Apple
- * SpeechRecognition runs best-effort for Cantonese words with SLOW capped
- * restarts (fast restart loops crashed iOS before).
+ * Safari: STT-only. Do NOT fall back to MediaRecorder — that steals the mic and
+ * leaves users stuck on「錄音中」with no words even when mic permission is Allow.
+ * Keep listening=true until ■ so the UI does not flash. Restart STT slowly.
  *
- * Note: 鍵盤「粵」≠ 聽寫「廣東話」. Keyboard dictation in Notes can work
- * while webpage Web Speech still needs Dictation + language pack.
+ * Mic Allow ≠ webpage 聽寫 working. Keyboard「粵」≠ 聽寫「廣東話」.
  */
 export function useSpeechRecognition() {
   const apple = typeof navigator !== 'undefined' && isAppleWebKit()
@@ -105,11 +86,10 @@ export function useSpeechRecognition() {
 
   const sessionId = useRef(0)
   const recRef = useRef<BrowserSpeechRecognition | null>(null)
-  const streamRef = useRef<MediaStream | null>(null)
-  const recorderRef = useRef<MediaRecorder | null>(null)
   const wantListen = useRef(false)
   const runningRef = useRef(false)
   const sttEnabled = useRef(true)
+  const micOkRef = useRef(false)
   const langIdx = useRef(0)
   const langsRef = useRef<string[]>(['zh-HK'])
   const tickTimer = useRef<number | null>(null)
@@ -119,8 +99,7 @@ export function useSpeechRecognition() {
   const interimRef = useRef('')
   const transcriptRef = useRef('')
   const appleRef = useRef(apple)
-  const handlersBound = useRef(false)
-  const modeRef = useRef<'none' | 'stt' | 'recorder'>('none')
+  const sidRef = useRef(0)
 
   appleRef.current = apple
 
@@ -147,140 +126,83 @@ export function useSpeechRecognition() {
     })
   }, [])
 
-  const stopRecorder = () => {
-    try {
-      if (recorderRef.current && recorderRef.current.state !== 'inactive') {
-        recorderRef.current.ondataavailable = null
-        recorderRef.current.onerror = null
-        recorderRef.current.stop()
-      }
-    } catch {
-      /* ignore */
-    }
-    recorderRef.current = null
-    stopTracks(streamRef.current)
-    streamRef.current = null
-  }
-
-  const detachRec = (rec: BrowserSpeechRecognition | null) => {
+  const hardStopStt = useCallback((finalStop: boolean) => {
+    const rec = recRef.current
     if (!rec) return
     rec.onstart = null
     rec.onresult = null
     rec.onerror = null
     rec.onend = null
-  }
-
-  const stopRecognition = useCallback((finalStop = false) => {
-    const rec = recRef.current
-    if (!rec) return
-    if (finalStop) {
-      detachRec(rec)
-      try {
-        if (appleRef.current) {
-          try {
-            rec.start()
-          } catch {
-            /* already started */
-          }
-        }
-        rec.stop()
-      } catch {
+    try {
+      if (finalStop && appleRef.current) {
         try {
-          rec.abort()
+          rec.start()
         } catch {
-          /* ignore */
+          /* already started */
         }
       }
-      recRef.current = null
-      handlersBound.current = false
-    } else {
-      // Soft pause between restarts — do not abort (abort storms crashed Safari)
+      if (finalStop) rec.stop()
+      else rec.stop()
+    } catch {
       try {
-        rec.stop()
+        rec.abort()
       } catch {
         /* ignore */
       }
     }
+    if (finalStop) recRef.current = null
     runningRef.current = false
   }, [])
 
   const hardStopSession = useCallback(() => {
     wantListen.current = false
     sttEnabled.current = false
-    modeRef.current = 'none'
     clearTimers()
     flushInterim()
-    stopRecognition(true)
-    stopRecorder()
+    hardStopStt(true)
     setListening(false)
     setSttAlive(false)
     setElapsedSec(0)
     setHeardSpeech(false)
     setStatusHint('')
-  }, [flushInterim, stopRecognition])
+  }, [flushInterim, hardStopStt])
 
-  const startTick = useCallback(
-    (sid: number, maxSec: number) => {
-      startedAt.current = Date.now()
-      if (tickTimer.current) window.clearInterval(tickTimer.current)
-      tickTimer.current = window.setInterval(() => {
-        if (sid !== sessionId.current || !wantListen.current) return
-        const sec = Math.floor((Date.now() - startedAt.current) / 1000)
-        setElapsedSec(sec)
-        if (sec >= maxSec) {
-          sessionId.current += 1
-          hardStopSession()
-        }
-      }, 250)
-    },
-    [hardStopSession],
-  )
-
-  const startRecorderHold = useCallback(
-    async (sid: number) => {
-      if (!canUseMic()) return
+  const scheduleRestart = useCallback((sid: number) => {
+    if (!wantListen.current || !sttEnabled.current) return
+    const maxRestart = appleRef.current ? 25 : 30
+    const delay = appleRef.current ? 700 : 400
+    if (restartCount.current >= maxRestart) {
+      setStatusHint('聽寫多次斷線——再撳 ●，或爸爸媽媽撳 ★')
+      return
+    }
+    restartCount.current += 1
+    setStatusHint(appleRef.current ? `重連廣東話聽寫…（${restartCount.current}）` : '重連轉文字…')
+    if (restartTimer.current) window.clearTimeout(restartTimer.current)
+    restartTimer.current = window.setTimeout(() => {
+      if (sid !== sessionId.current || !wantListen.current || !sttEnabled.current) return
+      const rec = recRef.current
+      if (!rec) return
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-        if (sid !== sessionId.current || !wantListen.current) {
-          stopTracks(stream)
-          return
-        }
-        // If STT already owns mic and is alive, skip recorder
-        if (runningRef.current && modeRef.current === 'stt') {
-          stopTracks(stream)
-          return
-        }
-        stopTracks(streamRef.current)
-        streamRef.current = stream
-        modeRef.current = 'recorder'
-        const mime = pickRecorderMime()
-        try {
-          const recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream)
-          recorder.start()
-          recorderRef.current = recorder
-        } catch {
-          recorderRef.current = null
-        }
-        setHeardSpeech(true)
-        if (!transcriptRef.current && !interimRef.current) {
-          setStatusHint('錄音練習中——網頁聽寫唔穩時，請爸爸媽媽聽完撳 ★')
-        }
+        rec.start()
       } catch {
-        /* mic already denied elsewhere */
+        // InvalidState — try once more shortly
+        window.setTimeout(() => {
+          if (sid !== sessionId.current || !wantListen.current || !recRef.current) return
+          try {
+            recRef.current.start()
+          } catch {
+            setStatusHint('聽寫重開失敗——再撳 ●，或用 ★')
+          }
+        }, 500)
       }
-    },
-    [],
-  )
+    }, delay)
+  }, [])
 
-  const bindHandlers = useCallback(
+  const attachHandlers = useCallback(
     (rec: BrowserSpeechRecognition, sid: number) => {
-      if (handlersBound.current) return
-      handlersBound.current = true
-
       rec.onstart = () => {
         if (sid !== sessionId.current || !wantListen.current) return
         runningRef.current = true
-        modeRef.current = 'stt'
         setSttAlive(true)
         setError(null)
         setStatusHint(appleRef.current ? '廣東話聽寫中…請大聲講' : '請大聲講…')
@@ -296,7 +218,6 @@ export function useSpeechRecognition() {
           if (event.results[i].isFinal) finalChunk += piece
           else interimChunk += piece
         }
-        // Safari sometimes never marks final — still show interim as text
         if (!finalChunk && !interimChunk && event.results.length > 0) {
           const last = event.results[event.results.length - 1]
           const piece = last?.[0]?.transcript?.trim() ?? ''
@@ -309,11 +230,6 @@ export function useSpeechRecognition() {
           setHeardSpeech(true)
           setStatusHint('')
           setError(null)
-          // STT got words — release recorder hold if any (mic for STT)
-          if (recorderRef.current || streamRef.current) {
-            stopRecorder()
-            modeRef.current = 'stt'
-          }
         }
         if (finalChunk) {
           setTranscript((prev) => {
@@ -338,19 +254,32 @@ export function useSpeechRecognition() {
         if (code === 'aborted') return
 
         if (code === 'not-allowed' || code === 'service-not-allowed' || code === 'audio-capture') {
-          // Keep practice session if we can hold mic another way
+          // Mic can be Allow while webpage Speech Recognition still fails
+          if (micOkRef.current && appleRef.current) {
+            setError(null)
+            setStatusHint(
+              '麥克風已開，但網頁聽寫未接通。請確認：設定→一般→鍵盤→聽寫→已下載「廣東話」。仍可講俾爸爸媽媽聽，撳 ★。',
+            )
+            // Keep trying a few times — service-not-allowed is sometimes transient
+            if (restartCount.current < 6) {
+              scheduleRestart(sid)
+            } else {
+              sttEnabled.current = false
+              setStatusHint('網頁聽寫未能啟動——請爸爸媽媽聽完撳 ★（麥克風權限已 OK）')
+            }
+            return
+          }
           sttEnabled.current = false
-          setError(
-            appleRef.current
-              ? '網頁未獲麥克風／聽寫權限。撳「aA」→ 網站設定 → 麥克風 → 允許。聽寫：設定→一般→鍵盤→聽寫→下載「廣東話」（唔係淨係鍵盤粵）。'
-              : '需要開咪高峰。去瀏覽器設定允許麥克風，再撳 ●。',
-          )
-          void startRecorderHold(sid)
+          wantListen.current = false
+          clearTimers()
+          setListening(false)
+          setError('麥克風未允許。撳網址列「aA」→ 網站設定 → 麥克風 → 允許。')
           return
         }
 
         if (code === 'no-speech') {
           setStatusHint('聽唔到聲——請繼續講…')
+          scheduleRestart(sid)
           return
         }
 
@@ -360,13 +289,15 @@ export function useSpeechRecognition() {
             rec.lang = langsRef.current[langIdx.current]
             setActiveLang(rec.lang)
             setStatusHint(`改用 ${rec.lang}…`)
+            scheduleRestart(sid)
             return
           }
           setStatusHint(
             appleRef.current
-              ? '聽寫語言未就緒。設定→一般→鍵盤→聽寫→下載「廣東話」。鍵盤有「粵」都唔夠。'
+              ? '聽寫語言未就緒。設定→一般→鍵盤→聽寫→下載「廣東話」（唔係淨係鍵盤粵）。或用 ★。'
               : '轉文字唔穩——可試 EN，或用 ★。',
           )
+          scheduleRestart(sid)
         }
       }
 
@@ -376,64 +307,22 @@ export function useSpeechRecognition() {
         setSttAlive(false)
         flushInterim()
         if (!wantListen.current || !sttEnabled.current) return
-
-        // Safari + Chrome mobile: restart slowly (cap) so ● session does not “flash” empty
-        const maxRestart = appleRef.current ? 18 : 30
-        const delay = appleRef.current ? 900 : 400
-        if (restartCount.current >= maxRestart) {
-          setStatusHint('聽寫暫停——可再撳 ●，或爸爸媽媽撳 ★')
-          void startRecorderHold(sid)
-          return
-        }
-        restartCount.current += 1
-        if (restartTimer.current) window.clearTimeout(restartTimer.current)
-        restartTimer.current = window.setTimeout(() => {
-          if (sid !== sessionId.current || !wantListen.current || !sttEnabled.current) return
-          if (!recRef.current) return
-          // Free mic from recorder hold before restarting Apple STT
-          stopRecorder()
-          modeRef.current = 'stt'
-          try {
-            recRef.current.start()
-          } catch {
-            void startRecorderHold(sid)
-          }
-        }, delay)
+        scheduleRestart(sid)
       }
     },
-    [flushInterim, startRecorderHold],
-  )
-
-  const ensureRec = useCallback(
-    (sid: number) => {
-      const Ctor = getRecognitionCtor()
-      if (!Ctor) return null
-      if (recRef.current) {
-        bindHandlers(recRef.current, sid)
-        return recRef.current
-      }
-      const rec = new Ctor()
-      recRef.current = rec
-      handlersBound.current = false
-      bindHandlers(rec, sid)
-      return rec
-    },
-    [bindHandlers],
+    [flushInterim, scheduleRestart],
   )
 
   useEffect(() => {
-    const hasStt = !!getRecognitionCtor()
-    const hasMic = canUseMic()
-    setSupported(hasStt || hasMic)
-    setEngine(isAppleWebKit() ? 'safari' : hasStt ? 'chrome' : hasMic ? 'chrome' : 'none')
+    setSupported(!!getRecognitionCtor() || canUseMic())
+    setEngine(isAppleWebKit() ? 'safari' : getRecognitionCtor() ? 'chrome' : 'none')
     return () => {
       sessionId.current += 1
       wantListen.current = false
       clearTimers()
-      stopRecognition(true)
-      stopRecorder()
+      hardStopStt(true)
     }
-  }, [stopRecognition])
+  }, [hardStopStt])
 
   const reset = useCallback(() => {
     setTranscript('')
@@ -452,20 +341,29 @@ export function useSpeechRecognition() {
     hardStopSession()
     if (appleRef.current && !hadText) {
       setStatusHint(
-        '未出字。請確認：設定→一般→鍵盤→聽寫→已下載「廣東話」（鍵盤有「粵」唔等於聽寫）。或以 ★ 為準。',
+        micOkRef.current
+          ? '未出字。麥克風已允許——請檢查 設定→一般→鍵盤→聽寫→「廣東話」。或以 ★ 為準。'
+          : '未出字。請允許麥克風，並下載聽寫「廣東話」。或以 ★ 為準。',
       )
     }
   }, [hardStopSession])
 
   const start = useCallback(
     (lang: ListenLang = 'zh-HK') => {
+      const Ctor = getRecognitionCtor()
+      if (!Ctor) {
+        setError('呢部瀏覽器未支援網頁聽寫。請爸爸媽媽聽完撳 ★。')
+        return
+      }
+
       sessionId.current += 1
       const sid = sessionId.current
+      sidRef.current = sid
       hardStopSession()
 
       wantListen.current = true
       sttEnabled.current = true
-      modeRef.current = 'none'
+      micOkRef.current = false
       restartCount.current = 0
       setError(null)
       setTranscript('')
@@ -475,78 +373,70 @@ export function useSpeechRecognition() {
       setElapsedSec(0)
       setSttAlive(false)
       setHeardSpeech(false)
-      // Critical: listening stays true until ■ — STT end must not flash UI back to ●
       setListening(true)
       langsRef.current = langFallbacks(lang, appleRef.current)
       langIdx.current = 0
       setActiveLang(langsRef.current[0])
-      startTick(sid, appleRef.current ? 45 : 45)
 
-      const rec = ensureRec(sid)
-      if (!rec) {
-        setStatusHint('呢部瀏覽器未支援網頁聽寫——改錄音練習，爸爸媽媽撳 ★')
-        void startRecorderHold(sid)
-        return
-      }
+      startedAt.current = Date.now()
+      if (tickTimer.current) window.clearInterval(tickTimer.current)
+      tickTimer.current = window.setInterval(() => {
+        if (sid !== sessionId.current || !wantListen.current) return
+        setElapsedSec(Math.floor((Date.now() - startedAt.current) / 1000))
+        if (Math.floor((Date.now() - startedAt.current) / 1000) >= 45) {
+          sessionId.current += 1
+          hardStopSession()
+        }
+      }, 250)
 
-      // iOS: continuous false + slow restart is more stable than continuous true “flash”
+      const rec = new Ctor()
+      recRef.current = rec
       rec.continuous = appleRef.current ? false : !isMobileUa()
       rec.interimResults = true
       rec.maxAlternatives = 1
       rec.lang = langsRef.current[0]
+      attachHandlers(rec, sid)
 
       setStatusHint(
         appleRef.current
           ? lang === 'en-US'
             ? '啟動英文聽寫…'
-            : '啟動廣東話聽寫…（要「聽寫→廣東話」，唔係淨係鍵盤粵）'
+            : '啟動廣東話聽寫…'
           : '啟動轉文字…',
       )
 
-      // Safari: warm mic permission then STT (async OK on WebKit)
-      const begin = () => {
+      const beginStt = () => {
         if (sid !== sessionId.current || !wantListen.current) return
         try {
           rec.start()
         } catch {
-          window.setTimeout(() => {
-            if (sid !== sessionId.current || !wantListen.current) return
-            try {
-              rec.start()
-            } catch {
-              sttEnabled.current = false
-              setStatusHint('聽寫開唔到——改用錄音練習，爸爸媽媽撳 ★')
-              void startRecorderHold(sid)
-            }
-          }, 400)
+          scheduleRestart(sid)
         }
-        // If STT never becomes alive, hold session with recorder so UI does not flash off
-        window.setTimeout(() => {
-          if (sid !== sessionId.current || !wantListen.current) return
-          if (!runningRef.current && !transcriptRef.current) {
-            void startRecorderHold(sid)
-          }
-        }, 1600)
       }
 
       if (appleRef.current && canUseMic()) {
+        setStatusHint('確認麥克風…')
         void navigator.mediaDevices
           .getUserMedia({ audio: true, video: false })
           .then((stream) => {
             stream.getTracks().forEach((t) => t.stop())
-            begin()
+            micOkRef.current = true
+            setError(null)
+            setStatusHint('啟動廣東話聽寫…')
+            beginStt()
           })
           .catch(() => {
+            micOkRef.current = false
             wantListen.current = false
             setListening(false)
-            setError('麥克風未允許。撳網址列「aA」→ 網站設定 → 麥克風 → 允許。')
+            setError('麥克風未允許。你張相已顯示網站可設為允許——請再撳 ●。')
           })
         return
       }
 
-      begin()
+      beginStt()
     },
-    [ensureRec, hardStopSession, startRecorderHold, startTick],
+    [attachHandlers, hardStopSession, scheduleRestart],
   )
 
   return {
