@@ -5,7 +5,12 @@
 
 export type Level = 1 | 2 | 3 | 4
 
-export type ActivityKind = 'speak' | 'choice' | 'math' | 'reorder' | 'prompt'
+export type ActivityKind = 'speak' | 'choice' | 'math' | 'reorder' | 'prompt' | 'sort'
+
+export type SortItem = {
+  text: string
+  bucket: string
+}
 
 export type Choice = {
   text: string
@@ -46,6 +51,10 @@ export type Activity = {
   correctOrder?: string[]
   fields?: string[]
   scene?: SceneId
+  /** For sort activities: items to place into buckets */
+  sortItems?: SortItem[]
+  /** Bucket labels in display order */
+  buckets?: string[]
 }
 
 export type DayId = 'day1' | 'day2' | 'day3' | 'day4' | 'day5' | 'day6'
@@ -775,41 +784,109 @@ export const days: DayPlan[] = [
     id: 'day4',
     day: 4,
     title: 'Day 4 情緒與時間',
-    subtitle: '情緒表達 · 英文短文閱讀 · 時間／日曆',
-    sections: ['情緒詞匯', '表達情緒', '情境解難', '英文短文閱讀', '時間運算', '日曆應用'],
+    subtitle: '情緒分類 · 情境解難 · 英文短文 · 時間',
+    sections: [
+      '詞匯學習',
+      '配對遊戲',
+      '表達情緒',
+      '情境解難',
+      '情緒分類',
+      '近義詞延伸',
+      '英文短文閱讀',
+      '時間運算',
+      '日曆應用',
+    ],
     color: '#FF9B7A',
     accent: '#A0452A',
     icon: '4',
     activities: [
       {
+        id: 'd4-vocab',
+        kind: 'speak',
+        level: 1,
+        section: '詞匯學習',
+        cue: '情緒詞匯',
+        promptZh: '跟著讀情緒詞：開心、驚慌、傷心、興奮、擔憂、失望、憤怒、平靜',
+        sampleZh: '開心。驚慌。傷心。興奮。擔憂。失望。憤怒。平靜。',
+        tip: '每個詞慢慢讀兩次，邊讀邊做表情更好玩。',
+      },
+      {
         id: 'd4-emo1',
         kind: 'choice',
         level: 1,
-        cue: '情緒',
+        section: '配對遊戲',
+        cue: '配對',
         promptZh: '你收到一份禮物，你會覺得點？',
         choices: [
-          { text: '開心／興奮', correct: true },
+          { text: '開心', correct: true },
           { text: '傷心', correct: false },
-          { text: '生氣', correct: false },
+          { text: '憤怒', correct: false },
+          { text: '擔憂', correct: false },
+        ],
+      },
+      {
+        id: 'd4-emo1b',
+        kind: 'choice',
+        level: 1,
+        section: '配對遊戲',
+        cue: '配對',
+        promptZh: '你唔見咗你最鍾意嘅玩具，你會覺得點？',
+        choices: [
+          { text: '開心', correct: false },
+          { text: '傷心', correct: true },
+          { text: '興奮', correct: false },
+          { text: '平靜', correct: false },
         ],
       },
       {
         id: 'd4-emo2',
         kind: 'speak',
         level: 2,
-        cue: '情緒句子',
-        promptZh: '用完整句子表達情緒：我覺得____，因為____。',
-        sampleZh: '我覺得開心，因為媽媽送了禮物給我。',
+        section: '表達情緒',
+        cue: '完整句子',
+        promptZh: '用完整句子表達情緒：今日我好____，因為____。',
+        sampleZh: '今日我好開心，因為媽媽送了禮物給我。',
       },
       {
         id: 'd4-solve',
         kind: 'speak',
         level: 3,
-        cue: '情境解難',
+        section: '情境解難',
+        cue: '情緒管理',
         promptZh: '同學搶你的玩具，你會說什麼？怎樣處理情緒？',
         sampleZh:
-          '首先，我會覺得不開心。但我不會打他。我會說：「可不可以輪流玩？」因為打人是不對的。',
-        tip: '先認情緒 → 不做傷害行為 → 講出解決方法。',
+          '首先，我會覺得不開心。然後，我會請他一齊輪流玩。但我不會打他，因為打人是不對的。',
+        tip: '先講感受 → 講解決方法 → 講唔會做咩錯事。',
+      },
+      {
+        id: 'd4-sort',
+        kind: 'sort',
+        level: 2,
+        section: '情緒分類',
+        cue: '正面／負面',
+        promptZh: '把情緒詞分類：點選詞語，再放入「正面的」或「負面的」。',
+        buckets: ['正面的', '負面的'],
+        sortItems: [
+          { text: '開心', bucket: '正面的' },
+          { text: '擔憂', bucket: '負面的' },
+          { text: '驚慌', bucket: '負面的' },
+          { text: '失望', bucket: '負面的' },
+          { text: '傷心', bucket: '負面的' },
+          { text: '興奮', bucket: '正面的' },
+          { text: '平靜', bucket: '正面的' },
+          { text: '憤怒', bucket: '負面的' },
+        ],
+        tip: '開心、興奮、平靜多屬正面；傷心、憤怒、擔憂、驚慌、失望多屬負面。',
+      },
+      {
+        id: 'd4-syn',
+        kind: 'speak',
+        level: 3,
+        section: '近義詞延伸',
+        cue: '近義詞',
+        promptZh: '講出「開心」嘅其他講法（近義詞）。',
+        sampleZh: '高興、快樂、愉快、開心到跳起嚟、好興奮。',
+        tip: '講到 2–3 個就好叻！',
       },
       {
         id: 'd4-ben',
