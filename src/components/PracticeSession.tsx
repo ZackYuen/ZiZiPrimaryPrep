@@ -387,7 +387,7 @@ export function PracticeSession({
             <div className="reorder">
               <p className="reorder__hint">點選詞語組成句子</p>
               <div className="reorder__sentence">
-                {order.length === 0 && <span className="reorder__placeholder">句子會出現在這裏</span>}
+                {order.length === 0 && <span className="reorder__placeholder">句子會出現在這裡</span>}
                 {order.map((w, i) => (
                   <button
                     key={`${w}-${i}`}
