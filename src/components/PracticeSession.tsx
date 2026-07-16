@@ -109,7 +109,9 @@ export function PracticeSession({
     error: listenError,
     elapsedSec,
     sttAlive,
+    heardSpeech,
     activeLang,
+    statusHint,
     start: startListening,
     stop: stopListening,
     reset: resetListening,
@@ -488,10 +490,11 @@ export function PracticeSession({
                       type="button"
                       className="primary-btn primary-btn--wide"
                       onClick={() => {
-                        unlockAudio()
+                        // Start STT first so rec.start() stays in the user-gesture stack
                         stop()
+                        startListening(listenLang)
+                        unlockAudio()
                         playSfx('tap')
-                        void startListening(listenLang)
                       }}
                       aria-label="開始聽你講"
                     >
@@ -502,8 +505,8 @@ export function PracticeSession({
                       type="button"
                       className="primary-btn primary-btn--wide listen-panel__stop"
                       onClick={() => {
-                        playSfx('tap')
                         stopListening()
+                        playSfx('tap')
                       }}
                       aria-label="停止聽"
                     >
@@ -514,10 +517,15 @@ export function PracticeSession({
                     {listening && (
                       <p className="listen-panel__live">
                         ● {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
-                        {sttAlive ? ' · 轉文字中' : ' · 準備轉文字'}
+                        {sttAlive
+                          ? heardSpeech
+                            ? ' · 聽到聲'
+                            : ' · 轉文字中'
+                          : ' · 啟動中'}
                         <span className="listen-panel__lang"> · {activeLang}</span>
                       </p>
                     )}
+                    {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
                     {(listenTranscript || listenInterim) ? (
                       <p className="listen-panel__text">
                         {listenTranscript}
@@ -527,7 +535,7 @@ export function PracticeSession({
                       </p>
                     ) : (
                       <p className="listen-panel__placeholder">
-                        {listening ? '請大聲講… 字會顯示喺呢度' : '撳 ● 開始講'}
+                        {listening ? '請大聲講… 字會顯示喺呢度' : '撳 ● 開始講（要用 Chrome + 網絡）'}
                       </p>
                     )}
                   </div>
@@ -547,7 +555,7 @@ export function PracticeSession({
                     </div>
                   )}
                   <p className="listen-panel__note">
-                    ● 講完撳 ■ · 轉文字要網絡 · ★ 由爸爸媽媽按
+                    ● 要 Chrome + 網絡 · 講完撳 ■ · ★ 由爸爸媽媽按
                   </p>
                 </div>
               )}
