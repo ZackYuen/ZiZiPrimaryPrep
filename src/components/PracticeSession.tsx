@@ -11,6 +11,7 @@ import {
 import { looksEnglish, useSpeech } from '../hooks/useSpeech'
 import { useSpeechRecognition, type ListenLang } from '../hooks/useSpeechRecognition'
 import { softSpeakFeedback } from '../lib/softSpeakFeedback'
+import { KID } from '../lib/kidLabels'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
 import { SceneArt } from './SceneArt'
 import { Confetti } from './Confetti'
@@ -32,19 +33,25 @@ type Props = {
 }
 
 const METHOD_LABEL: Record<ActivityKind, string> = {
-  speak: '大聲講',
-  choice: '點選答案',
-  math: '打數字',
-  reorder: '排詞語',
-  prompt: '同家長一齊',
-  sort: '拖／點分類',
-  clock: '看鐘打時間',
-  money: '數硬幣',
+  speak: '▶ 講',
+  choice: '○ 揀',
+  math: '123',
+  reorder: '↔ 排',
+  prompt: '✓ 做',
+  sort: '＋－',
+  clock: '◎ 鐘',
+  money: '$',
 }
 
 const MATH_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '/'] as const
 const CLOCK_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', ':', '0', '00'] as const
-const MONEY_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '檢查'] as const
+const MONEY_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '✓'] as const
+
+function bucketTitle(bucket: string): string {
+  if (bucket === '正面的') return '＋'
+  if (bucket === '負面的') return '－'
+  return bucket
+}
 
 function placeIntoBucket(
   text: string,
@@ -314,7 +321,7 @@ export function PracticeSession({
 
   const appendMoneyKey = (key: string) => {
     if (mathResult === 'ok') return
-    if (key === '檢查') {
+    if (key === '✓') {
       submitMoney()
       return
     }
@@ -367,8 +374,9 @@ export function PracticeSession({
             playSfx('tap')
             onBack()
           }}
+          aria-label="返回"
         >
-          ← 返回
+          {KID.back}
         </button>
         <div className="session__progress">
           <span className="session__title">{title}</span>
@@ -417,8 +425,9 @@ export function PracticeSession({
                 playSfx('tap')
                 speak(item.promptZh, 'zh-HK')
               }}
+              aria-label="聽題目"
             >
-              聽題目
+              {KID.listen}
             </button>
             {item.promptEn && (
               <button
@@ -429,8 +438,9 @@ export function PracticeSession({
                   playSfx('tap')
                   speak(item.promptEn!, 'en-US')
                 }}
+                aria-label="Hear English"
               >
-                Hear EN
+                {KID.listenEn}
               </button>
             )}
           </div>
@@ -438,7 +448,7 @@ export function PracticeSession({
           {item.kind === 'speak' && (
             <div className="speak-box">
               <p className="speak-box__guide">
-                唔使打字！大聲講俾爸爸媽媽聽。可以叫電話試聽（只係練習提示，唔會自動判錯）。
+                ▶ 講俾爸爸媽媽聽 · ★ 就得（電話聽只係練習）
               </p>
 
               {listenSupported && (
@@ -452,8 +462,9 @@ export function PracticeSession({
                         playSfx('tap')
                         setListenLang('zh-HK')
                       }}
+                      aria-label="廣東話"
                     >
-                      廣東話
+                      {KID.cantonese}
                     </button>
                     <button
                       type="button"
@@ -463,8 +474,9 @@ export function PracticeSession({
                         playSfx('tap')
                         setListenLang('en-US')
                       }}
+                      aria-label="English"
                     >
-                      English
+                      {KID.english}
                     </button>
                   </div>
                   {!listening ? (
@@ -477,8 +489,9 @@ export function PracticeSession({
                         playSfx('tap')
                         startListening(listenLang)
                       }}
+                      aria-label="用電話聽你講"
                     >
-                      試下用電話聽你講
+                      {KID.mic} 講
                     </button>
                   ) : (
                     <button
@@ -488,12 +501,13 @@ export function PracticeSession({
                         playSfx('tap')
                         stopListening()
                       }}
+                      aria-label="停止聽"
                     >
-                      講完，停止聽
+                      {KID.micStop}
                     </button>
                   )}
                   <div className="listen-panel__transcript" aria-live="polite">
-                    {listening && <p className="listen-panel__live">聽緊…大聲少少講啦</p>}
+                    {listening && <p className="listen-panel__live">● …</p>}
                     {(listenTranscript || listenInterim) ? (
                       <p className="listen-panel__text">
                         {listenTranscript}
@@ -520,9 +534,7 @@ export function PracticeSession({
                       )}
                     </div>
                   )}
-                  <p className="listen-panel__note">
-                    童聲粵語電話未必聽得準——星星仍然由爸爸媽媽決定。
-                  </p>
+                  <p className="listen-panel__note">● 聽只係練習 · ★ 由爸爸媽媽按</p>
                 </div>
               )}
 
@@ -541,11 +553,12 @@ export function PracticeSession({
                     onMarkDone(item.id, moduleKey)
                     setJustStar(true)
                   }}
+                  aria-label="我講完啦"
                 >
-                  我講完啦 ★
+                  {KID.starOk}
                 </button>
               ) : (
-                <p className="math-feedback is-ok">講得好！已經有星星啦</p>
+                <p className="math-feedback is-ok">★</p>
               )}
               <div className="session__actions">
                 <button
@@ -555,8 +568,9 @@ export function PracticeSession({
                     playSfx('flip')
                     setShowSample((v) => !v)
                   }}
+                  aria-label={showSample ? '收起參考' : '家長睇參考'}
                 >
-                  {showSample ? '收起參考' : '家長：睇／聽參考'}
+                  {showSample ? `${KID.parentHint} ×` : `${KID.parentHint} ?`}
                 </button>
               </div>
               {showSample && (item.sampleZh || item.sampleEn || item.tip) && (
@@ -576,8 +590,9 @@ export function PracticeSession({
                           stopListening()
                           speak(item.sampleZh!, 'zh-HK')
                         }}
+                        aria-label="聽參考"
                       >
-                        聽參考
+                        {KID.listen}
                       </button>
                     )}
                     {item.sampleEn && (
@@ -589,8 +604,9 @@ export function PracticeSession({
                           stopListening()
                           speak(item.sampleEn!, 'en-US')
                         }}
+                        aria-label="Listen English sample"
                       >
-                        Listen EN
+                        {KID.listenEn}
                       </button>
                     )}
                   </div>
@@ -601,7 +617,7 @@ export function PracticeSession({
 
           {item.kind === 'choice' && item.choices && (
             <div className="choice-list">
-              <p className="reorder__hint">聽完選項再揀（唔識字都得）</p>
+              <p className="reorder__hint">▶ 聽 · 再撳揀</p>
               <div className="session__actions">
                 <button
                   type="button"
@@ -615,8 +631,9 @@ export function PracticeSession({
                     )
                     speakQueue(lines, lang)
                   }}
+                  aria-label="讀晒選項"
                 >
-                  讀晒選項
+                  {KID.listenAll}
                 </button>
               </div>
               {voiceStatus.tip && (
@@ -677,7 +694,7 @@ export function PracticeSession({
                         speak(c.text, choiceLang)
                       }}
                     >
-                      聽
+                      {KID.listen}
                     </button>
                   </div>
                 )
@@ -694,8 +711,9 @@ export function PracticeSession({
                     const correctIdx = item.choices!.findIndex((x) => x.correct)
                     if (correctIdx >= 0) setPicked(correctIdx)
                   }}
+                  aria-label="睇睇答案"
                 >
-                  睇睇答案
+                  {KID.peek}
                 </button>
               )}
             </div>
@@ -703,7 +721,7 @@ export function PracticeSession({
 
           {item.kind === 'clock' && (
             <div className="math-box">
-              <p className="math-box__label">看鐘面，用數字打時間（例如 7:30）</p>
+              <p className="math-box__label">睇鐘 · 撳數字（7:30）</p>
               <div className="math-display" aria-live="polite">
                 {mathInput || <span className="math-display__placeholder">__:__</span>}
               </div>
@@ -736,8 +754,9 @@ export function PracticeSession({
                   className="numpad__key numpad__key--wide numpad__key--go"
                   disabled={mathResult === 'ok' || !mathInput}
                   onClick={submitClock}
+                  aria-label="檢查"
                 >
-                  檢查
+                  {KID.check}
                 </button>
               </div>
               {(coachMsg || mathResult === 'ok') && (
@@ -755,8 +774,9 @@ export function PracticeSession({
                     setRevealAnswer(true)
                     setCoachMsg(`參考答案：${item.answer ?? ''}${item.tip ? `（${item.tip}）` : ''}`)
                   }}
+                  aria-label="睇睇答案"
                 >
-                  睇睇答案
+                  {KID.peek}
                 </button>
               )}
               {revealAnswer && mathResult !== 'ok' && item.answer && (
@@ -767,7 +787,7 @@ export function PracticeSession({
 
           {item.kind === 'money' && (
             <div className="math-box">
-              <p className="math-box__label">先點「元」或「角」，再用數字鍵填（唔使打中文）</p>
+              <p className="math-box__label">先撳 $ 或 ¢，再用數字</p>
               <div className="money-fields">
                 <button
                   type="button"
@@ -778,7 +798,7 @@ export function PracticeSession({
                   }}
                 >
                   <span className="money-field__value">{moneyYuan || '—'}</span>
-                  <span className="money-field__unit">元</span>
+                  <span className="money-field__unit" aria-label="元">$</span>
                 </button>
                 <button
                   type="button"
@@ -789,7 +809,7 @@ export function PracticeSession({
                   }}
                 >
                   <span className="money-field__value">{moneyJiao || '—'}</span>
-                  <span className="money-field__unit">角</span>
+                  <span className="money-field__unit" aria-label="角">¢</span>
                 </button>
               </div>
               <div className="numpad" role="group" aria-label="元角鍵盤">
@@ -799,14 +819,14 @@ export function PracticeSession({
                     type="button"
                     className={[
                       'numpad__key',
-                      key === '檢查' ? 'numpad__key--go' : '',
-                      key === '⌫' || key === '檢查' ? 'numpad__key--wide' : '',
+                      key === '✓' ? 'numpad__key--go' : '',
+                      key === '⌫' || key === '✓' ? 'numpad__key--wide' : '',
                     ]
                       .filter(Boolean)
                       .join(' ')}
                     disabled={
                       mathResult === 'ok' ||
-                      (key === '檢查' && (!moneyYuan || !moneyJiao)) ||
+                      (key === '✓' && (!moneyYuan || !moneyJiao)) ||
                       (key === '⌫' && !(moneyField === 'yuan' ? moneyYuan : moneyJiao))
                     }
                     onClick={() => appendMoneyKey(key)}
@@ -834,8 +854,9 @@ export function PracticeSession({
                       `參考答案：${item.moneyYuan} 元 ${item.moneyJiao} 角${item.tip ? `（${item.tip}）` : ''}`,
                     )
                   }}
+                  aria-label="睇睇答案"
                 >
-                  睇睇答案
+                  {KID.peek}
                 </button>
               )}
               {revealAnswer && mathResult !== 'ok' && (
@@ -848,7 +869,7 @@ export function PracticeSession({
 
           {item.kind === 'math' && (
             <div className="math-box">
-              <p className="math-box__label">只用大數字鍵（唔使打中文／英文）</p>
+              <p className="math-box__label">撳數字</p>
               <div className="math-display" aria-live="polite">
                 {mathInput || <span className="math-display__placeholder">答案會顯示喺度</span>}
               </div>
@@ -881,8 +902,9 @@ export function PracticeSession({
                   className="numpad__key numpad__key--wide numpad__key--go"
                   disabled={mathResult === 'ok' || !mathInput}
                   onClick={submitMath}
+                  aria-label="檢查"
                 >
-                  檢查
+                  {KID.check}
                 </button>
               </div>
               {(coachMsg || mathResult === 'ok') && (
@@ -900,8 +922,9 @@ export function PracticeSession({
                     setRevealAnswer(true)
                     setCoachMsg(`參考答案：${item.answer ?? ''}${item.tip ? `（${item.tip}）` : ''}`)
                   }}
+                  aria-label="睇睇答案"
                 >
-                  睇睇答案
+                  {KID.peek}
                 </button>
               )}
               {revealAnswer && mathResult !== 'ok' && item.answer && (
@@ -914,8 +937,8 @@ export function PracticeSession({
             <div className="sort-box">
               <p className="reorder__hint">
                 {sortSelected
-                  ? `已選「${sortSelected}」——拖去或再點圓圈放入`
-                  : '拖詞語入圓圈，或者先點詞再點圓圈'}
+                  ? `已揀「${sortSelected}」→ 再撳 ＋ 或 －`
+                  : '拖去 ＋ / － ，或者先撳詞再撳圓圈'}
               </p>
               <div className="sort-buckets">
                 {item.buckets.map((bucket) => (
@@ -937,7 +960,9 @@ export function PracticeSession({
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={onDropBucket(bucket)}
                   >
-                    <span className="sort-bucket__title">{bucket}</span>
+                    <span className="sort-bucket__title" title={bucket}>
+                      {bucketTitle(bucket)}
+                    </span>
                     <div className="sort-bucket__items">
                       {item.sortItems!
                         .filter((s) => sortPlacement[s.text] === bucket)
@@ -1020,8 +1045,9 @@ export function PracticeSession({
                       registerWrong(item.tip)
                     }
                   }}
+                  aria-label="檢查分類"
                 >
-                  檢查分類
+                  {KID.check}
                 </button>
                 {!sortCorrect && !revealAnswer && wrongAttempts >= 2 && (
                   <button
@@ -1038,8 +1064,9 @@ export function PracticeSession({
                       setSortChecked(true)
                       setCoachMsg(item.tip || '已顯示正確分類。')
                     }}
+                    aria-label="睇睇答案"
                   >
-                    睇睇答案
+                    {KID.peek}
                   </button>
                 )}
               </div>
@@ -1051,7 +1078,7 @@ export function PracticeSession({
 
           {item.kind === 'reorder' && (
             <div className="reorder">
-              <p className="reorder__hint">點選詞語組成句子（唔使打字）</p>
+              <p className="reorder__hint">撳詞組成句子</p>
               <div className="reorder__sentence">
                 {order.length === 0 && <span className="reorder__placeholder">句子會出現在這裡</span>}
                 {order.map((w, i) => (
@@ -1099,8 +1126,9 @@ export function PracticeSession({
                     playSfx('tap')
                     awardAndMaybeNext(false)
                   }}
+                  aria-label="收下星星"
                 >
-                  收下星星
+                  {KID.starOk}
                 </button>
               )}
             </div>
@@ -1108,7 +1136,7 @@ export function PracticeSession({
 
           {item.kind === 'prompt' && (
             <div className="prompt-fields">
-              <p className="reorder__hint">和家長一起做動作／傾偈，打勾就可以（唔使打字）</p>
+              <p className="reorder__hint">同爸爸媽媽一齊 · 撳 ✓</p>
               {(item.fields ?? ['我已經試過']).map((f) => (
                 <label key={f} className="check-row">
                   <input
@@ -1152,16 +1180,18 @@ export function PracticeSession({
             playSfx('whoosh')
             setIndex((i) => Math.max(0, i - 1))
           }}
+          aria-label="上一題"
         >
-          上一題
+          {KID.prev}
         </button>
         <button
           type="button"
           className="primary-btn primary-btn--wide"
           disabled={!done && !canProceed()}
           onClick={handlePrimary}
+          aria-label={done ? (isLast ? '完成回主頁' : '下一題') : isLast ? '完成今日' : '下一題'}
         >
-          {done ? (isLast ? '完成！回主頁' : '下一題') : isLast ? '完成今日' : '下一題'}
+          {done ? (isLast ? KID.doneHome : KID.next) : isLast ? KID.doneToday : KID.next}
         </button>
       </footer>
 

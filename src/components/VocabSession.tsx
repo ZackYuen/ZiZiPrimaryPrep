@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { CHILD, vocabCategories } from '../data/content'
+import { vocabCategories } from '../data/content'
 import { useSpeech } from '../hooks/useSpeech'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
+import { KID } from '../lib/kidLabels'
 import { Mascot } from './Mascot'
 import { SoundToggle } from './SoundToggle'
 import { Confetti } from './Confetti'
@@ -53,18 +54,19 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
         <button
           type="button"
           className="ghost-btn"
+          aria-label="返回"
           onClick={() => {
             stop()
             playSfx('tap')
             onBack()
           }}
         >
-          ← 返回
+          {KID.back}
         </button>
         <div className="session__progress">
-          <span className="session__title">第一週字詞表</span>
+          <span className="session__title">字詞</span>
           <span>
-            {cat.title} · {itemIndex + 1}/{cat.items.length}
+            {itemIndex + 1}/{cat.items.length}
           </span>
         </div>
         <SoundToggle />
@@ -76,6 +78,7 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
           type="button"
           className={`vocab-card ${flipped ? 'is-flipped' : ''}`}
           key={cardId}
+          aria-label={flipped ? '翻回中文' : '睇英文'}
           onClick={() => {
             unlockAudio()
             playSfx('flip')
@@ -85,7 +88,7 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
           <p className="vocab-card__cat">{cat.title}</p>
           <p className="vocab-card__zh">{item.zh}</p>
           <p className={`vocab-card__en ${flipped ? 'is-show' : ''}`}>{item.en}</p>
-          <p className="vocab-card__hint">{flipped ? '再點一下可翻面' : `點卡片給 ${CHILD.nameShort} 看英文`}</p>
+          <p className="vocab-card__hint">{flipped ? '↺' : '↻ EN'}</p>
         </button>
       </div>
 
@@ -93,24 +96,26 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
         <button
           type="button"
           className="pill-btn"
+          aria-label="聽中文"
           onClick={() => {
             unlockAudio()
             playSfx('tap')
             speak(item.zh, 'zh-HK')
           }}
         >
-          聽中文
+          {KID.listen}
         </button>
         <button
           type="button"
           className="pill-btn pill-btn--soft"
+          aria-label="Hear English"
           onClick={() => {
             unlockAudio()
             playSfx('tap')
             speak(item.en, 'en-US')
           }}
         >
-          Hear English
+          {KID.listenEn}
         </button>
       </div>
 
@@ -137,6 +142,7 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
         <button
           type="button"
           className="ghost-btn"
+          aria-label="上一個"
           disabled={catIndex === 0 && itemIndex === 0}
           onClick={() => {
             stop()
@@ -150,10 +156,15 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
             }
           }}
         >
-          上一個
+          {KID.prev}
         </button>
-        <button type="button" className="primary-btn primary-btn--wide" onClick={next}>
-          {done ? '下一個' : '識咗 · 下一個'}
+        <button
+          type="button"
+          className="primary-btn primary-btn--wide"
+          aria-label={done ? '下一個' : '識咗，下一個'}
+          onClick={next}
+        >
+          {done ? KID.next : `★ ${KID.next}`}
         </button>
       </footer>
     </section>

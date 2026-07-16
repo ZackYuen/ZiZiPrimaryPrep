@@ -1,0 +1,21 @@
+/** Kid-facing control labels: symbols first (Seth is 5 and may not read Chinese). */
+export const KID = {
+  back: '←',
+  prev: '←',
+  next: '→',
+  doneHome: '★ →',
+  doneToday: '★',
+  listen: '▶',
+  listenAll: '▶▶',
+  listenEn: '▶ EN',
+  check: '✓',
+  peek: '?',
+  starOk: '★',
+  mic: '●',
+  micStop: '■',
+  cantonese: '粵',
+  english: 'EN',
+  parentHint: 'P',
+  soundOn: '♪',
+  soundOff: '×♪',
+} as const

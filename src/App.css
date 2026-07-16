@@ -585,9 +585,35 @@
   font-size: 0.95rem;
 }
 
-.pill-btn--soft {
-  background: rgba(27, 58, 75, 0.1);
-  color: var(--ink);
+.pill-btn,
+.primary-btn,
+.ghost-btn,
+.choice-hear {
+  font-variant-numeric: tabular-nums;
+}
+
+.pill-btn,
+.choice-hear,
+.numpad__key--go,
+.numpad__key--wide {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.primary-btn {
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.ghost-btn {
+  font-size: 1.35rem;
+  font-weight: 800;
+  min-width: 2.8rem;
+}
+
+.money-field__unit {
+  font-size: 1.45rem;
 }
 
 /* ---- Practice session ---- */

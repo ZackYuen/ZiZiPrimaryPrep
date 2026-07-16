@@ -10,8 +10,8 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
   return (
     <section className="parent">
       <header className="session__top">
-        <button type="button" className="ghost-btn" onClick={onBack}>
-          ← 返回
+        <button type="button" className="ghost-btn" onClick={onBack} aria-label="返回">
+          ←
         </button>
         <p className="parent__stars">碩孜已收集 {stars} 顆星</p>
       </header>
@@ -75,9 +75,10 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
           </p>
         </article>
         <article className="parent__item">
-          <h3>選擇題會讀出嚟</h3>
+          <h3>掣用符號（方便唔識字）</h3>
           <p>
-            每題有「讀晒選項」，每個選項旁有「聽」。唔識字都可以先聽再揀。
+            主要掣改成符號：▶ 聽、▶▶ 讀晒、✓ 檢查、? 睇答案、★ 完成、← → 上一／下一、＋／－
+            分類、$／¢ 金錢。中文保留喺旁白同 aria，方便家長。
           </p>
         </article>
         <article className="parent__item">
