@@ -532,7 +532,8 @@ export function PracticeSession({
                     {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
                     {engine === 'safari' && !listening && !listenTranscript ? (
                       <p className="listen-panel__hint">
-                        Safari：設定 → 一般 → 鍵盤 → 聽寫 → 打開，並下載「廣東話」或「中文」
+                        第一次撳 ● 會問麥克風——請撳「允許」。若已拒絕：網址列「aA」→ 網站設定 → 麥克風 →
+                        允許。並打開：設定 → 一般 → 鍵盤 → 聽寫
                       </p>
                     ) : null}
                     {(listenTranscript || listenInterim) ? (

@@ -71,8 +71,8 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>電話聽講（練習提示）</h3>
           <p>
-            Safari 可以轉文字：先去「設定 → 一般 → 鍵盤 → 聽寫」打開聽寫，並下載「廣東話」或「中文」。撳 ●
-            開始，講完撳 ■。星星仍然由家長撳 ★。
+            Safari：第一次撳 ● 請允許麥克風。若之前拒絕過，撳網址列「aA」→ 網站設定 → 麥克風 → 允許。並去「設定 →
+            一般 → 鍵盤 → 聽寫」打開聽寫、下載廣東話／中文。講完撳 ■，星星由家長撳 ★。
           </p>
         </article>
         <article className="parent__item">
