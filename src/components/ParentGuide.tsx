@@ -62,6 +62,18 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
             選擇題／數學：第一次答錯只會鼓勵「再試一次」，唔顯示正確答案。第二次錯先出小提示；碩孜按「睇睇答案」先揭曉。答啱先有星星。
           </p>
         </article>
+        <article className="parent__item">
+          <h3>五歲唔使打字</h3>
+          <p>
+            中英文題：碩孜大聲講完，按「我講完啦」。分類／排句：拖或點。數學：只用大數字鍵盤。唔使打中文或英文。
+          </p>
+        </article>
+        <article className="parent__item">
+          <h3>電話聽講（練習提示）</h3>
+          <p>
+            說話題可按「試下用電話聽你講」睇電話聽到咩字，並有溫柔重點提示。童聲粵語未必準——星星仍然由家長按「我講完啦」決定，唔會自動判錯。
+          </p>
+        </article>
       </div>
 
       <h3 className="parent__h3">家長金句</h3>

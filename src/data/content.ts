@@ -5,7 +5,15 @@
 
 export type Level = 1 | 2 | 3 | 4
 
-export type ActivityKind = 'speak' | 'choice' | 'math' | 'reorder' | 'prompt' | 'sort'
+export type ActivityKind =
+  | 'speak'
+  | 'choice'
+  | 'math'
+  | 'reorder'
+  | 'prompt'
+  | 'sort'
+  | 'clock'
+  | 'money'
 
 export type SortItem = {
   text: string
@@ -16,6 +24,9 @@ export type Choice = {
   text: string
   correct: boolean
 }
+
+/** Hong Kong coin face values in dollars (0.1 = 1 角) */
+export type CoinValue = 10 | 5 | 2 | 1 | 0.5 | 0.2 | 0.1
 
 export type SceneId =
   | 'sleep'
@@ -55,6 +66,17 @@ export type Activity = {
   sortItems?: SortItem[]
   /** Bucket labels in display order */
   buckets?: string[]
+  /** Analog clock face for clock-reading activities */
+  clock?: { hour: number; minute: number }
+  /** Coins shown in a purse for money-counting activities */
+  coins?: CoinValue[]
+  /** Owner label under the purse, e.g. 小宇 */
+  purseOwner?: string
+  /** Expected 元 / 角 for money activities */
+  moneyYuan?: string
+  moneyJiao?: string
+  /** Highlight a June date on the mini calendar (1–30) */
+  calendarDay?: number
 }
 
 export type DayId = 'day1' | 'day2' | 'day3' | 'day4' | 'day5' | 'day6'
@@ -150,6 +172,10 @@ export const parentQuotes = [
 ]
 
 export const parentTips = [
+  {
+    title: '五歲答題方式：講、揀、拖，唔使打字',
+    body: '中英文題請碩孜大聲講；選擇題點選；分類題拖／點入圓圈。只有數學用大數字鍵盤打數字（唔使打中文／英文）。家長可以幫按「我講完啦」。',
+  },
   {
     title: '面試不是考試，而是一場「傾偈」',
     body: '面試官想認識小朋友。願意說話、願意嘗試、有禮貌，遠比全部答對但不出聲更受歡迎。',
@@ -743,14 +769,26 @@ export const days: DayPlan[] = [
           'I like cycling. I cycle in the park. I play with my daddy. Because it is fun. I feel happy.',
       },
       {
-        id: 'd3-m1',
+        id: 'd3-m1a',
+        kind: 'choice',
+        level: 1,
+        cue: '比較',
+        promptZh: '小明有 18 粒糖，小華有 12 粒糖，誰比較多？',
+        choices: [
+          { text: '小明', correct: true },
+          { text: '小華', correct: false },
+          { text: '一樣多', correct: false },
+        ],
+        tip: '18 比 12 大，所以小明多。',
+      },
+      {
+        id: 'd3-m1b',
         kind: 'math',
         level: 1,
         cue: '比較',
-        promptZh: '小明有 18 粒糖，小華有 12 粒糖，誰比較多？多多少粒？',
-        answer: '小明多6',
-        answers: ['小明', '小明多6', '6', '小明多6粒'],
-        tip: '完整答：小明比較多，多 6 粒。',
+        promptZh: '小明有 18 粒，小華有 12 粒。小明多多少粒？',
+        answer: '6',
+        tip: '18 − 12 = 6。用數字鍵盤打 6。',
       },
       {
         id: 'd3-m2',
@@ -761,14 +799,25 @@ export const days: DayPlan[] = [
         answer: '10',
       },
       {
-        id: 'd3-m3',
+        id: 'd3-m3a',
         kind: 'math',
         level: 3,
         cue: '部分整體',
-        promptZh: '蘋果和橙共 18 個，蘋果有 10 個，橙有幾個？誰多？多多少？',
-        answer: '橙8蘋果多2',
-        answers: ['8', '橙8', '蘋果多2', '蘋果多2個'],
-        tip: '橙有 8 個；蘋果多 2 個。',
+        promptZh: '蘋果和橙共 18 個，蘋果有 10 個，橙有幾個？',
+        answer: '8',
+        tip: '18 − 10 = 8。',
+      },
+      {
+        id: 'd3-m3b',
+        kind: 'choice',
+        level: 3,
+        cue: '部分整體',
+        promptZh: '蘋果 10 個、橙 8 個，誰比較多？多多少？',
+        choices: [
+          { text: '蘋果多 2 個', correct: true },
+          { text: '橙多 2 個', correct: false },
+          { text: '一樣多', correct: false },
+        ],
       },
       {
         id: 'd3-m4',
@@ -784,7 +833,7 @@ export const days: DayPlan[] = [
     id: 'day4',
     day: 4,
     title: 'Day 4 情緒與時間',
-    subtitle: '情緒分類 · 情境解難 · 英文短文 · 時間',
+    subtitle: '情緒分類 · 讀鐘面 · 日曆 · 時間運算',
     sections: [
       '詞匯學習',
       '配對遊戲',
@@ -793,7 +842,9 @@ export const days: DayPlan[] = [
       '情緒分類',
       '近義詞延伸',
       '英文短文閱讀',
+      '讀鐘面',
       '時間運算',
+      '星期詞匯',
       '日曆應用',
     ],
     color: '#FF9B7A',
@@ -864,7 +915,7 @@ export const days: DayPlan[] = [
         level: 2,
         section: '情緒分類',
         cue: '正面／負面',
-        promptZh: '把情緒詞分類：點選詞語，再放入「正面的」或「負面的」。',
+        promptZh: '把情緒詞分類：拖去或點選詞語，再放入「正面的」或「負面的」。',
         buckets: ['正面的', '負面的'],
         sortItems: [
           { text: '開心', bucket: '正面的' },
@@ -935,40 +986,172 @@ export const days: DayPlan[] = [
         tip: 'Bonus：你失望／擔心時會怎樣做？',
       },
       {
+        id: 'd4-clk1',
+        kind: 'clock',
+        level: 1,
+        section: '讀鐘面',
+        cue: '讀鐘',
+        promptZh: '看看鐘面，現在是幾點幾分？用數字打，例如 7:30。',
+        clock: { hour: 7, minute: 30 },
+        answer: '7:30',
+        answers: ['7:30', '07:30', '730'],
+      },
+      {
+        id: 'd4-clk2',
+        kind: 'clock',
+        level: 1,
+        section: '讀鐘面',
+        cue: '讀鐘',
+        promptZh: '看看鐘面，現在是幾點幾分？',
+        clock: { hour: 10, minute: 0 },
+        answer: '10:00',
+        answers: ['10:00', '10:0', '1000', '10'],
+        tip: '分針指住 12，就是整點。可以打 10:00。',
+      },
+      {
+        id: 'd4-clk3',
+        kind: 'clock',
+        level: 1,
+        section: '讀鐘面',
+        cue: '讀鐘',
+        promptZh: '看看鐘面，現在是幾點幾分？',
+        clock: { hour: 12, minute: 30 },
+        answer: '12:30',
+        answers: ['12:30', '1230'],
+      },
+      {
+        id: 'd4-clk4',
+        kind: 'clock',
+        level: 1,
+        section: '讀鐘面',
+        cue: '讀鐘',
+        promptZh: '看看鐘面，現在是幾點幾分？',
+        clock: { hour: 3, minute: 0 },
+        answer: '3:00',
+        answers: ['3:00', '03:00', '300', '3'],
+      },
+      {
+        id: 'd4-clk5',
+        kind: 'clock',
+        level: 1,
+        section: '讀鐘面',
+        cue: '讀鐘',
+        promptZh: '看看鐘面，現在是幾點幾分？',
+        clock: { hour: 4, minute: 30 },
+        answer: '4:30',
+        answers: ['4:30', '04:30', '430'],
+      },
+      {
+        id: 'd4-clk6',
+        kind: 'clock',
+        level: 1,
+        section: '讀鐘面',
+        cue: '讀鐘',
+        promptZh: '看看鐘面，現在是幾點幾分？',
+        clock: { hour: 12, minute: 0 },
+        answer: '12:00',
+        answers: ['12:00', '1200', '12'],
+      },
+      {
         id: 'd4-t1',
         kind: 'math',
         level: 1,
-        cue: '時間',
+        section: '時間運算',
+        cue: '小時',
         promptZh: '現在是 3 時，2 小時後是幾點？',
         answer: '5',
         answers: ['5', '5時', '5點'],
       },
       {
-        id: 'd4-t2',
+        id: 'd4-t1b',
         kind: 'math',
+        level: 1,
+        section: '時間運算',
+        cue: '小時',
+        promptZh: '現在是 11 時，3 小時後是幾點？（24 小時制數字）',
+        answer: '14',
+        answers: ['14', '14時', '2時', '下午2時', '下午2點'],
+        tip: '11 + 3 = 14。打 14 就得。',
+      },
+      {
+        id: 'd4-t2',
+        kind: 'clock',
         level: 2,
-        cue: '時間',
-        promptZh: '現在是 2 時 30 分，30 分鐘後是幾點幾分？',
-        answer: '3時',
-        answers: ['3', '3時', '3:00', '3時0分', '3時00分'],
+        section: '時間運算',
+        cue: '分鐘',
+        promptZh: '現在是 2:30，30 分鐘後是幾點幾分？打時間，例如 3:00。',
+        clock: { hour: 2, minute: 30 },
+        answer: '3:00',
+        answers: ['3:00', '03:00', '3', '300'],
+      },
+      {
+        id: 'd4-t2b',
+        kind: 'clock',
+        level: 2,
+        section: '時間運算',
+        cue: '分鐘',
+        promptZh: '現在是 10:45，20 分鐘後是幾點幾分？',
+        clock: { hour: 10, minute: 45 },
+        answer: '11:05',
+        answers: ['11:05', '1105'],
+        tip: '45 + 20 = 65 分 → 多 1 小時，剩 5 分 → 11:05。',
+      },
+      {
+        id: 'd4-week',
+        kind: 'speak',
+        level: 1,
+        section: '星期詞匯',
+        cue: '星期',
+        promptZh: '跟著讀：星期一、星期二、星期三、星期四、星期五、星期六、星期日',
+        sampleZh: '星期一。星期二。星期三。星期四。星期五。星期六。星期日。',
       },
       {
         id: 'd4-cal',
         kind: 'math',
         level: 2,
+        section: '日曆應用',
         cue: '日曆',
-        promptZh: '今天是 6 月 8 日，明天是幾月幾日？',
-        answer: '6月9日',
-        answers: ['6月9日', '6/9', '六月九日', '6月9號'],
+        promptZh: '今天是 6 月 8 日，明天是幾月幾日？用數字打「月/日」，例如 6/9。',
+        answer: '6/9',
+        answers: ['6/9', '6月9日', '六月九日', '6月9號'],
+        tip: '按數字鍵：6 → / → 9。唔使打中文。',
+        calendarDay: 8,
+      },
+      {
+        id: 'd4-cal3',
+        kind: 'math',
+        level: 2,
+        section: '日曆應用',
+        cue: '日曆',
+        promptZh: '今天是 6 月 8 日，3 天後是幾月幾日？打「月/日」。',
+        answer: '6/11',
+        answers: ['6/11', '6月11日', '六月十一日'],
+        calendarDay: 8,
+        tip: '8 → 9 → 10 → 11。打 6/11。',
+      },
+      {
+        id: 'd4-cal4',
+        kind: 'math',
+        level: 2,
+        section: '日曆應用',
+        cue: '日曆',
+        promptZh: '今天是 6 月 8 日，5 天前是幾月幾日？打「月/日」。',
+        answer: '6/3',
+        answers: ['6/3', '6月3日', '六月三日'],
+        calendarDay: 8,
+        tip: '8 減 5 = 3。打 6/3。',
       },
       {
         id: 'd4-cal2',
         kind: 'math',
         level: 3,
+        section: '日曆應用',
         cue: '跨月',
-        promptZh: '今天是 6 月 28 日，5 天後是幾月幾日？（六月有 30 天）',
-        answer: '7月3日',
-        answers: ['7月3日', '7/3', '七月三日', '7月3號'],
+        promptZh: '今天是 6 月 28 日，5 天後是幾月幾日？（六月有 30 天）用數字打「月/日」。',
+        answer: '7/3',
+        answers: ['7/3', '7月3日', '七月三日', '7月3號'],
+        tip: '6 月剩餘 2 天，再加 3 天 → 7 月 3 日。打 7/3。',
+        calendarDay: 28,
       },
     ],
   },
@@ -976,8 +1159,8 @@ export const days: DayPlan[] = [
     id: 'day5',
     day: 5,
     title: 'Day 5 家人故事',
-    subtitle: '家人職業／喜好 · 四格圖故事 · 金錢',
-    sections: ['家人詞匯', '職業介紹', '家人喜好', '四格圖故事', '金錢／購物應用'],
+    subtitle: '家人職業／喜好 · 四格圖故事 · 數硬幣 · 購物',
+    sections: ['家人詞匯', '職業介紹', '家人喜好', '四格圖故事', '數硬幣錢包', '金錢／購物應用'],
     color: '#F4A4B8',
     accent: '#8A2F4A',
     icon: '5',
@@ -1030,6 +1213,86 @@ export const days: DayPlan[] = [
         sampleZh: '做錯事不要緊，最緊要肯承認和承擔。誠實很重要。',
       },
       {
+        id: 'd5-purse-yu',
+        kind: 'money',
+        level: 1,
+        section: '數硬幣錢包',
+        cue: '小宇錢包',
+        promptZh: '數一數圖裡的硬幣：小宇的錢包有幾多元、幾多角？',
+        purseOwner: '小宇',
+        coins: [10, 1, 0.2, 0.1],
+        moneyYuan: '11',
+        moneyJiao: '3',
+        tip: '10 + 1 = 11 元；2 角 + 1 角 = 3 角。',
+      },
+      {
+        id: 'd5-purse-qi',
+        kind: 'money',
+        level: 1,
+        section: '數硬幣錢包',
+        cue: '小琪錢包',
+        promptZh: '數一數圖裡的硬幣：小琪的錢包有幾多元、幾多角？',
+        purseOwner: '小琪',
+        coins: [5, 2, 2, 1, 0.5, 0.1],
+        moneyYuan: '10',
+        moneyJiao: '6',
+        tip: '5+2+2+1 = 10 元；5 角 + 1 角 = 6 角。',
+      },
+      {
+        id: 'd5-purse-si',
+        kind: 'money',
+        level: 1,
+        section: '數硬幣錢包',
+        cue: '小思錢包',
+        promptZh: '數一數圖裡的硬幣：小思的錢包有幾多元、幾多角？',
+        purseOwner: '小思',
+        coins: [5, 5, 0.1, 0.2, 0.5],
+        moneyYuan: '10',
+        moneyJiao: '8',
+        tip: '5+5 = 10 元；1+2+5 角 = 8 角。',
+      },
+      {
+        id: 'd5-purse-hao',
+        kind: 'money',
+        level: 1,
+        section: '數硬幣錢包',
+        cue: '小豪錢包',
+        promptZh: '數一數圖裡的硬幣：小豪的錢包有幾多元、幾多角？',
+        purseOwner: '小豪',
+        coins: [10, 10, 0.2, 0.2],
+        moneyYuan: '20',
+        moneyJiao: '4',
+        tip: '10+10 = 20 元；2+2 角 = 4 角。',
+      },
+      {
+        id: 'd5-purse-most',
+        kind: 'choice',
+        level: 1,
+        section: '數硬幣錢包',
+        cue: '比較',
+        promptZh: '邊個有的錢最多？（小宇 11.3、小琪 10.6、小思 10.8、小豪 20.4）',
+        choices: [
+          { text: '小豪', correct: true },
+          { text: '小宇', correct: false },
+          { text: '小琪', correct: false },
+          { text: '小思', correct: false },
+        ],
+      },
+      {
+        id: 'd5-purse-least',
+        kind: 'choice',
+        level: 1,
+        section: '數硬幣錢包',
+        cue: '比較',
+        promptZh: '邊個有的錢最少？（小宇 11.3、小琪 10.6、小思 10.8、小豪 20.4）',
+        choices: [
+          { text: '小琪', correct: true },
+          { text: '小豪', correct: false },
+          { text: '小宇', correct: false },
+          { text: '小思', correct: false },
+        ],
+      },
+      {
         id: 'd5-$1',
         kind: 'math',
         level: 1,
@@ -1052,9 +1315,10 @@ export const days: DayPlan[] = [
         kind: 'math',
         level: 2,
         cue: '元角',
-        promptZh: '買一本簿 3 元 2 角、一枝筆 2 元 5 角，共要付多少？（可寫 5 元 7 角）',
-        answer: '5元7角',
-        answers: ['5元7角', '5.7', '57角', '5元7'],
+        promptZh: '買一本簿 3 元 2 角、一枝筆 2 元 5 角，共要付多少元？（用小數，例如 5.7）',
+        answer: '5.7',
+        answers: ['5.7', '5元7角', '57角', '5元7'],
+        tip: '3.2 + 2.5 = 5.7。用數字鍵盤打 5.7。',
       },
       {
         id: 'd5-$4',
@@ -1066,14 +1330,22 @@ export const days: DayPlan[] = [
         answers: ['27', '27元'],
       },
       {
-        id: 'd5-$5',
+        id: 'd5-$5a',
         kind: 'math',
         level: 4,
         cue: '綜合',
-        promptZh: '爸爸用 50 元買菜 12.5、魚 18.8、肉 15.3。總共用了多少？還餘多少？',
-        answer: '用46.6餘3.4',
-        answers: ['46.6', '3.4', '用46.6餘3.4', '46元6角', '3元4角'],
-        tip: '總額 46 元 6 角，餘 3 元 4 角。',
+        promptZh: '爸爸買菜 12.5、魚 18.8、肉 15.3。總共用了多少元？（小數）',
+        answer: '46.6',
+        tip: '12.5 + 18.8 + 15.3 = 46.6',
+      },
+      {
+        id: 'd5-$5b',
+        kind: 'math',
+        level: 4,
+        cue: '綜合',
+        promptZh: '爸爸帶 50 元，用了 46.6 元，還餘多少元？',
+        answer: '3.4',
+        tip: '50 − 46.6 = 3.4',
       },
     ],
   },
@@ -1170,55 +1442,85 @@ export const days: DayPlan[] = [
         kind: 'math',
         level: 1,
         cue: '複習 Lv1',
-        promptZh: '現在是 10 時，3 小時後是幾時？',
+        promptZh: '現在是 10 時，3 小時後是幾時？（用 24 小時制數字，例如 13）',
         answer: '13',
         answers: ['13', '13時', '下午1時', '下午一時', '下午1點'],
-        tip: '也可以說下午 1 時。',
+        tip: '10 + 3 = 13。打數字 13 就得。',
       },
       {
         id: 'd6-r2',
-        kind: 'math',
+        kind: 'choice',
         level: 1,
         cue: '複習 Lv1',
         promptZh: '小明有 8 粒糖，小華有 5 粒，誰比較多？',
-        answer: '小明',
-        answers: ['小明', '小明多'],
+        choices: [
+          { text: '小明', correct: true },
+          { text: '小華', correct: false },
+          { text: '一樣多', correct: false },
+        ],
       },
       {
-        id: 'd6-r3',
+        id: 'd6-r3a',
+        kind: 'choice',
+        level: 2,
+        cue: '複習 Lv2',
+        promptZh: '一班 14 人，二班 9 人，哪班比較多？',
+        choices: [
+          { text: '一班', correct: true },
+          { text: '二班', correct: false },
+          { text: '一樣多', correct: false },
+        ],
+      },
+      {
+        id: 'd6-r3b',
         kind: 'math',
         level: 2,
         cue: '複習 Lv2',
-        promptZh: '一班 14 人，二班 9 人，哪班多？多幾多？',
-        answer: '一班多5',
-        answers: ['一班多5', '一班多5人', '一班多五', '多5', '多5人'],
+        promptZh: '一班 14 人，二班 9 人，一班多幾多人？',
+        answer: '5',
       },
       {
-        id: 'd6-r4',
+        id: 'd6-r4a',
         kind: 'math',
         level: 3,
         cue: '複習 Lv3',
-        promptZh: '買 4 元 6 角麵包 + 2 元 5 角牛奶，共多少？付 10 元找回多少？',
-        answer: '共7.1找回2.9',
-        answers: ['7.1', '2.9', '7元1角', '2元9角', '共7.1找回2.9'],
-        tip: '共 7 元 1 角，找回 2 元 9 角。',
+        promptZh: '買 4.6 元麵包 + 2.5 元牛奶，共多少元？（小數）',
+        answer: '7.1',
+        tip: '4.6 + 2.5 = 7.1',
+      },
+      {
+        id: 'd6-r4b',
+        kind: 'math',
+        level: 3,
+        cue: '複習 Lv3',
+        promptZh: '一共 7.1 元，付 10 元，找回多少元？',
+        answer: '2.9',
+        tip: '10 − 7.1 = 2.9',
       },
     ],
   },
 ]
 
+function activityById(id: string): Activity {
+  for (const day of days) {
+    const found = day.activities.find((a) => a.id === id)
+    if (found) return found
+  }
+  throw new Error(`Activity not found: ${id}`)
+}
+
 /** Short mock flow drawn from key speaking tasks */
 export const mockInterview: Activity[] = [
-  days[0].activities[1],
-  days[0].activities[2],
-  days[0].activities[4],
-  days[0].activities[5],
-  days[2].activities[5],
-  days[3].activities[2],
-  days[4].activities[1],
-  days[5].activities[0],
-  days[5].activities[3],
-]
+  'd1-zh-basic',
+  'd1-zh-like',
+  'd1-zh-dream',
+  'd1-en-basic',
+  'd3-share',
+  'd4-emo2',
+  'd5-job',
+  'd6-dad',
+  'd6-en1',
+].map(activityById)
 
 export function getDay(id: DayId): DayPlan | undefined {
   return days.find((d) => d.id === id)
@@ -1268,4 +1570,43 @@ export function checkMath(activity: Activity, input: string): boolean {
   }
 
   return false
+}
+
+/** Normalize kid time input: 7:30 / 730 / 7 → 7:30 / 7:00 */
+export function normalizeTimeAnswer(s: string): string {
+  let t = normalizeAnswer(s)
+    .replace(/時|点|點/g, ':')
+    .replace(/分/g, '')
+    .replace(/:+/g, ':')
+    .replace(/^:|:$/g, '')
+
+  if (/^\d{1,2}:\d{1,2}$/.test(t)) {
+    const [h, m] = t.split(':')
+    return `${Number(h)}:${m.padStart(2, '0')}`
+  }
+  if (/^\d{3}$/.test(t)) {
+    return `${Number(t[0])}:${t.slice(1)}`
+  }
+  if (/^\d{4}$/.test(t)) {
+    return `${Number(t.slice(0, 2))}:${t.slice(2)}`
+  }
+  if (/^\d{1,2}$/.test(t)) {
+    return `${Number(t)}:00`
+  }
+  return t
+}
+
+export function checkClock(activity: Activity, input: string): boolean {
+  const accepted = (activity.answers ?? (activity.answer ? [activity.answer] : [])).map(normalizeTimeAnswer)
+  const got = normalizeTimeAnswer(input)
+  if (!got || accepted.length === 0) return false
+  return accepted.includes(got)
+}
+
+export function checkMoney(activity: Activity, yuan: string, jiao: string): boolean {
+  if (activity.moneyYuan == null || activity.moneyJiao == null) return false
+  return (
+    normalizeAnswer(yuan) === normalizeAnswer(activity.moneyYuan) &&
+    normalizeAnswer(jiao) === normalizeAnswer(activity.moneyJiao)
+  )
 }

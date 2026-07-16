@@ -698,6 +698,162 @@
   margin-top: 1rem;
 }
 
+.session__method {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #17384a;
+  background: rgba(255, 214, 102, 0.85);
+}
+
+.session__method--speak {
+  background: rgba(255, 184, 120, 0.95);
+}
+
+.session__method--math {
+  background: rgba(126, 200, 227, 0.95);
+}
+
+.session__method--choice,
+.session__method--reorder,
+.session__method--sort {
+  background: rgba(140, 212, 170, 0.95);
+}
+
+.session__method--prompt {
+  background: rgba(214, 196, 255, 0.95);
+}
+
+.speak-box {
+  margin-top: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.speak-box__guide {
+  margin: 0;
+  font-weight: 700;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.listen-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border-radius: 20px;
+  background: rgba(126, 200, 227, 0.14);
+  border: 2px dashed rgba(27, 58, 75, 0.12);
+}
+
+.listen-panel.is-listening {
+  border-style: solid;
+  border-color: rgba(196, 92, 38, 0.45);
+  background: rgba(255, 184, 120, 0.22);
+  animation: listen-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes listen-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(196, 92, 38, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(196, 92, 38, 0);
+  }
+}
+
+.listen-panel__stop {
+  background: #c45c26;
+}
+
+.listen-panel__transcript {
+  min-height: 4.2rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 16px;
+  background: white;
+  border: 2px solid rgba(27, 58, 75, 0.1);
+}
+
+.listen-panel__live {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #c45c26;
+}
+
+.listen-panel__text {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.listen-panel__interim {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.listen-panel__placeholder {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.listen-panel__error {
+  margin: 0;
+  font-weight: 700;
+  color: #a0452a;
+  line-height: 1.4;
+}
+
+.listen-panel__feedback {
+  padding: 0.65rem 0.75rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.listen-panel__feedback p {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.listen-panel__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.listen-chip {
+  display: inline-flex;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.listen-chip--ok {
+  background: rgba(140, 212, 170, 0.85);
+  color: #17384a;
+}
+
+.listen-panel__note {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
 .session__coach {
   margin-top: 1.4rem;
   padding-top: 1.2rem;
@@ -996,27 +1152,301 @@
   color: var(--ink-soft);
 }
 
-.math-box__row {
+.math-display {
+  min-height: 3.2rem;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1rem;
+  border-radius: 18px;
+  border: 2px solid rgba(27, 58, 75, 0.15);
+  background: white;
+  font-size: clamp(1.6rem, 6vw, 2rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+}
+
+.math-display__placeholder {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  letter-spacing: 0;
+}
+
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.55rem;
 }
 
-.math-input {
-  flex: 1;
-  min-width: 0;
-  padding: 0.75rem 0.9rem;
+.numpad__key {
+  min-height: 3.35rem;
+  border: none;
   border-radius: 16px;
-  border: 2px solid rgba(27, 58, 75, 0.15);
-  font-size: 1.15rem;
-  font-weight: 700;
-  font-family: var(--font-body);
+  background: #e8f6fb;
   color: var(--ink);
-  background: white;
+  font-size: 1.45rem;
+  font-weight: 800;
+  font-family: var(--font-body);
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(27, 58, 75, 0.12);
+  transition: transform 0.12s ease, background 0.12s ease;
 }
 
-.math-input:focus {
+.numpad__key:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.numpad__key:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.numpad__key--wide {
+  font-size: 1.15rem;
+}
+
+.numpad__key--go {
+  background: var(--accent, #1b6b8a);
+  color: white;
+}
+
+.session__method--clock,
+.session__method--money {
+  background: rgba(255, 214, 102, 0.95);
+}
+
+.analog-clock {
+  margin: 1rem auto 0.25rem;
+  width: min(100%, 260px);
+}
+
+.analog-clock__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 8px 16px rgba(27, 58, 75, 0.12));
+}
+
+.analog-clock__rim {
+  fill: #d8eef6;
+  stroke: #1b6b8a;
+  stroke-width: 4;
+}
+
+.analog-clock__face {
+  fill: #fffdf8;
+}
+
+.analog-clock__num {
+  font-size: 14px;
+  font-weight: 800;
+  fill: #17384a;
+  font-family: var(--font-body);
+}
+
+.analog-clock__tick {
+  stroke: rgba(27, 58, 75, 0.25);
+  stroke-width: 1.5;
+}
+
+.analog-clock__tick--major {
+  stroke: #17384a;
+  stroke-width: 2.5;
+}
+
+.analog-clock__hand {
+  stroke-linecap: round;
+}
+
+.analog-clock__hand--hour {
+  stroke: #17384a;
+  stroke-width: 6;
+}
+
+.analog-clock__hand--minute {
+  stroke: #c45c26;
+  stroke-width: 4;
+}
+
+.analog-clock__pin {
+  fill: #c45c26;
+}
+
+.coin-purse {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.coin-purse__bag {
+  margin: 0 auto;
+  max-width: 340px;
+  min-height: 160px;
+  padding: 1.1rem 1rem 1.3rem;
+  border-radius: 40% 40% 28% 28% / 55% 55% 35% 35%;
+  background: linear-gradient(180deg, #f3c27a 0%, #e0a45a 55%, #c88a3e 100%);
+  border: 4px solid #8a5520;
+  box-shadow: inset 0 -18px 0 rgba(0, 0, 0, 0.08);
+}
+
+.coin-purse__coins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.hk-coin {
+  width: 4.1rem;
+  height: 4.1rem;
+  border-radius: 50%;
+  border: 3px solid rgba(27, 58, 75, 0.2);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+  transition: transform 0.12s ease, outline 0.12s ease;
+}
+
+.hk-coin:active {
+  transform: translateY(2px);
+}
+
+.hk-coin.is-tapped {
+  outline: 3px solid #1f6b3a;
+  transform: scale(1.05);
+}
+
+.hk-coin__value {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.hk-coin--silver {
+  background: radial-gradient(circle at 30% 30%, #f7f7f7, #b8bdc4 70%);
+  color: #222;
+}
+
+.hk-coin--ten {
+  background: radial-gradient(circle at 35% 30%, #ffe9a8, #d4a017 45%, #c0c4cc 46%, #8e949c);
+  color: #222;
+}
+
+.hk-coin--two {
+  background: radial-gradient(circle at 30% 30%, #f2f2f2, #b0b5bc);
+  color: #222;
+  border-radius: 42%;
+}
+
+.hk-coin--gold,
+.hk-coin--twenty {
+  background: radial-gradient(circle at 30% 30%, #ffe6a8, #d4a24c 70%);
+  color: #5a3510;
+}
+
+.hk-coin--twenty {
+  border-radius: 40%;
+}
+
+.coin-purse__owner {
+  margin: 0.65rem 0 0.15rem;
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+
+.coin-purse__hint {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.money-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.money-field {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 3.4rem;
+  border-radius: 18px;
+  border: 2px solid rgba(27, 58, 75, 0.15);
+  background: white;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.money-field.is-active {
+  border-color: var(--sky-deep, #1b6b8a);
   outline: 3px solid rgba(126, 200, 227, 0.45);
-  border-color: var(--sky-deep);
+}
+
+.money-field__value {
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+
+.money-field__unit {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.june-cal {
+  margin: 1rem auto 0.25rem;
+  max-width: 320px;
+  padding: 0.75rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 2px solid rgba(27, 58, 75, 0.1);
+}
+
+.june-cal__title {
+  margin: 0 0 0.45rem;
+  text-align: center;
+  font-weight: 800;
+}
+
+.june-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.june-cal__head,
+.june-cal__cell {
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.28rem 0;
+}
+
+.june-cal__head {
+  color: var(--ink-soft);
+}
+
+.june-cal__cell {
+  border-radius: 8px;
+  background: rgba(126, 200, 227, 0.12);
+}
+
+.june-cal__cell.is-empty {
+  background: transparent;
+}
+
+.june-cal__cell.is-highlight {
+  background: #ffb86b;
+  color: #17384a;
+  font-weight: 900;
 }
 
 .math-feedback {

@@ -1,16 +1,24 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties, type DragEvent } from 'react'
 import {
+  checkClock,
   checkMath,
+  checkMoney,
   levels,
   type Activity,
+  type ActivityKind,
   type DayId,
 } from '../data/content'
 import { useSpeech } from '../hooks/useSpeech'
+import { useSpeechRecognition, type ListenLang } from '../hooks/useSpeechRecognition'
+import { softSpeakFeedback } from '../lib/softSpeakFeedback'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
 import { SceneArt } from './SceneArt'
 import { Confetti } from './Confetti'
 import { Mascot } from './Mascot'
 import { SoundToggle } from './SoundToggle'
+import { AnalogClock } from './AnalogClock'
+import { CoinPurse } from './CoinPurse'
+import { JuneCalendar } from './JuneCalendar'
 
 type Props = {
   title: string
@@ -21,6 +29,37 @@ type Props = {
   onMarkDone: (itemId: string, moduleKey: DayId | 'mock' | 'vocab') => void
   onBack: () => void
   celebrate?: boolean
+}
+
+const METHOD_LABEL: Record<ActivityKind, string> = {
+  speak: '大聲講',
+  choice: '點選答案',
+  math: '打數字',
+  reorder: '排詞語',
+  prompt: '同家長一齊',
+  sort: '拖／點分類',
+  clock: '看鐘打時間',
+  money: '數硬幣',
+}
+
+const MATH_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '/'] as const
+const CLOCK_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', ':', '0', '00'] as const
+const MONEY_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '檢查'] as const
+
+function placeIntoBucket(
+  text: string,
+  bucket: string,
+  setSortPlacement: (fn: (prev: Record<string, string>) => Record<string, string>) => void,
+  setSortSelected: (v: string | null) => void,
+  setSortChecked: (v: boolean) => void,
+  setCoachMsg: (v: string | null) => void,
+) {
+  unlockAudio()
+  playSfx('tap')
+  setSortPlacement((prev) => ({ ...prev, [text]: bucket }))
+  setSortSelected(null)
+  setSortChecked(false)
+  setCoachMsg(null)
 }
 
 export function PracticeSession({
@@ -44,13 +83,28 @@ export function PracticeSession({
   const [coachMsg, setCoachMsg] = useState<string | null>(null)
   const [mathInput, setMathInput] = useState('')
   const [mathResult, setMathResult] = useState<'ok' | 'no' | null>(null)
+  const [moneyYuan, setMoneyYuan] = useState('')
+  const [moneyJiao, setMoneyJiao] = useState('')
+  const [moneyField, setMoneyField] = useState<'yuan' | 'jiao'>('yuan')
   const [order, setOrder] = useState<string[]>([])
   const [pool, setPool] = useState<string[]>([])
   const [checkedFields, setCheckedFields] = useState<Record<string, boolean>>({})
   const [sortSelected, setSortSelected] = useState<string | null>(null)
   const [sortPlacement, setSortPlacement] = useState<Record<string, string>>({})
   const [sortChecked, setSortChecked] = useState(false)
+  const [dragWord, setDragWord] = useState<string | null>(null)
   const { speak, stop } = useSpeech()
+  const {
+    supported: listenSupported,
+    listening,
+    transcript: listenTranscript,
+    interim: listenInterim,
+    error: listenError,
+    start: startListening,
+    stop: stopListening,
+    reset: resetListening,
+  } = useSpeechRecognition()
+  const [listenLang, setListenLang] = useState<ListenLang>('zh-HK')
 
   const item = items[index]
   const isLast = index >= items.length - 1
@@ -68,11 +122,12 @@ export function PracticeSession({
     return item.sortItems.every((s) => !!sortPlacement[s.text])
   }, [item, sortPlacement])
 
-  const mascotMood = justStar || mathResult === 'ok' || solvedChoice || (sortChecked && sortCorrect)
-    ? 'cheer'
-    : mathResult === 'no' || wrongAttempts > 0 || (sortChecked && !sortCorrect)
-      ? 'think'
-      : 'happy'
+  const mascotMood =
+    justStar || mathResult === 'ok' || solvedChoice || (sortChecked && sortCorrect)
+      ? 'cheer'
+      : mathResult === 'no' || wrongAttempts > 0 || (sortChecked && !sortCorrect)
+        ? 'think'
+        : 'happy'
 
   const resetInteraction = (_activity: Activity) => {
     setShowSample(false)
@@ -84,10 +139,17 @@ export function PracticeSession({
     setCoachMsg(null)
     setMathInput('')
     setMathResult(null)
+    setMoneyYuan('')
+    setMoneyJiao('')
+    setMoneyField('yuan')
     setCheckedFields({})
+    stopListening()
+    resetListening()
+    setListenLang(_activity.promptEn && (!_activity.sampleZh || _activity.sampleZh === _activity.sampleEn) ? 'en-US' : 'zh-HK')
     setSortSelected(null)
     setSortPlacement({})
     setSortChecked(false)
+    setDragWord(null)
     if (_activity.kind === 'reorder' && _activity.fragments) {
       const shuffled = [..._activity.fragments].sort(() => Math.random() - 0.5)
       setPool(shuffled)
@@ -120,6 +182,15 @@ export function PracticeSession({
     return order.length === item.correctOrder.length && order.every((w, i) => w === item.correctOrder![i])
   }, [item, order])
 
+  const speakFeedback = useMemo(() => {
+    if (item.kind !== 'speak' || !listenTranscript.trim()) return null
+    const sample =
+      listenLang === 'en-US'
+        ? item.sampleEn || item.sampleZh
+        : item.sampleZh || item.sampleEn
+    return softSpeakFeedback(listenTranscript, sample, listenLang === 'en-US' ? 'en' : 'zh')
+  }, [item, listenTranscript, listenLang])
+
   useEffect(() => {
     if (reorderCorrect && !done) {
       playSfx('correct')
@@ -128,6 +199,7 @@ export function PracticeSession({
 
   const goNext = () => {
     stop()
+    stopListening()
     playSfx('whoosh')
     if (isLast) {
       if (celebrate) playSfx('celebrate')
@@ -147,25 +219,29 @@ export function PracticeSession({
 
   const isSolved = (): boolean => {
     if (item.kind === 'choice') return solvedChoice
-    if (item.kind === 'math') return mathResult === 'ok'
+    if (item.kind === 'math' || item.kind === 'clock' || item.kind === 'money') {
+      return mathResult === 'ok'
+    }
     if (item.kind === 'reorder') return reorderCorrect
     if (item.kind === 'sort') return sortChecked && sortCorrect
     if (item.kind === 'prompt') {
       if (!item.fields?.length) return true
       return item.fields.every((f) => checkedFields[f])
     }
-    return showSample
+    // speak: star when parent/kid taps「我講完啦」(marks done)
+    return done
   }
 
   const canProceed = (): boolean => {
     if (done) return true
-    if (item.kind === 'choice' || item.kind === 'math') {
+    if (item.kind === 'speak') return false
+    if (item.kind === 'choice' || item.kind === 'math' || item.kind === 'clock' || item.kind === 'money') {
       return isSolved() || revealAnswer
     }
     if (item.kind === 'reorder') return reorderCorrect
     if (item.kind === 'sort') return (sortChecked && sortCorrect) || revealAnswer
     if (item.kind === 'prompt') return isSolved()
-    return showSample || done
+    return false
   }
 
   const registerWrong = (extraTip?: string) => {
@@ -182,18 +258,99 @@ export function PracticeSession({
     })
   }
 
+  const markMathOk = () => {
+    setMathResult('ok')
+    setCoachMsg('答對啦！好努力！')
+    playSfx('correct')
+    if (!done) {
+      onMarkDone(item.id, moduleKey)
+      setJustStar(true)
+    }
+  }
+
+  const submitMath = () => {
+    if (mathResult === 'ok') return
+    unlockAudio()
+    const ok = checkMath(item, mathInput)
+    if (ok) markMathOk()
+    else {
+      setMathResult('no')
+      playSfx('wrong')
+      registerWrong(item.tip)
+    }
+  }
+
+  const submitClock = () => {
+    if (mathResult === 'ok') return
+    unlockAudio()
+    const ok = checkClock(item, mathInput)
+    if (ok) markMathOk()
+    else {
+      setMathResult('no')
+      playSfx('wrong')
+      registerWrong(item.tip)
+    }
+  }
+
+  const submitMoney = () => {
+    if (mathResult === 'ok') return
+    unlockAudio()
+    const ok = checkMoney(item, moneyYuan, moneyJiao)
+    if (ok) markMathOk()
+    else {
+      setMathResult('no')
+      playSfx('wrong')
+      registerWrong(item.tip)
+    }
+  }
+
+  const appendMathKey = (key: string) => {
+    if (mathResult === 'ok') return
+    playSfx('tap')
+    setMathResult(null)
+    if (key === '00') setMathInput((prev) => `${prev}00`)
+    else setMathInput((prev) => `${prev}${key}`)
+  }
+
+  const appendMoneyKey = (key: string) => {
+    if (mathResult === 'ok') return
+    if (key === '檢查') {
+      submitMoney()
+      return
+    }
+    playSfx('tap')
+    setMathResult(null)
+    if (key === '⌫') {
+      if (moneyField === 'yuan') setMoneyYuan((p) => p.slice(0, -1))
+      else setMoneyJiao((p) => p.slice(0, -1))
+      return
+    }
+    if (moneyField === 'yuan') setMoneyYuan((p) => `${p}${key}`)
+    else setMoneyJiao((p) => `${p}${key}`)
+  }
+
   const handlePrimary = () => {
     unlockAudio()
     playSfx('tap')
-    if (item.kind === 'speak' && !showSample && !done) {
-      setShowSample(true)
-      playSfx('flip')
-      return
-    }
     if (!canProceed() && !done) return
-    // Only award a star when Seth actually solved it (not only peeked answer)
     if (!done && isSolved()) awardAndMaybeNext(true)
     else goNext()
+  }
+
+  const onDragStartWord = (text: string) => (e: DragEvent) => {
+    setDragWord(text)
+    setSortSelected(text)
+    e.dataTransfer.setData('text/plain', text)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const onDropBucket = (bucket: string) => (e: DragEvent) => {
+    e.preventDefault()
+    if (sortChecked && sortCorrect) return
+    const text = e.dataTransfer.getData('text/plain') || dragWord || sortSelected
+    if (!text) return
+    placeIntoBucket(text, bucket, setSortPlacement, setSortSelected, setSortChecked, setCoachMsg)
+    setDragWord(null)
   }
 
   return (
@@ -206,6 +363,7 @@ export function PracticeSession({
           className="ghost-btn"
           onClick={() => {
             stop()
+            stopListening()
             playSfx('tap')
             onBack()
           }}
@@ -231,6 +389,7 @@ export function PracticeSession({
 
         <div className="session__card" key={item.id}>
           <div className="session__badges">
+            <p className={`session__method session__method--${item.kind}`}>{METHOD_LABEL[item.kind]}</p>
             {(item.section || item.cue) && (
               <p className="session__cue">{item.section || item.cue}</p>
             )}
@@ -242,6 +401,9 @@ export function PracticeSession({
           </div>
 
           {item.scene && <SceneArt scene={item.scene} alt={item.promptZh} />}
+          {item.clock && <AnalogClock hour={item.clock.hour} minute={item.clock.minute} />}
+          {item.coins && item.purseOwner && <CoinPurse owner={item.purseOwner} coins={item.coins} />}
+          {item.calendarDay != null && <JuneCalendar highlightDay={item.calendarDay} />}
 
           <h2 className="session__q">{item.promptZh}</h2>
           {item.promptEn && <p className="session__q-en">{item.promptEn}</p>}
@@ -273,8 +435,173 @@ export function PracticeSession({
             )}
           </div>
 
+          {item.kind === 'speak' && (
+            <div className="speak-box">
+              <p className="speak-box__guide">
+                唔使打字！大聲講俾爸爸媽媽聽。可以叫電話試聽（只係練習提示，唔會自動判錯）。
+              </p>
+
+              {listenSupported && (
+                <div className={`listen-panel ${listening ? 'is-listening' : ''}`}>
+                  <div className="session__actions">
+                    <button
+                      type="button"
+                      className={`pill-btn ${listenLang === 'zh-HK' ? '' : 'pill-btn--soft'}`}
+                      disabled={listening}
+                      onClick={() => {
+                        playSfx('tap')
+                        setListenLang('zh-HK')
+                      }}
+                    >
+                      廣東話
+                    </button>
+                    <button
+                      type="button"
+                      className={`pill-btn ${listenLang === 'en-US' ? '' : 'pill-btn--soft'}`}
+                      disabled={listening}
+                      onClick={() => {
+                        playSfx('tap')
+                        setListenLang('en-US')
+                      }}
+                    >
+                      English
+                    </button>
+                  </div>
+                  {!listening ? (
+                    <button
+                      type="button"
+                      className="primary-btn primary-btn--wide"
+                      onClick={() => {
+                        unlockAudio()
+                        stop()
+                        playSfx('tap')
+                        startListening(listenLang)
+                      }}
+                    >
+                      試下用電話聽你講
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="primary-btn primary-btn--wide listen-panel__stop"
+                      onClick={() => {
+                        playSfx('tap')
+                        stopListening()
+                      }}
+                    >
+                      講完，停止聽
+                    </button>
+                  )}
+                  <div className="listen-panel__transcript" aria-live="polite">
+                    {listening && <p className="listen-panel__live">聽緊…大聲少少講啦</p>}
+                    {(listenTranscript || listenInterim) ? (
+                      <p className="listen-panel__text">
+                        {listenTranscript}
+                        {listenInterim ? (
+                          <span className="listen-panel__interim"> {listenInterim}</span>
+                        ) : null}
+                      </p>
+                    ) : (
+                      <p className="listen-panel__placeholder">電話聽到嘅字會顯示喺度</p>
+                    )}
+                  </div>
+                  {listenError && <p className="listen-panel__error">{listenError}</p>}
+                  {speakFeedback && (
+                    <div className="listen-panel__feedback">
+                      <p>{speakFeedback.message}</p>
+                      {speakFeedback.matched.length > 0 && (
+                        <div className="listen-panel__chips">
+                          {speakFeedback.matched.map((k) => (
+                            <span key={k} className="listen-chip listen-chip--ok">
+                              {k}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <p className="listen-panel__note">
+                    童聲粵語電話未必聽得準——星星仍然由爸爸媽媽決定。
+                  </p>
+                </div>
+              )}
+
+              {!listenSupported && (
+                <p className="speak-box__guide">呢部瀏覽器未支援語音辨識，改由爸爸媽媽聽就得。</p>
+              )}
+
+              {!done ? (
+                <button
+                  type="button"
+                  className="primary-btn primary-btn--wide"
+                  onClick={() => {
+                    unlockAudio()
+                    stopListening()
+                    playSfx('correct')
+                    onMarkDone(item.id, moduleKey)
+                    setJustStar(true)
+                  }}
+                >
+                  我講完啦 ★
+                </button>
+              ) : (
+                <p className="math-feedback is-ok">講得好！已經有星星啦</p>
+              )}
+              <div className="session__actions">
+                <button
+                  type="button"
+                  className="pill-btn pill-btn--soft"
+                  onClick={() => {
+                    playSfx('flip')
+                    setShowSample((v) => !v)
+                  }}
+                >
+                  {showSample ? '收起參考' : '家長：睇／聽參考'}
+                </button>
+              </div>
+              {showSample && (item.sampleZh || item.sampleEn || item.tip) && (
+                <div className="sample">
+                  {item.sampleZh && <p className="sample__zh">{item.sampleZh}</p>}
+                  {item.sampleEn && item.sampleEn !== item.sampleZh && (
+                    <p className="sample__en">{item.sampleEn}</p>
+                  )}
+                  {item.tip && <p className="sample__tip">小提示：{item.tip}</p>}
+                  <div className="session__actions">
+                    {item.sampleZh && (
+                      <button
+                        type="button"
+                        className="pill-btn"
+                        onClick={() => {
+                          playSfx('tap')
+                          stopListening()
+                          speak(item.sampleZh!, 'zh-HK')
+                        }}
+                      >
+                        聽參考
+                      </button>
+                    )}
+                    {item.sampleEn && (
+                      <button
+                        type="button"
+                        className="pill-btn pill-btn--soft"
+                        onClick={() => {
+                          playSfx('tap')
+                          stopListening()
+                          speak(item.sampleEn!, 'en-US')
+                        }}
+                      >
+                        Listen EN
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {item.kind === 'choice' && item.choices && (
             <div className="choice-list">
+              <p className="reorder__hint">用手指點正確答案（唔使打字）</p>
               {item.choices.map((c, i) => {
                 const selected = picked === i
                 const triedWrong = wrongPicks.includes(i)
@@ -336,46 +663,186 @@ export function PracticeSession({
             </div>
           )}
 
-          {item.kind === 'math' && (
+          {item.kind === 'clock' && (
             <div className="math-box">
-              <label className="math-box__label" htmlFor="math-answer">
-                你的答案
-              </label>
-              <div className="math-box__row">
-                <input
-                  id="math-answer"
-                  className="math-input"
-                  value={mathInput}
-                  onChange={(e) => {
-                    setMathInput(e.target.value)
-                    setMathResult(null)
-                  }}
-                  placeholder="輸入答案"
-                  inputMode="text"
-                  autoComplete="off"
-                  disabled={mathResult === 'ok'}
-                />
+              <p className="math-box__label">看鐘面，用數字打時間（例如 7:30）</p>
+              <div className="math-display" aria-live="polite">
+                {mathInput || <span className="math-display__placeholder">__:__</span>}
+              </div>
+              <div className="numpad" role="group" aria-label="時間鍵盤">
+                {CLOCK_KEYS.map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className="numpad__key"
+                    disabled={mathResult === 'ok'}
+                    onClick={() => appendMathKey(key)}
+                  >
+                    {key}
+                  </button>
+                ))}
                 <button
                   type="button"
-                  className="pill-btn"
-                  disabled={mathResult === 'ok'}
+                  className="numpad__key numpad__key--wide"
+                  disabled={mathResult === 'ok' || !mathInput}
                   onClick={() => {
-                    unlockAudio()
-                    const ok = checkMath(item, mathInput)
-                    if (ok) {
-                      setMathResult('ok')
-                      setCoachMsg('答對啦！好努力！')
-                      playSfx('correct')
-                      if (!done) {
-                        onMarkDone(item.id, moduleKey)
-                        setJustStar(true)
-                      }
-                    } else {
-                      setMathResult('no')
-                      playSfx('wrong')
-                      registerWrong(item.tip)
-                    }
+                    playSfx('tap')
+                    setMathResult(null)
+                    setMathInput((prev) => prev.slice(0, -1))
                   }}
+                >
+                  ⌫
+                </button>
+                <button
+                  type="button"
+                  className="numpad__key numpad__key--wide numpad__key--go"
+                  disabled={mathResult === 'ok' || !mathInput}
+                  onClick={submitClock}
+                >
+                  檢查
+                </button>
+              </div>
+              {(coachMsg || mathResult === 'ok') && (
+                <p className={`math-feedback ${mathResult === 'ok' ? 'is-ok' : 'is-no'}`}>
+                  {mathResult === 'ok' ? '答對啦！好努力！' : coachMsg}
+                </p>
+              )}
+              {mathResult !== 'ok' && !revealAnswer && wrongAttempts >= 2 && (
+                <button
+                  type="button"
+                  className="pill-btn pill-btn--soft"
+                  style={{ marginTop: '0.55rem' }}
+                  onClick={() => {
+                    playSfx('flip')
+                    setRevealAnswer(true)
+                    setCoachMsg(`參考答案：${item.answer ?? ''}${item.tip ? `（${item.tip}）` : ''}`)
+                  }}
+                >
+                  睇睇答案
+                </button>
+              )}
+              {revealAnswer && mathResult !== 'ok' && item.answer && (
+                <p className="sample__tip">參考答案：{item.answer}</p>
+              )}
+            </div>
+          )}
+
+          {item.kind === 'money' && (
+            <div className="math-box">
+              <p className="math-box__label">先點「元」或「角」，再用數字鍵填（唔使打中文）</p>
+              <div className="money-fields">
+                <button
+                  type="button"
+                  className={`money-field ${moneyField === 'yuan' ? 'is-active' : ''}`}
+                  onClick={() => {
+                    playSfx('tap')
+                    setMoneyField('yuan')
+                  }}
+                >
+                  <span className="money-field__value">{moneyYuan || '—'}</span>
+                  <span className="money-field__unit">元</span>
+                </button>
+                <button
+                  type="button"
+                  className={`money-field ${moneyField === 'jiao' ? 'is-active' : ''}`}
+                  onClick={() => {
+                    playSfx('tap')
+                    setMoneyField('jiao')
+                  }}
+                >
+                  <span className="money-field__value">{moneyJiao || '—'}</span>
+                  <span className="money-field__unit">角</span>
+                </button>
+              </div>
+              <div className="numpad" role="group" aria-label="元角鍵盤">
+                {MONEY_KEYS.map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className={[
+                      'numpad__key',
+                      key === '檢查' ? 'numpad__key--go' : '',
+                      key === '⌫' || key === '檢查' ? 'numpad__key--wide' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    disabled={
+                      mathResult === 'ok' ||
+                      (key === '檢查' && (!moneyYuan || !moneyJiao)) ||
+                      (key === '⌫' && !(moneyField === 'yuan' ? moneyYuan : moneyJiao))
+                    }
+                    onClick={() => appendMoneyKey(key)}
+                  >
+                    {key}
+                  </button>
+                ))}
+              </div>
+              {(coachMsg || mathResult === 'ok') && (
+                <p className={`math-feedback ${mathResult === 'ok' ? 'is-ok' : 'is-no'}`}>
+                  {mathResult === 'ok' ? '答對啦！好努力！' : coachMsg}
+                </p>
+              )}
+              {mathResult !== 'ok' && !revealAnswer && wrongAttempts >= 2 && (
+                <button
+                  type="button"
+                  className="pill-btn pill-btn--soft"
+                  style={{ marginTop: '0.55rem' }}
+                  onClick={() => {
+                    playSfx('flip')
+                    setRevealAnswer(true)
+                    setMoneyYuan(item.moneyYuan ?? '')
+                    setMoneyJiao(item.moneyJiao ?? '')
+                    setCoachMsg(
+                      `參考答案：${item.moneyYuan} 元 ${item.moneyJiao} 角${item.tip ? `（${item.tip}）` : ''}`,
+                    )
+                  }}
+                >
+                  睇睇答案
+                </button>
+              )}
+              {revealAnswer && mathResult !== 'ok' && (
+                <p className="sample__tip">
+                  參考答案：{item.moneyYuan} 元 {item.moneyJiao} 角
+                </p>
+              )}
+            </div>
+          )}
+
+          {item.kind === 'math' && (
+            <div className="math-box">
+              <p className="math-box__label">只用大數字鍵（唔使打中文／英文）</p>
+              <div className="math-display" aria-live="polite">
+                {mathInput || <span className="math-display__placeholder">答案會顯示喺度</span>}
+              </div>
+              <div className="numpad" role="group" aria-label="數字鍵盤">
+                {MATH_KEYS.map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className="numpad__key"
+                    disabled={mathResult === 'ok'}
+                    onClick={() => appendMathKey(key)}
+                  >
+                    {key}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className="numpad__key numpad__key--wide"
+                  disabled={mathResult === 'ok' || !mathInput}
+                  onClick={() => {
+                    playSfx('tap')
+                    setMathResult(null)
+                    setMathInput((prev) => prev.slice(0, -1))
+                  }}
+                >
+                  ⌫
+                </button>
+                <button
+                  type="button"
+                  className="numpad__key numpad__key--wide numpad__key--go"
+                  disabled={mathResult === 'ok' || !mathInput}
+                  onClick={submitMath}
                 >
                   檢查
                 </button>
@@ -408,31 +875,36 @@ export function PracticeSession({
           {item.kind === 'sort' && item.sortItems && item.buckets && (
             <div className="sort-box">
               <p className="reorder__hint">
-                {sortSelected ? `已選「${sortSelected}」——再點圓圈放入` : '先點選下面的情緒詞'}
+                {sortSelected
+                  ? `已選「${sortSelected}」——拖去或再點圓圈放入`
+                  : '拖詞語入圓圈，或者先點詞再點圓圈'}
               </p>
               <div className="sort-buckets">
                 {item.buckets.map((bucket) => (
                   <button
                     key={bucket}
                     type="button"
-                    className={`sort-bucket ${sortSelected ? 'is-ready' : ''}`}
+                    className={`sort-bucket ${sortSelected || dragWord ? 'is-ready' : ''}`}
                     onClick={() => {
                       if (!sortSelected || (sortChecked && sortCorrect)) return
-                      unlockAudio()
-                      playSfx('tap')
-                      setSortPlacement((prev) => ({ ...prev, [sortSelected]: bucket }))
-                      setSortSelected(null)
-                      setSortChecked(false)
-                      setCoachMsg(null)
+                      placeIntoBucket(
+                        sortSelected,
+                        bucket,
+                        setSortPlacement,
+                        setSortSelected,
+                        setSortChecked,
+                        setCoachMsg,
+                      )
                     }}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={onDropBucket(bucket)}
                   >
                     <span className="sort-bucket__title">{bucket}</span>
                     <div className="sort-bucket__items">
                       {item.sortItems!
                         .filter((s) => sortPlacement[s.text] === bucket)
                         .map((s) => {
-                          const wrongHere =
-                            sortChecked && !revealAnswer && s.bucket !== bucket
+                          const wrongHere = sortChecked && !revealAnswer && s.bucket !== bucket
                           const showOk =
                             (sortChecked && sortCorrect) || revealAnswer
                               ? s.bucket === bucket
@@ -441,6 +913,7 @@ export function PracticeSession({
                             <button
                               key={s.text}
                               type="button"
+                              draggable={!(sortChecked && sortCorrect)}
                               className={[
                                 'chip chip--placed',
                                 wrongHere ? 'is-sort-wrong' : '',
@@ -448,6 +921,7 @@ export function PracticeSession({
                               ]
                                 .filter(Boolean)
                                 .join(' ')}
+                              onDragStart={onDragStartWord(s.text)}
                               onClick={(e) => {
                                 e.stopPropagation()
                                 if (sortChecked && sortCorrect) return
@@ -475,7 +949,9 @@ export function PracticeSession({
                     <button
                       key={text}
                       type="button"
+                      draggable={!(sortChecked && sortCorrect)}
                       className={`chip ${sortSelected === text ? 'chip--active' : ''}`}
+                      onDragStart={onDragStartWord(text)}
                       onClick={() => {
                         if (sortChecked && sortCorrect) return
                         playSfx('tap')
@@ -537,7 +1013,7 @@ export function PracticeSession({
 
           {item.kind === 'reorder' && (
             <div className="reorder">
-              <p className="reorder__hint">點選詞語組成句子</p>
+              <p className="reorder__hint">點選詞語組成句子（唔使打字）</p>
               <div className="reorder__sentence">
                 {order.length === 0 && <span className="reorder__placeholder">句子會出現在這裡</span>}
                 {order.map((w, i) => (
@@ -594,7 +1070,7 @@ export function PracticeSession({
 
           {item.kind === 'prompt' && (
             <div className="prompt-fields">
-              <p className="reorder__hint">和家長一起完成，打勾就可以</p>
+              <p className="reorder__hint">和家長一起做動作／傾偈，打勾就可以（唔使打字）</p>
               {(item.fields ?? ['我已經試過']).map((f) => (
                 <label key={f} className="check-row">
                   <input
@@ -611,62 +1087,19 @@ export function PracticeSession({
             </div>
           )}
 
-          {(item.kind === 'speak' || item.sampleZh || item.sampleEn || item.tip) && (
-            <div className="session__coach">
-              {item.kind === 'speak' && <p className="session__coach-label">先自己試答，再看參考</p>}
-              {item.kind === 'speak' && !showSample ? (
-                <button
-                  type="button"
-                  className="primary-btn"
-                  onClick={() => {
-                    playSfx('flip')
-                    setShowSample(true)
-                  }}
-                >
-                  看參考答案
-                </button>
-              ) : (
-                (showSample || item.kind !== 'speak') &&
-                (item.sampleZh || item.sampleEn || item.tip) && (
-                  <div className="sample">
-                    {item.sampleZh && <p className="sample__zh">{item.sampleZh}</p>}
-                    {item.sampleEn && item.sampleEn !== item.sampleZh && (
-                      <p className="sample__en">{item.sampleEn}</p>
-                    )}
-                    {item.tip && <p className="sample__tip">小提示：{item.tip}</p>}
-                    {(item.sampleZh || item.sampleEn) && (
-                      <div className="session__actions">
-                        {item.sampleZh && (
-                          <button
-                            type="button"
-                            className="pill-btn"
-                            onClick={() => {
-                              playSfx('tap')
-                              speak(item.sampleZh!, 'zh-HK')
-                            }}
-                          >
-                            聽參考
-                          </button>
-                        )}
-                        {item.sampleEn && (
-                          <button
-                            type="button"
-                            className="pill-btn pill-btn--soft"
-                            onClick={() => {
-                              playSfx('tap')
-                              speak(item.sampleEn!, 'en-US')
-                            }}
-                          >
-                            Listen EN
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )
-              )}
-            </div>
-          )}
+          {item.kind !== 'speak' &&
+            (item.sampleZh || item.sampleEn || item.tip) &&
+            (showSample || item.kind === 'prompt') && (
+              <div className="session__coach">
+                <div className="sample">
+                  {item.sampleZh && <p className="sample__zh">{item.sampleZh}</p>}
+                  {item.sampleEn && item.sampleEn !== item.sampleZh && (
+                    <p className="sample__en">{item.sampleEn}</p>
+                  )}
+                  {item.tip && <p className="sample__tip">小提示：{item.tip}</p>}
+                </div>
+              </div>
+            )}
         </div>
       </div>
 
@@ -677,6 +1110,7 @@ export function PracticeSession({
           disabled={index === 0}
           onClick={() => {
             stop()
+            stopListening()
             playSfx('whoosh')
             setIndex((i) => Math.max(0, i - 1))
           }}
@@ -686,7 +1120,7 @@ export function PracticeSession({
         <button
           type="button"
           className="primary-btn primary-btn--wide"
-          disabled={!done && !canProceed() && item.kind !== 'speak'}
+          disabled={!done && !canProceed()}
           onClick={handlePrimary}
         >
           {done ? (isLast ? '完成！回主頁' : '下一題') : isLast ? '完成今日' : '下一題'}
