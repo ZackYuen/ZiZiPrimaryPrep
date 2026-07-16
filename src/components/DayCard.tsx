@@ -97,11 +97,15 @@ export function DayCard({ day, doneCount, total, onOpen, delay = 0 }: Props) {
       <span className="module-card__body">
         <span className="module-card__title">{day.title}</span>
         <span className="module-card__sub">{day.subtitle}</span>
+        <span className="module-card__sections">
+          {day.sections.slice(0, 3).join(' · ')}
+          {day.sections.length > 3 ? ' …' : ''}
+        </span>
         <span className="module-card__bar" aria-hidden>
           <span style={{ width: `${pct}%` }} />
         </span>
         <span className="module-card__meta">
-          {doneCount}/{total} 完成
+          {doneCount}/{total} 完成 · 跟 PDF Day {day.day}
         </span>
       </span>
     </button>

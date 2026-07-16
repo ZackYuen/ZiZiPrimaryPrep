@@ -1129,14 +1129,42 @@
   border-radius: 22px;
   overflow: hidden;
   border: 3px solid rgba(27, 58, 75, 0.08);
-  background: #b8e4f5;
+  background: #fff6e4;
   animation: rise-in 0.4s ease both;
+}
+
+.scene-art--photo {
+  background: #fff8ef;
+  box-shadow: inset 0 0 0 1px rgba(27, 58, 75, 0.04);
+}
+
+.scene-art__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(52vh, 360px);
+  object-fit: contain;
+  background: linear-gradient(180deg, #fffaf0, #ffe9c8);
 }
 
 .scene-art__svg {
   display: block;
   width: 100%;
   height: auto;
+}
+
+.module-card__sections {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  line-height: 1.35;
+  margin-top: 0.15rem;
+}
+
+.section-note {
+  margin: -0.35rem 0 0.25rem;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  font-weight: 600;
 }
 
 .scene-sun {
