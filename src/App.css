@@ -743,6 +743,117 @@
   line-height: 1.45;
 }
 
+.listen-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border-radius: 20px;
+  background: rgba(126, 200, 227, 0.14);
+  border: 2px dashed rgba(27, 58, 75, 0.12);
+}
+
+.listen-panel.is-listening {
+  border-style: solid;
+  border-color: rgba(196, 92, 38, 0.45);
+  background: rgba(255, 184, 120, 0.22);
+  animation: listen-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes listen-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(196, 92, 38, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(196, 92, 38, 0);
+  }
+}
+
+.listen-panel__stop {
+  background: #c45c26;
+}
+
+.listen-panel__transcript {
+  min-height: 4.2rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 16px;
+  background: white;
+  border: 2px solid rgba(27, 58, 75, 0.1);
+}
+
+.listen-panel__live {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #c45c26;
+}
+
+.listen-panel__text {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.listen-panel__interim {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.listen-panel__placeholder {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.listen-panel__error {
+  margin: 0;
+  font-weight: 700;
+  color: #a0452a;
+  line-height: 1.4;
+}
+
+.listen-panel__feedback {
+  padding: 0.65rem 0.75rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.listen-panel__feedback p {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.listen-panel__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.listen-chip {
+  display: inline-flex;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.listen-chip--ok {
+  background: rgba(140, 212, 170, 0.85);
+  color: #17384a;
+}
+
+.listen-panel__note {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
 .session__coach {
   margin-top: 1.4rem;
   padding-top: 1.2rem;

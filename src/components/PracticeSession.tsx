@@ -9,6 +9,8 @@ import {
   type DayId,
 } from '../data/content'
 import { useSpeech } from '../hooks/useSpeech'
+import { useSpeechRecognition, type ListenLang } from '../hooks/useSpeechRecognition'
+import { softSpeakFeedback } from '../lib/softSpeakFeedback'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
 import { SceneArt } from './SceneArt'
 import { Confetti } from './Confetti'
@@ -92,6 +94,17 @@ export function PracticeSession({
   const [sortChecked, setSortChecked] = useState(false)
   const [dragWord, setDragWord] = useState<string | null>(null)
   const { speak, stop } = useSpeech()
+  const {
+    supported: listenSupported,
+    listening,
+    transcript: listenTranscript,
+    interim: listenInterim,
+    error: listenError,
+    start: startListening,
+    stop: stopListening,
+    reset: resetListening,
+  } = useSpeechRecognition()
+  const [listenLang, setListenLang] = useState<ListenLang>('zh-HK')
 
   const item = items[index]
   const isLast = index >= items.length - 1
@@ -130,6 +143,9 @@ export function PracticeSession({
     setMoneyJiao('')
     setMoneyField('yuan')
     setCheckedFields({})
+    stopListening()
+    resetListening()
+    setListenLang(_activity.promptEn && (!_activity.sampleZh || _activity.sampleZh === _activity.sampleEn) ? 'en-US' : 'zh-HK')
     setSortSelected(null)
     setSortPlacement({})
     setSortChecked(false)
@@ -166,6 +182,15 @@ export function PracticeSession({
     return order.length === item.correctOrder.length && order.every((w, i) => w === item.correctOrder![i])
   }, [item, order])
 
+  const speakFeedback = useMemo(() => {
+    if (item.kind !== 'speak' || !listenTranscript.trim()) return null
+    const sample =
+      listenLang === 'en-US'
+        ? item.sampleEn || item.sampleZh
+        : item.sampleZh || item.sampleEn
+    return softSpeakFeedback(listenTranscript, sample, listenLang === 'en-US' ? 'en' : 'zh')
+  }, [item, listenTranscript, listenLang])
+
   useEffect(() => {
     if (reorderCorrect && !done) {
       playSfx('correct')
@@ -174,6 +199,7 @@ export function PracticeSession({
 
   const goNext = () => {
     stop()
+    stopListening()
     playSfx('whoosh')
     if (isLast) {
       if (celebrate) playSfx('celebrate')
@@ -337,6 +363,7 @@ export function PracticeSession({
           className="ghost-btn"
           onClick={() => {
             stop()
+            stopListening()
             playSfx('tap')
             onBack()
           }}
@@ -411,14 +438,105 @@ export function PracticeSession({
           {item.kind === 'speak' && (
             <div className="speak-box">
               <p className="speak-box__guide">
-                唔使打字！大聲講俾爸爸媽媽聽，講完按下面掣。
+                唔使打字！大聲講俾爸爸媽媽聽。可以叫電話試聽（只係練習提示，唔會自動判錯）。
               </p>
+
+              {listenSupported && (
+                <div className={`listen-panel ${listening ? 'is-listening' : ''}`}>
+                  <div className="session__actions">
+                    <button
+                      type="button"
+                      className={`pill-btn ${listenLang === 'zh-HK' ? '' : 'pill-btn--soft'}`}
+                      disabled={listening}
+                      onClick={() => {
+                        playSfx('tap')
+                        setListenLang('zh-HK')
+                      }}
+                    >
+                      廣東話
+                    </button>
+                    <button
+                      type="button"
+                      className={`pill-btn ${listenLang === 'en-US' ? '' : 'pill-btn--soft'}`}
+                      disabled={listening}
+                      onClick={() => {
+                        playSfx('tap')
+                        setListenLang('en-US')
+                      }}
+                    >
+                      English
+                    </button>
+                  </div>
+                  {!listening ? (
+                    <button
+                      type="button"
+                      className="primary-btn primary-btn--wide"
+                      onClick={() => {
+                        unlockAudio()
+                        stop()
+                        playSfx('tap')
+                        startListening(listenLang)
+                      }}
+                    >
+                      試下用電話聽你講
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="primary-btn primary-btn--wide listen-panel__stop"
+                      onClick={() => {
+                        playSfx('tap')
+                        stopListening()
+                      }}
+                    >
+                      講完，停止聽
+                    </button>
+                  )}
+                  <div className="listen-panel__transcript" aria-live="polite">
+                    {listening && <p className="listen-panel__live">聽緊…大聲少少講啦</p>}
+                    {(listenTranscript || listenInterim) ? (
+                      <p className="listen-panel__text">
+                        {listenTranscript}
+                        {listenInterim ? (
+                          <span className="listen-panel__interim"> {listenInterim}</span>
+                        ) : null}
+                      </p>
+                    ) : (
+                      <p className="listen-panel__placeholder">電話聽到嘅字會顯示喺度</p>
+                    )}
+                  </div>
+                  {listenError && <p className="listen-panel__error">{listenError}</p>}
+                  {speakFeedback && (
+                    <div className="listen-panel__feedback">
+                      <p>{speakFeedback.message}</p>
+                      {speakFeedback.matched.length > 0 && (
+                        <div className="listen-panel__chips">
+                          {speakFeedback.matched.map((k) => (
+                            <span key={k} className="listen-chip listen-chip--ok">
+                              {k}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <p className="listen-panel__note">
+                    童聲粵語電話未必聽得準——星星仍然由爸爸媽媽決定。
+                  </p>
+                </div>
+              )}
+
+              {!listenSupported && (
+                <p className="speak-box__guide">呢部瀏覽器未支援語音辨識，改由爸爸媽媽聽就得。</p>
+              )}
+
               {!done ? (
                 <button
                   type="button"
                   className="primary-btn primary-btn--wide"
                   onClick={() => {
                     unlockAudio()
+                    stopListening()
                     playSfx('correct')
                     onMarkDone(item.id, moduleKey)
                     setJustStar(true)
@@ -455,6 +573,7 @@ export function PracticeSession({
                         className="pill-btn"
                         onClick={() => {
                           playSfx('tap')
+                          stopListening()
                           speak(item.sampleZh!, 'zh-HK')
                         }}
                       >
@@ -467,6 +586,7 @@ export function PracticeSession({
                         className="pill-btn pill-btn--soft"
                         onClick={() => {
                           playSfx('tap')
+                          stopListening()
                           speak(item.sampleEn!, 'en-US')
                         }}
                       >
