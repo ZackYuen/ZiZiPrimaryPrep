@@ -74,6 +74,21 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
             說話題可按「試下用電話聽你講」睇電話聽到咩字，並有溫柔重點提示。童聲粵語未必準——星星仍然由家長按「我講完啦」決定，唔會自動判錯。
           </p>
         </article>
+        <article className="parent__item">
+          <h3>選擇題會讀出嚟</h3>
+          <p>
+            每題有「讀晒選項」，每個選項旁有「聽」。唔識字都可以先聽再揀。
+          </p>
+        </article>
+        <article className="parent__item">
+          <h3>點樣先有真正粵語朗讀？</h3>
+          <p>
+            而家用瀏覽器 Web Speech（免費、唔使 API key），會優先揀 yue / zh-HK /
+            Cantonese 聲線；Chrome／Edge 通常最好。若聽到普通話，請喺系統加入「中文（香港）」語音。
+            更高質（要收費／後端）：Google Cloud TTS 嘅 <code>yue-HK</code> 聲線，或
+            cantonese.ai。
+          </p>
+        </article>
       </div>
 
       <h3 className="parent__h3">家長金句</h3>

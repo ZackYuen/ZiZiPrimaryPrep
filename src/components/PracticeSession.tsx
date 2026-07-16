@@ -8,7 +8,7 @@ import {
   type ActivityKind,
   type DayId,
 } from '../data/content'
-import { useSpeech } from '../hooks/useSpeech'
+import { looksEnglish, useSpeech } from '../hooks/useSpeech'
 import { useSpeechRecognition, type ListenLang } from '../hooks/useSpeechRecognition'
 import { softSpeakFeedback } from '../lib/softSpeakFeedback'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
@@ -93,7 +93,7 @@ export function PracticeSession({
   const [sortPlacement, setSortPlacement] = useState<Record<string, string>>({})
   const [sortChecked, setSortChecked] = useState(false)
   const [dragWord, setDragWord] = useState<string | null>(null)
-  const { speak, stop } = useSpeech()
+  const { speak, speakQueue, stop, voiceStatus } = useSpeech()
   const {
     supported: listenSupported,
     listening,
@@ -601,47 +601,85 @@ export function PracticeSession({
 
           {item.kind === 'choice' && item.choices && (
             <div className="choice-list">
-              <p className="reorder__hint">用手指點正確答案（唔使打字）</p>
+              <p className="reorder__hint">聽完選項再揀（唔識字都得）</p>
+              <div className="session__actions">
+                <button
+                  type="button"
+                  className="pill-btn"
+                  onClick={() => {
+                    unlockAudio()
+                    playSfx('tap')
+                    const lang = item.choices!.every((c) => looksEnglish(c.text)) ? 'en-US' : 'zh-HK'
+                    const lines = item.choices!.map(
+                      (c, i) => `${String.fromCharCode(65 + i)}. ${c.text}`,
+                    )
+                    speakQueue(lines, lang)
+                  }}
+                >
+                  讀晒選項
+                </button>
+              </div>
+              {voiceStatus.tip && (
+                <p className="choice-voice-tip">粵語提示：{voiceStatus.tip}</p>
+              )}
               {item.choices.map((c, i) => {
                 const selected = picked === i
                 const triedWrong = wrongPicks.includes(i)
                 const showCorrect = (solvedChoice || revealAnswer) && c.correct
                 const locked = solvedChoice || revealAnswer
+                const choiceLang = looksEnglish(c.text) ? 'en-US' : 'zh-HK'
                 return (
-                  <button
+                  <div
                     key={c.text}
-                    type="button"
                     className={[
-                      'choice-btn',
+                      'choice-row',
                       selected && c.correct ? 'is-selected' : '',
                       showCorrect ? 'is-correct' : '',
                       triedWrong && !c.correct ? 'is-wrong' : '',
                     ]
                       .filter(Boolean)
                       .join(' ')}
-                    disabled={locked || triedWrong}
-                    onClick={() => {
-                      unlockAudio()
-                      if (locked || triedWrong) return
-                      if (c.correct) {
-                        setPicked(i)
-                        setCoachMsg('答對啦！你好努力！')
-                        playSfx('correct')
-                        if (!done) {
-                          onMarkDone(item.id, moduleKey)
-                          setJustStar(true)
-                        }
-                      } else {
-                        playSfx('wrong')
-                        setWrongPicks((prev) => (prev.includes(i) ? prev : [...prev, i]))
-                        registerWrong()
-                        setPicked(null)
-                      }
-                    }}
                   >
-                    <span className="choice-btn__mark">{String.fromCharCode(65 + i)}</span>
-                    <span>{c.text}</span>
-                  </button>
+                    <button
+                      type="button"
+                      className="choice-btn"
+                      disabled={locked || triedWrong}
+                      onClick={() => {
+                        unlockAudio()
+                        if (locked || triedWrong) return
+                        if (c.correct) {
+                          setPicked(i)
+                          setCoachMsg('答對啦！你好努力！')
+                          playSfx('correct')
+                          if (!done) {
+                            onMarkDone(item.id, moduleKey)
+                            setJustStar(true)
+                          }
+                        } else {
+                          playSfx('wrong')
+                          setWrongPicks((prev) => (prev.includes(i) ? prev : [...prev, i]))
+                          registerWrong()
+                          setPicked(null)
+                        }
+                      }}
+                    >
+                      <span className="choice-btn__mark">{String.fromCharCode(65 + i)}</span>
+                      <span>{c.text}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="choice-hear"
+                      aria-label={`聽選項 ${String.fromCharCode(65 + i)}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        unlockAudio()
+                        playSfx('tap')
+                        speak(c.text, choiceLang)
+                      }}
+                    >
+                      聽
+                    </button>
+                  </div>
                 )
               })}
               {coachMsg && <p className={`math-feedback ${solvedChoice ? 'is-ok' : 'is-no'}`}>{coachMsg}</p>}
