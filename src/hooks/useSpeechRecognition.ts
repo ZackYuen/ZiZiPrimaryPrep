@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { transcribeWithWhisper } from '../lib/whisperTranscribe'
 
 export type ListenLang = 'zh-HK' | 'en-US'
 
@@ -41,9 +42,8 @@ function getRecognitionCtor(): SpeechRecognitionCtor | null {
 function isAppleWebKit(): boolean {
   if (typeof navigator === 'undefined') return false
   const ua = navigator.userAgent
-  // All iOS browsers are WebKit; desktop Safari too. Web Speech restarts crash Safari tabs.
   if (/iPhone|iPad|iPod/i.test(ua)) return true
-  if (/Safari/i.test(ua) && !/Chrome|Chromium|Edg|OPR/i.test(ua)) return true
+  if (/Safari/i.test(ua) && !/Chrome|Chromium|Edg|OPR|CriOS|FxiOS/i.test(ua)) return true
   return typeof navigator.vendor === 'string' && navigator.vendor.includes('Apple')
 }
 
@@ -58,7 +58,7 @@ function canUseMic(): boolean {
 
 function langFallbacks(lang: ListenLang): string[] {
   if (lang === 'en-US') return ['en-US', 'en-GB', 'en-HK', 'en']
-  return ['zh-HK', 'zh-TW', 'zh-Hans', 'zh-CN', 'yue-HK']
+  return ['zh-HK', 'zh-TW', 'zh-CN', 'zh-Hans', 'yue-HK']
 }
 
 function pickRecorderMime(): string | undefined {
@@ -78,9 +78,9 @@ function stopTracks(stream: MediaStream | null) {
 }
 
 /**
- * Safari/iOS: NEVER use SpeechRecognition (restart loops crash the tab).
- * Use a simple getUserMedia (+ MediaRecorder) practice session; parent confirms ★.
- * Chrome/Android: Web Speech for live words.
+ * Chrome: live Web Speech.
+ * Safari: record with MediaRecorder, then Whisper (on-device) on ■ so words appear
+ * without Web Speech restart loops that crash iOS tabs.
  */
 export function useSpeechRecognition() {
   const apple = typeof navigator !== 'undefined' && isAppleWebKit()
@@ -96,21 +96,25 @@ export function useSpeechRecognition() {
   const [activeLang, setActiveLang] = useState('zh-HK')
   const [statusHint, setStatusHint] = useState('')
   const [engine, setEngine] = useState<'safari' | 'chrome' | 'none'>('none')
+  const [busy, setBusy] = useState(false)
 
   const sessionId = useRef(0)
   const recRef = useRef<BrowserSpeechRecognition | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const recorderRef = useRef<MediaRecorder | null>(null)
+  const chunksRef = useRef<BlobPart[]>([])
   const wantListen = useRef(false)
   const runningRef = useRef(false)
   const langIdx = useRef(0)
   const langsRef = useRef<string[]>(['zh-HK'])
+  const listenLangRef = useRef<ListenLang>('zh-HK')
   const tickTimer = useRef<number | null>(null)
   const restartTimer = useRef<number | null>(null)
   const restartCount = useRef(0)
   const startedAt = useRef(0)
   const interimRef = useRef('')
   const appleRef = useRef(apple)
+  const transcriptRef = useRef('')
 
   appleRef.current = apple
 
@@ -130,7 +134,11 @@ export function useSpeechRecognition() {
     interimRef.current = ''
     setInterim('')
     if (!chunk) return
-    setTranscript((prev) => `${prev}${chunk}`.trim())
+    setTranscript((prev) => {
+      const next = `${prev}${chunk}`.trim()
+      transcriptRef.current = next
+      return next
+    })
   }, [])
 
   const stopRecorder = () => {
@@ -138,6 +146,7 @@ export function useSpeechRecognition() {
       if (recorderRef.current && recorderRef.current.state !== 'inactive') {
         recorderRef.current.ondataavailable = null
         recorderRef.current.onerror = null
+        recorderRef.current.onstop = null
         recorderRef.current.stop()
       }
     } catch {
@@ -179,10 +188,12 @@ export function useSpeechRecognition() {
     setElapsedSec(0)
     setHeardSpeech(false)
     setStatusHint('')
+    setBusy(false)
   }, [flushInterim, stopRecognition])
 
   useEffect(() => {
     const appleNow = isAppleWebKit()
+    // Safari: mic is enough (Whisper path). Chrome: prefer Web Speech.
     setSupported(appleNow ? canUseMic() : !!getRecognitionCtor() || canUseMic())
     setEngine(appleNow ? 'safari' : getRecognitionCtor() ? 'chrome' : canUseMic() ? 'chrome' : 'none')
     return () => {
@@ -196,39 +207,102 @@ export function useSpeechRecognition() {
 
   const reset = useCallback(() => {
     setTranscript('')
+    transcriptRef.current = ''
     interimRef.current = ''
     setInterim('')
     setError(null)
     setElapsedSec(0)
     setHeardSpeech(false)
     setStatusHint('')
+    chunksRef.current = []
   }, [])
 
-  const stop = useCallback(() => {
-    sessionId.current += 1
-    hardStopSession()
-  }, [hardStopSession])
+  const finishSafariSessionRef = useRef<(sid: number) => Promise<void>>(async () => {})
 
-  const startTick = useCallback(
-    (sid: number) => {
-      startedAt.current = Date.now()
-      if (tickTimer.current) window.clearInterval(tickTimer.current)
-      tickTimer.current = window.setInterval(() => {
-        if (sid !== sessionId.current || !wantListen.current) return
-        const sec = Math.floor((Date.now() - startedAt.current) / 1000)
-        setElapsedSec(sec)
-        if (sec >= 45) {
-          sessionId.current += 1
-          hardStopSession()
-        }
-      }, 250)
-    },
-    [hardStopSession],
-  )
+  const finishSafariSession = useCallback(async (sid: number) => {
+    wantListen.current = false
+    clearTimers()
+    setListening(false)
+    setSttAlive(false)
 
-  /** Safari-safe: mic hold only. No SpeechRecognition (prevents tab crash loops). */
+    const recorder = recorderRef.current
+    const stream = streamRef.current
+
+    const blob: Blob | null = await new Promise((resolve) => {
+      if (!recorder || recorder.state === 'inactive') {
+        stopTracks(stream)
+        streamRef.current = null
+        recorderRef.current = null
+        resolve(chunksRef.current.length ? new Blob(chunksRef.current, { type: 'audio/mp4' }) : null)
+        return
+      }
+      recorder.onstop = () => {
+        const type = recorder.mimeType || 'audio/mp4'
+        const b = new Blob(chunksRef.current, { type })
+        stopTracks(stream)
+        streamRef.current = null
+        recorderRef.current = null
+        resolve(b)
+      }
+      try {
+        recorder.stop()
+      } catch {
+        stopTracks(stream)
+        streamRef.current = null
+        recorderRef.current = null
+        resolve(chunksRef.current.length ? new Blob(chunksRef.current, { type: 'audio/mp4' }) : null)
+      }
+    })
+
+    // stop()/auto-stop bumps sessionId to sid+1; abort if user started a newer session
+    if (sessionId.current !== sid && sessionId.current !== sid + 1) {
+      setBusy(false)
+      return
+    }
+
+    if (transcriptRef.current.trim()) {
+      setStatusHint('')
+      setBusy(false)
+      setElapsedSec(0)
+      return
+    }
+
+    if (!blob || blob.size < 800) {
+      setStatusHint('未錄到聲——再撳 ● 試一次，或爸爸媽媽撳 ★')
+      setBusy(false)
+      setElapsedSec(0)
+      return
+    }
+
+    setBusy(true)
+    setStatusHint('轉文字中（第一次要下載模型，可能要一分鐘）…')
+    try {
+      const text = await transcribeWithWhisper(
+        blob,
+        listenLangRef.current === 'en-US' ? 'en' : 'zh',
+        (msg) => setStatusHint(msg),
+      )
+      if (text) {
+        transcriptRef.current = text
+        setTranscript(text)
+        setHeardSpeech(true)
+        setStatusHint('轉字完成 ✓')
+        setError(null)
+      } else {
+        setStatusHint('聽唔到清楚嘅字——再講一次，或爸爸媽媽撳 ★')
+      }
+    } catch {
+      setStatusHint('轉字失敗——請連網再試，或爸爸媽媽聽完撳 ★')
+    } finally {
+      setBusy(false)
+      setElapsedSec(0)
+      chunksRef.current = []
+    }
+  }, [])
+
+  finishSafariSessionRef.current = finishSafariSession
   const startSafariRecord = useCallback(
-    async (sid: number) => {
+    async (sid: number, lang: ListenLang) => {
       if (!canUseMic()) {
         setError('呢部 Safari 開唔到麥克風。請爸爸媽媽聽完撳 ★。')
         setListening(false)
@@ -236,7 +310,13 @@ export function useSpeechRecognition() {
         return
       }
 
+      listenLangRef.current = lang
+      chunksRef.current = []
+      transcriptRef.current = ''
+      setTranscript('')
+      setInterim('')
       setStatusHint('請允許麥克風…')
+
       let stream: MediaStream
       try {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
@@ -258,21 +338,42 @@ export function useSpeechRecognition() {
       const mime = pickRecorderMime()
       try {
         const recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream)
-        // No timeslice callback storm — just keep the session alive
-        recorder.start()
+        recorder.ondataavailable = (ev) => {
+          if (ev.data && ev.data.size > 0) chunksRef.current.push(ev.data)
+        }
+        recorder.onerror = () => {
+          setStatusHint('錄音出錯——再撳 ●，或用 ★')
+        }
+        // Request data periodically so we always have audio even if stop is flaky
+        recorder.start(1000)
         recorderRef.current = recorder
       } catch {
-        // Holding getUserMedia tracks is enough for practice + orange mic
         recorderRef.current = null
+        setError('呢部 Safari 唔支援錄音轉字。請爸爸媽媽聽完撳 ★。')
+        stopTracks(stream)
+        streamRef.current = null
+        wantListen.current = false
+        setListening(false)
+        return
       }
 
       setHeardSpeech(true)
-      setSttAlive(false)
+      setSttAlive(true)
       setError(null)
-      setStatusHint('錄音中——請大聲講。Safari 唔轉字，爸爸媽媽聽完撳 ★')
-      startTick(sid)
+      setStatusHint('錄音中——請大聲講，講完撳 ■ 就會出字')
+      startedAt.current = Date.now()
+      if (tickTimer.current) window.clearInterval(tickTimer.current)
+      tickTimer.current = window.setInterval(() => {
+        if (sid !== sessionId.current || !wantListen.current) return
+        const sec = Math.floor((Date.now() - startedAt.current) / 1000)
+        setElapsedSec(sec)
+        if (sec >= 30) {
+          sessionId.current += 1
+          void finishSafariSessionRef.current(sid)
+        }
+      }, 250)
     },
-    [startTick],
+    [],
   )
 
   const startChromeStt = useCallback(
@@ -318,7 +419,11 @@ export function useSpeechRecognition() {
           else interimChunk += piece
         }
         if (finalChunk) {
-          setTranscript((prev) => `${prev}${finalChunk}`.trim())
+          setTranscript((prev) => {
+            const next = `${prev}${finalChunk}`.trim()
+            transcriptRef.current = next
+            return next
+          })
           interimRef.current = ''
           setInterim('')
         } else {
@@ -339,7 +444,6 @@ export function useSpeechRecognition() {
         setSttAlive(false)
         const code = event.error
         if (code === 'aborted') return
-
         if (code === 'not-allowed' || code === 'service-not-allowed' || code === 'audio-capture') {
           wantListen.current = false
           clearTimers()
@@ -347,7 +451,6 @@ export function useSpeechRecognition() {
           setError('需要開咪高峰。去瀏覽器設定允許麥克風，再撳 ●。')
           return
         }
-
         if (
           wantListen.current &&
           (code === 'language-not-supported' || code === 'network') &&
@@ -359,12 +462,8 @@ export function useSpeechRecognition() {
           setStatusHint(`改用 ${rec.lang}…`)
           return
         }
-
-        if (code === 'no-speech') {
-          setStatusHint('聽唔到聲——請靠近咪高峰大聲講。')
-        } else if (code === 'network') {
-          setError('轉文字要網絡。可繼續講，最後撳 ★。')
-        }
+        if (code === 'no-speech') setStatusHint('聽唔到聲——請靠近咪高峰大聲講。')
+        else if (code === 'network') setError('轉文字要網絡。可繼續講，最後撳 ★。')
       }
 
       rec.onend = () => {
@@ -373,7 +472,6 @@ export function useSpeechRecognition() {
         setSttAlive(false)
         flushInterim()
         if (!wantListen.current) return
-        // Cap restarts — prevents crash loops on flaky mobile Chrome
         if (restartCount.current >= 30) {
           setStatusHint('轉文字已停——可再撳 ●，或用 ★')
           return
@@ -390,7 +488,18 @@ export function useSpeechRecognition() {
         }, 400)
       }
 
-      startTick(sid)
+      startedAt.current = Date.now()
+      if (tickTimer.current) window.clearInterval(tickTimer.current)
+      tickTimer.current = window.setInterval(() => {
+        if (sid !== sessionId.current || !wantListen.current) return
+        const sec = Math.floor((Date.now() - startedAt.current) / 1000)
+        setElapsedSec(sec)
+        if (sec >= 45) {
+          sessionId.current += 1
+          hardStopSession()
+        }
+      }, 250)
+
       try {
         rec.start()
       } catch {
@@ -399,8 +508,19 @@ export function useSpeechRecognition() {
         setError('開唔到語音辨識。請再用 Chrome，或撳 ★。')
       }
     },
-    [flushInterim, startTick, stopRecognition],
+    [flushInterim, hardStopSession, stopRecognition],
   )
+
+  const stop = useCallback(() => {
+    const sid = sessionId.current
+    if (appleRef.current) {
+      sessionId.current += 1
+      void finishSafariSessionRef.current(sid)
+      return
+    }
+    sessionId.current += 1
+    hardStopSession()
+  }, [hardStopSession])
 
   const start = useCallback(
     (lang: ListenLang = 'zh-HK') => {
@@ -411,16 +531,19 @@ export function useSpeechRecognition() {
       wantListen.current = true
       setError(null)
       setTranscript('')
+      transcriptRef.current = ''
       interimRef.current = ''
       setInterim('')
       setElapsedSec(0)
       setSttAlive(false)
       setHeardSpeech(false)
       setListening(true)
+      setBusy(false)
       setActiveLang(langFallbacks(lang)[0])
+      listenLangRef.current = lang
 
       if (appleRef.current) {
-        void startSafariRecord(sid)
+        void startSafariRecord(sid, lang)
         return
       }
       startChromeStt(lang, sid)
@@ -440,6 +563,7 @@ export function useSpeechRecognition() {
     activeLang,
     statusHint,
     engine,
+    busy,
     start,
     stop,
     reset,
