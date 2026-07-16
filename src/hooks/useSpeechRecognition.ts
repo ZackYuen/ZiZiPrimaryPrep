@@ -277,8 +277,8 @@ export function useSpeechRecognition() {
       setBusy(true)
       setStatusHint(
         listenLangRef.current === 'en-US'
-          ? '轉文字中（第一次要下載模型）…'
-          : '廣東話轉字中（第一次下載粵語模型較大，請用 Wi‑Fi）…',
+          ? '轉文字中…'
+          : '轉文字中（電話用輕量模式，避免當機）…',
       )
     try {
       const text = await transcribeWithWhisper(
@@ -290,13 +290,13 @@ export function useSpeechRecognition() {
         transcriptRef.current = text
         setTranscript(text)
         setHeardSpeech(true)
-        setStatusHint('轉字完成 ✓')
+        setStatusHint('轉字完成 ✓（唔準可以再講，或以 ★ 為準）')
         setError(null)
       } else {
         setStatusHint('聽唔到清楚嘅字——再講一次，或爸爸媽媽撳 ★')
       }
     } catch {
-      setStatusHint('轉字失敗——請連網再試，或爸爸媽媽聽完撳 ★')
+      setStatusHint('轉字逾時或失敗——請再試短句，或爸爸媽媽聽完撳 ★')
     } finally {
       setBusy(false)
       setElapsedSec(0)
@@ -364,14 +364,14 @@ export function useSpeechRecognition() {
       setHeardSpeech(true)
       setSttAlive(true)
       setError(null)
-      setStatusHint('錄音中——請大聲講，講完撳 ■ 就會出字')
+      setStatusHint('錄音中——請大聲講（約 10 秒內），講完撳 ■ 就會出字')
       startedAt.current = Date.now()
       if (tickTimer.current) window.clearInterval(tickTimer.current)
       tickTimer.current = window.setInterval(() => {
         if (sid !== sessionId.current || !wantListen.current) return
         const sec = Math.floor((Date.now() - startedAt.current) / 1000)
         setElapsedSec(sec)
-        if (sec >= 30) {
+        if (sec >= 12) {
           sessionId.current += 1
           void finishSafariSessionRef.current(sid)
         }
