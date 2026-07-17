@@ -65,7 +65,7 @@ iPhone Safari 網頁聽寫經常被拒。App 支援 **Google Cloud Speech-to-Tex
    - Value: 你嘅 API key  
 4. **Actions → Build Pages with Google STT → Run workflow**  
 
-完成後，Safari 講題會顯示 **Google** 引擎。
+完成後，Safari／Chrome 講題會**直接用 Google**（唔再用 iPhone 內建聽寫）。
 
 > 呢個方法會把 key 編進前端 JS（有 referrer 限制）。家庭自用夠用，**唔使開 Cloudflare**。
 
