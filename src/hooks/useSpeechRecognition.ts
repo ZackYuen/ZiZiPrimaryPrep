@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-export type ListenLang = 'zh-HK' | 'en-US'
+export type ListenLang = 'yue-Hant-HK' | 'en-US'
 
 type BrowserSpeechRecognition = {
   lang: string
@@ -58,7 +58,7 @@ function canUseMic(): boolean {
 function langFallbacks(lang: ListenLang, apple: boolean): string[] {
   if (lang === 'en-US') return ['en-US', 'en-GB', 'en-HK', 'en']
   if (apple) return ['yue-Hant-HK', 'yue-HK', 'zh-Hant-HK', 'zh-HK', 'zh-TW']
-  return ['zh-HK', 'zh-TW', 'zh-Hans', 'zh-CN', 'yue-HK']
+  return ['yue-Hant-HK', 'yue-HK', 'zh-HK', 'zh-TW', 'zh-Hans', 'zh-CN']
 }
 
 /**
@@ -79,8 +79,8 @@ export function useSpeechRecognition() {
   const [elapsedSec, setElapsedSec] = useState(0)
   const [sttAlive, setSttAlive] = useState(false)
   const [heardSpeech, setHeardSpeech] = useState(false)
-  const [activeLang, setActiveLang] = useState('zh-HK')
-  const [requestedLang, setRequestedLang] = useState('zh-HK')
+  const [activeLang, setActiveLang] = useState('yue-Hant-HK')
+  const [requestedLang, setRequestedLang] = useState('yue-Hant-HK')
   const [langConfirmed, setLangConfirmed] = useState(false)
   const [lastErrorCode, setLastErrorCode] = useState<string | null>(null)
   const [statusHint, setStatusHint] = useState('')
@@ -94,7 +94,7 @@ export function useSpeechRecognition() {
   const sttEnabled = useRef(true)
   const micOkRef = useRef(false)
   const langIdx = useRef(0)
-  const langsRef = useRef<string[]>(['zh-HK'])
+  const langsRef = useRef<string[]>(['yue-Hant-HK'])
   const tickTimer = useRef<number | null>(null)
   const restartTimer = useRef<number | null>(null)
   const restartCount = useRef(0)
@@ -103,7 +103,7 @@ export function useSpeechRecognition() {
   const transcriptRef = useRef('')
   const appleRef = useRef(apple)
   const sidRef = useRef(0)
-  const requestedLangRef = useRef('zh-HK')
+  const requestedLangRef = useRef('yue-Hant-HK')
 
   appleRef.current = apple
   requestedLangRef.current = requestedLang
@@ -177,7 +177,7 @@ export function useSpeechRecognition() {
     const maxRestart = appleRef.current ? 25 : 30
     const delay = appleRef.current ? 700 : 400
     if (restartCount.current >= maxRestart) {
-      setStatusHint('聽寫多次斷線——再撳 ●，或撳綠色「★ 聽完就得」')
+      setStatusHint('聽寫多次斷線——再撳 ●，或撳下面黃色 ★')
       return
     }
     restartCount.current += 1
@@ -196,7 +196,7 @@ export function useSpeechRecognition() {
           try {
             recRef.current.start()
           } catch {
-            setStatusHint('聽寫重開失敗——再撳 ●，或撳綠色「★ 聽完就得」')
+            setStatusHint('聽寫重開失敗——再撳 ●，或撳下面黃色 ★')
           }
         }, 500)
       }
@@ -273,7 +273,7 @@ export function useSpeechRecognition() {
           if (micOkRef.current && appleRef.current) {
             setError(null)
             setStatusHint(
-              `麥克風已開，但網頁聽寫未接通（${code}）。要求語言 ${requestedLangRef.current} 未確認啟動。Safari 私密瀏覽常會封鎖網頁聽寫；可改用普通分頁，或撳綠色「★ 聽完就得」。`,
+              `麥克風已開，但網頁聽寫未接通（${code}）。要求語言 ${requestedLangRef.current} 未確認啟動。Safari 私密瀏覽常會封鎖網頁聽寫；可改用普通分頁，或撳下面黃色 ★。`,
             )
             if (restartCount.current < 6) {
               scheduleRestart(sid)
@@ -281,7 +281,7 @@ export function useSpeechRecognition() {
               sttEnabled.current = false
               setLangConfirmed(false)
               setStatusHint(
-                `網頁聽寫未能啟動（${code}）——「${requestedLangRef.current}」只係要求語言，引擎未真正開。Safari 私密瀏覽下常見，請改普通分頁，或撳綠色「★ 聽完就得」。`,
+                `網頁聽寫未能啟動（${code}）——「${requestedLangRef.current}」只係要求語言，引擎未真正開。Safari 私密瀏覽下常見，請改普通分頁，或撳下面黃色 ★。`,
               )
             }
             return
@@ -313,8 +313,8 @@ export function useSpeechRecognition() {
           }
           setStatusHint(
             appleRef.current
-              ? `聽寫語言未就緒（${code}）。設定→一般→鍵盤→聽寫→下載「廣東話」。或撳綠色「★ 聽完就得」。`
-              : `轉文字唔穩（${code}）——可試 EN，或撳綠色「★ 聽完就得」。`,
+              ? `聽寫語言未就緒（${code}）。設定→一般→鍵盤→聽寫→下載「廣東話」。或撳下面黃色 ★。`
+              : `轉文字唔穩（${code}）——可試 EN，或撳下面黃色 ★。`,
           )
           scheduleRestart(sid)
         }
@@ -363,17 +363,17 @@ export function useSpeechRecognition() {
     if (appleRef.current && !hadText) {
       setStatusHint(
         micOkRef.current
-          ? '未出字。麥克風已允許——請檢查 設定→一般→鍵盤→聽寫→「廣東話」。或撳綠色「★ 聽完就得」。'
-          : '未出字。請允許麥克風，並下載聽寫「廣東話」。或撳綠色「★ 聽完就得」。',
+          ? '未出字。麥克風已允許——請檢查 設定→一般→鍵盤→聽寫→「廣東話」。或撳下面黃色 ★。'
+          : '未出字。請允許麥克風，並下載聽寫「廣東話」。或撳下面黃色 ★。',
       )
     }
   }, [hardStopSession])
 
   const start = useCallback(
-    (lang: ListenLang = 'zh-HK') => {
+    (lang: ListenLang = 'yue-Hant-HK') => {
       const Ctor = getRecognitionCtor()
       if (!Ctor) {
-        setError('呢部瀏覽器未支援網頁聽寫。請爸爸媽媽聽完，撳綠色「★ 聽完就得」。')
+        setError('呢部瀏覽器未支援網頁聽寫。請爸爸媽媽聽完，撳下面黃色 ★。')
         return
       }
 

@@ -121,7 +121,7 @@ export function PracticeSession({
     stop: stopListening,
     reset: resetListening,
   } = useSpeechRecognition()
-  const [listenLang, setListenLang] = useState<ListenLang>('zh-HK')
+  const [listenLang, setListenLang] = useState<ListenLang>('yue-Hant-HK')
   const [manualTranscript, setManualTranscript] = useState('')
 
   const item = items[index]
@@ -164,7 +164,9 @@ export function PracticeSession({
     stopListening()
     resetListening()
     setManualTranscript('')
-    setListenLang(_activity.promptEn && (!_activity.sampleZh || _activity.sampleZh === _activity.sampleEn) ? 'en-US' : 'zh-HK')
+    setListenLang(
+      _activity.promptEn && (!_activity.sampleZh || _activity.sampleZh === _activity.sampleEn) ? 'en-US' : 'yue-Hant-HK',
+    )
     setSortSelected(null)
     setSortPlacement({})
     setSortChecked(false)
@@ -461,46 +463,18 @@ export function PracticeSession({
 
           {item.kind === 'speak' && (
             <div className="speak-box">
-              <p className="speak-box__guide">
-                1. 細路講俾爸爸媽媽聽　2. 爸爸媽媽撳下面綠色掣（電話聽字只係練習）
-              </p>
-
-              {!done ? (
-                <button
-                  type="button"
-                  className="primary-btn primary-btn--wide speak-box__parent-star"
-                  onClick={() => {
-                    unlockAudio()
-                    stopListening()
-                    playSfx('correct')
-                    onMarkDone(item.id, moduleKey)
-                    setJustStar(true)
-                  }}
-                  aria-label="爸爸媽媽：聽完就撳，完成呢題"
-                >
-                  {KID.parentStar}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="primary-btn primary-btn--wide speak-box__parent-star is-done"
-                  disabled
-                  aria-label="呢題已完成"
-                >
-                  {KID.parentStarDone}
-                </button>
-              )}
+              <p className="speak-box__guide">細路講俾爸爸媽媽聽（電話聽字只係練習）</p>
 
               {listenSupported && (
                 <div className={`listen-panel ${listening ? 'is-listening' : ''}`}>
                   <div className="session__actions">
                     <button
                       type="button"
-                      className={`pill-btn ${listenLang === 'zh-HK' ? '' : 'pill-btn--soft'}`}
+                      className={`pill-btn ${listenLang === 'yue-Hant-HK' ? '' : 'pill-btn--soft'}`}
                       disabled={listening}
                       onClick={() => {
                         playSfx('tap')
-                        setListenLang('zh-HK')
+                        setListenLang('yue-Hant-HK')
                       }}
                       aria-label="廣東話"
                     >
@@ -576,13 +550,13 @@ export function PracticeSession({
                     {listening && !langConfirmed && engine === 'safari' ? (
                       <p className="listen-panel__hint">
                         畫面上嘅語言碼只係「要求」Safari 用邊種聽寫；未見到「引擎 xxx」前，其實未真正用到
-                        zh-HK。
+                        yue-Hant-HK。
                       </p>
                     ) : null}
                     {engine === 'safari' && !listening && !listenTranscript ? (
                       <p className="listen-panel__hint">
                         麥克風允許之後，仲要：設定→一般→鍵盤→聽寫→下載「廣東話」。鍵盤「粵」同 Notes
-                        聽寫得，網頁都可能仍無字——無字就撳上面綠色「★ 聽完就得」。
+                        聽寫得，網頁都可能仍無字——無字就撳下面黃色 ★。
                       </p>
                     ) : null}
                     {(listenTranscript || listenInterim) ? (
@@ -623,14 +597,14 @@ export function PracticeSession({
                   )}
                   <p className="listen-panel__note">
                     {engine === 'safari'
-                      ? '● 保持到 ■ · 無字唔緊要 · 完成請撳上面綠色「★ 聽完就得」'
-                      : '● 要網絡 · 講完撳 ■ · 完成請撳上面綠色「★ 聽完就得」'}
+                      ? '● 保持到 ■ · 無字唔緊要 · 完成請撳下面黃色 ★'
+                      : '● 要網絡 · 講完撳 ■ · 完成請撳下面黃色 ★'}
                   </p>
                 </div>
               )}
 
               {!listenSupported && (
-                <p className="speak-box__guide">呢部瀏覽器未支援語音辨識——直接撳綠色「★ 聽完就得」。</p>
+                <p className="speak-box__guide">呢部瀏覽器未支援語音辨識——直接撳下面黃色 ★。</p>
               )}
               {engine === 'safari' && (
                 <div className="dictation-fallback">
@@ -657,6 +631,26 @@ export function PracticeSession({
                     </button>
                   </div>
                 </div>
+              )}
+              {!done ? (
+                <button
+                  type="button"
+                  className="speak-box__parent-star"
+                  onClick={() => {
+                    unlockAudio()
+                    stopListening()
+                    playSfx('correct')
+                    onMarkDone(item.id, moduleKey)
+                    setJustStar(true)
+                  }}
+                  aria-label="爸爸媽媽確認完成"
+                >
+                  {KID.starOk}
+                </button>
+              ) : (
+                <button type="button" className="speak-box__parent-star is-done" disabled aria-label="呢題已完成">
+                  {KID.starOk}
+                </button>
               )}
               <div className="session__actions">
                 <button

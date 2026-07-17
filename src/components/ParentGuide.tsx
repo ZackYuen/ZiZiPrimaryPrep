@@ -72,20 +72,20 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
           <h3>電話聽講（練習提示）</h3>
           <p>
             Safari／iPhone：即使麥克風已「允許」，網頁聽寫都可能無字（同 Notes 鍵盤聽寫唔同系統）。請確認「設定 → 一般 →
-            鍵盤 → 聽寫 → 廣東話」。App 會試聽寫，但無字唔緊要——聽完直接撳綠色「★ 聽完就得」。
+            鍵盤 → 聽寫 → 廣東話」。App 會試聽寫，但無字唔緊要——聽完直接撳黃色 ★。
           </p>
         </article>
         <article className="parent__item">
           <h3>掣用符號（方便唔識字）</h3>
           <p>
             主要掣多用符號：▶ 聽、▶▶ 讀晒、✓ 檢查、? 睇答案、← → 上一／下一、＋／－
-            分類、$／¢ 金錢。講題完成掣係綠色「★ 聽完就得」（唔再淨係一粒星圖示）。中文保留喺旁白同 aria。
+            分類、$／¢ 金錢。講題完成掣係黃色 ★（未完成較光，完成會變淡）。中文保留喺旁白同 aria。
           </p>
         </article>
         <article className="parent__item">
           <h3>點樣先有真正粵語朗讀？</h3>
           <p>
-            而家用瀏覽器 Web Speech（免費、唔使 API key），會優先揀 yue / zh-HK /
+            而家用瀏覽器 Web Speech（免費、唔使 API key），會優先揀 yue-Hant-HK / yue-HK / zh-HK /
             Cantonese 聲線；Chrome／Edge 通常最好。若聽到普通話，請喺系統加入「中文（香港）」語音。
             更高質（要收費／後端）：Google Cloud TTS 嘅 <code>yue-HK</code> 聲線，或
             cantonese.ai。
