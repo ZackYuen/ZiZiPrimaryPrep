@@ -376,7 +376,6 @@ export const days: DayPlan[] = [
         cue: '中文 · 基本版',
         promptZh: '說出姓名、年齡、就讀幼稚園。',
         sampleZh: introZh,
-        scene: 'intro',
         tip: '望住老師笑，大聲清楚講出自己的名字。',
       },
       {
