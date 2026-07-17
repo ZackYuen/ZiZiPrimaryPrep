@@ -71,15 +71,13 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>電話聽講（練習提示）</h3>
           <p>
-            已設定 Google STT 時，撳 ● 會直接用 Google Cloud Speech（`yue-Hant-HK`）錄音轉字，唔再用
-            iPhone／Safari 內建網頁聽寫。講完爸爸媽媽撳黃色 ★。
+            撳 ● 錄音 → ■ 轉字（Google）→ 爸爸媽媽撳 ★。
           </p>
         </article>
         <article className="parent__item">
           <h3>掣用符號（方便唔識字）</h3>
           <p>
-            主要掣多用符號：▶ 聽、▶▶ 讀晒、✓ 檢查、? 睇答案、← → 上一／下一、＋／－
-            分類、$／¢ 金錢。講題完成掣係黃色 ★（未完成較光，完成會變淡）。中文保留喺旁白同 aria。
+            主要掣用符號：▶ ▶▶ ✓ ? ← → ＋ － $ ★。中文喺旁白／aria。
           </p>
         </article>
         <article className="parent__item">
