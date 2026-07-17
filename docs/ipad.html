@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="袁碩孜升小面試 — 舊 iPad（iOS 10）專用頁" />
     <title>碩孜升小面試 · 舊 iPad</title>
-    <link rel="stylesheet" href="/ZiZiPrimaryPrep/docs/assets/index-zkHhRJRw.css" />
+    <link rel="stylesheet" href="/ZiZiPrimaryPrep/docs/assets/index--bjY7odF.css" />
     <style>
       #zizi-boot {
         font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
@@ -13,13 +13,18 @@
         color: #1b3a4b;
         line-height: 1.5;
       }
+      /* Old WebKit can freeze SPA views at opacity:0 after navigation */
+      .session, .session__card, .parent, .vocab-card, .module-card {
+        opacity: 1 !important;
+        animation: none !important;
+      }
     </style>
   </head>
   <body>
     <div id="zizi-boot">載入中…（舊 iPad 模式）</div>
     <div id="root"></div>
     <!-- Classic scripts only — no type=module (Safari 10 dies on modern modules). -->
-    <script src="/ZiZiPrimaryPrep/docs/assets/polyfills-legacy-Bmu1NIMt.js"></script>
+    <script src="/ZiZiPrimaryPrep/docs/assets/polyfills-legacy-qGu1tXyz.js"></script>
     <script>
       (function () {
         function fail(msg) {
@@ -31,7 +36,7 @@
             fail('SystemJS 未載入。請用較新 iPhone／iPad 開啟。');
             return;
           }
-          System.import('/ZiZiPrimaryPrep/docs/assets/index-legacy-D98Truls.js').then(function () {
+          System.import('/ZiZiPrimaryPrep/docs/assets/index-legacy-CaIH24YM.js').then(function () {
             var el = document.getElementById('zizi-boot');
             if (el && el.parentNode) el.parentNode.removeChild(el);
           }).catch(function (err) {
