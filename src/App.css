@@ -1739,11 +1739,14 @@
 
 .reorder__ghost {
   position: fixed;
-  z-index: 80;
+  z-index: 9999;
   pointer-events: none;
-  transform: translate(-50%, -120%);
+  /* Center on the finger — portal to body so parent transforms don't offset it */
+  transform: translate(-50%, -50%);
+  margin: 0;
   box-shadow: 0 10px 24px rgba(27, 58, 75, 0.22);
-  opacity: 0.95;
+  opacity: 0.96;
+  will-change: left, top;
 }
 
 .reorder.is-dragging {
