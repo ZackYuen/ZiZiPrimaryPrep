@@ -2,8 +2,8 @@ import './polyfills/ios10'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import './legacy-ios10.css'
 import App from './App.tsx'
+import './legacy-ios10.css'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
 createRoot(document.getElementById('root')!).render(
