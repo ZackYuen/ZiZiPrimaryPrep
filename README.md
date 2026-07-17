@@ -53,31 +53,25 @@ iPhone Safari 網頁聽寫經常被拒。App 支援 **Google Cloud Speech-to-Tex
 2. 撳 **■** 送去 Google 轉字  
 3. 字入同一個講題框  
 
-### 設定（推薦：Cloudflare Worker proxy）
+### 最簡單（唔使 Cloudflare）
 
 1. Google Cloud Console → 啟用 **Cloud Speech-to-Text API** → 建立 API key  
-2. 部署 worker：
+2. 限制呢把 key（重要）：  
+   - Application restrictions → **HTTP referrers**  
+   - 加：`zackyuen.github.io/*`  
+   - API restrictions → 只准 **Cloud Speech-to-Text API**  
+3. GitHub repo → **Settings → Secrets → Actions** 新增：  
+   - Name: `VITE_GOOGLE_SPEECH_API_KEY`  
+   - Value: 你嘅 API key  
+4. **Actions → Build Pages with Google STT → Run workflow**  
 
-```bash
-cd workers/google-stt
-npx wrangler secret put GOOGLE_SPEECH_API_KEY
-npx wrangler deploy
-```
+完成後，Safari 講題會顯示 **Google** 引擎。
 
-3. 本機／建置時設定：
+> 呢個方法會把 key 編進前端 JS（有 referrer 限制）。家庭自用夠用，**唔使開 Cloudflare**。
 
-```bash
-# .env.local
-VITE_GOOGLE_STT_URL=https://zizi-google-stt.<your-subdomain>.workers.dev
-```
+### 進階（可選 · Cloudflare Worker）
 
-4. 若用 GitHub Actions 建置，喺 repo **Secrets** 加 `VITE_GOOGLE_STT_URL`（workflow 會注入）。
-
-不要把 API key 直接 commit 上 GitHub Pages。Worker proxy 先安全。
-
-### 開發捷徑（唔建議上線）
-
-`.env.local` 可暫時用 `VITE_GOOGLE_SPEECH_API_KEY=...`（請用 HTTP referrer 限制到 `zackyuen.github.io/*`）。
+冇 Cloudflare 帳號可完全跳過。有帳號先至需要：部署 `workers/google-stt`，再設 secret `VITE_GOOGLE_STT_URL`。
 
 ## 原則（來自教材）
 
