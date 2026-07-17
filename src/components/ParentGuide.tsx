@@ -71,8 +71,9 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>電話聽講（練習提示）</h3>
           <p>
-            Safari／iPhone：撳 ● 會開 App 入面嘅輸入框同系統鍵盤；再撳鍵盤麥克風，用內建廣東話聽寫。字會直接入同一個講題框。
-            請確認「設定 → 一般 → 鍵盤 → 聽寫 → 廣東話」。講完爸爸媽媽撳黃色 ★。
+            Safari／iPhone：撳 ● 會直接啟動網頁聽寫（Apple Speech）。字會入同一個講題框。若顯示
+            service-not-allowed，請改用普通分頁（唔好用私密瀏覽），並確認「設定 → 一般 → 鍵盤 → 聽寫 → 廣東話」。
+            講完爸爸媽媽撳黃色 ★。
           </p>
         </article>
         <article className="parent__item">

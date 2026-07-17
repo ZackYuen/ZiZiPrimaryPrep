@@ -62,9 +62,10 @@ function langFallbacks(lang: ListenLang, apple: boolean): string[] {
 }
 
 /**
- * Safari: STT-only. Do NOT fall back to MediaRecorder — that steals the mic and
- * leaves users stuck on「錄音中」with no words even when mic permission is Allow.
- * Keep listening=true until ■ so the UI does not flash. Restart STT slowly.
+ * Safari/iPhone: start webkitSpeechRecognition synchronously inside the ●
+ * tap gesture. Do NOT await getUserMedia first — that breaks the gesture and
+ * often yields service-not-allowed even when mic is Allow.
+ * Do NOT fall back to MediaRecorder (steals the mic, no words).
  *
  * Mic Allow ≠ webpage 聽寫 working. Keyboard「粵」≠ 聽寫「廣東話」.
  */
@@ -86,6 +87,7 @@ export function useSpeechRecognition() {
   const [statusHint, setStatusHint] = useState('')
   const [engine, setEngine] = useState<'safari' | 'chrome' | 'none'>('none')
   const [busy] = useState(false)
+  const [sttBlocked, setSttBlocked] = useState(false)
 
   const sessionId = useRef(0)
   const recRef = useRef<BrowserSpeechRecognition | null>(null)
@@ -270,18 +272,22 @@ export function useSpeechRecognition() {
 
         if (code === 'not-allowed' || code === 'service-not-allowed' || code === 'audio-capture') {
           // Mic can be Allow while webpage Speech Recognition still fails
-          if (micOkRef.current && appleRef.current) {
+          if (appleRef.current && (micOkRef.current || code === 'service-not-allowed')) {
             setError(null)
-            setStatusHint(
-              `麥克風已開，但網頁聽寫未接通（${code}）。要求語言 ${requestedLangRef.current} 未確認啟動。Safari 私密瀏覽常會封鎖網頁聽寫；可改用普通分頁，或撳下面黃色 ★。`,
-            )
-            if (restartCount.current < 6) {
+            if (restartCount.current < 4) {
+              setStatusHint(`重試 iPhone 聽寫…（${restartCount.current + 1}）`)
               scheduleRestart(sid)
             } else {
               sttEnabled.current = false
               setLangConfirmed(false)
+              setSttBlocked(true)
+              setListening(false)
+              wantListen.current = false
+              clearTimers()
               setStatusHint(
-                `網頁聽寫未能啟動（${code}）——「${requestedLangRef.current}」只係要求語言，引擎未真正開。Safari 私密瀏覽下常見，請改普通分頁，或撳下面黃色 ★。`,
+                code === 'service-not-allowed'
+                  ? 'Safari 未能開網頁聽寫（私密瀏覽常見）。請改用普通分頁再撳 ●，或改用鍵盤麥克風。'
+                  : `聽寫未能啟動（${code}）。請改用普通分頁再撳 ●，或改用鍵盤麥克風。`,
               )
             }
             return
@@ -290,6 +296,7 @@ export function useSpeechRecognition() {
           wantListen.current = false
           clearTimers()
           setListening(false)
+          setSttBlocked(true)
           setError('麥克風未允許。撳網址列「aA」→ 網站設定 → 麥克風 → 允許。')
           return
         }
@@ -354,27 +361,27 @@ export function useSpeechRecognition() {
     setStatusHint('')
     setLangConfirmed(false)
     setLastErrorCode(null)
+    setSttBlocked(false)
   }, [])
 
   const stop = useCallback(() => {
     sessionId.current += 1
     const hadText = !!(transcriptRef.current.trim() || interimRef.current.trim())
     hardStopSession()
-    if (appleRef.current && !hadText) {
+    if (appleRef.current && !hadText && !sttBlocked) {
       setStatusHint(
-        micOkRef.current
-          ? '未出字。麥克風已允許——請檢查 設定→一般→鍵盤→聽寫→「廣東話」。或撳下面黃色 ★。'
-          : '未出字。請允許麥克風，並下載聽寫「廣東話」。或撳下面黃色 ★。',
+        '未出字。請再撳 ● 試 iPhone 聽寫；私密瀏覽請改普通分頁。或以黃色 ★ 為準。',
       )
     }
-  }, [hardStopSession])
+  }, [hardStopSession, sttBlocked])
 
   const start = useCallback(
     (lang: ListenLang = 'yue-Hant-HK') => {
       const Ctor = getRecognitionCtor()
       if (!Ctor) {
-        setError('呢部瀏覽器未支援網頁聽寫。請爸爸媽媽聽完，撳下面黃色 ★。')
-        return
+        setSttBlocked(true)
+        setError('呢部瀏覽器未支援網頁聽寫。可改用鍵盤麥克風，或撳黃色 ★。')
+        return false
       }
 
       sessionId.current += 1
@@ -387,6 +394,7 @@ export function useSpeechRecognition() {
       micOkRef.current = false
       restartCount.current = 0
       setError(null)
+      setSttBlocked(false)
       setTranscript('')
       transcriptRef.current = ''
       interimRef.current = ''
@@ -426,41 +434,46 @@ export function useSpeechRecognition() {
       setStatusHint(
         appleRef.current
           ? lang === 'en-US'
-            ? '啟動英文聽寫…'
-            : '啟動廣東話聽寫…'
+            ? '啟動 iPhone 英文聽寫…'
+            : '啟動 iPhone 廣東話聽寫…'
           : '啟動轉文字…',
       )
 
-      const beginStt = () => {
-        if (sid !== sessionId.current || !wantListen.current) return
+      // Must stay inside the ● user-gesture stack (especially Safari).
+      let started = false
+      try {
+        rec.start()
+        started = true
+      } catch {
+        try {
+          rec.abort()
+        } catch {
+          /* ignore */
+        }
         try {
           rec.start()
+          started = true
         } catch {
           scheduleRestart(sid)
         }
       }
 
-      if (appleRef.current && canUseMic()) {
-        setStatusHint('確認麥克風…')
+      // Probe mic in parallel only — never gate rec.start() on it.
+      if (canUseMic()) {
         void navigator.mediaDevices
           .getUserMedia({ audio: true, video: false })
           .then((stream) => {
             stream.getTracks().forEach((t) => t.stop())
+            if (sid !== sessionId.current) return
             micOkRef.current = true
-            setError(null)
-            setStatusHint('啟動廣東話聽寫…')
-            beginStt()
           })
           .catch(() => {
+            if (sid !== sessionId.current) return
             micOkRef.current = false
-            wantListen.current = false
-            setListening(false)
-            setError('麥克風未允許。你張相已顯示網站可設為允許——請再撳 ●。')
           })
-        return
       }
 
-      beginStt()
+      return started
     },
     [attachHandlers, hardStopSession, scheduleRestart],
   )
@@ -481,6 +494,7 @@ export function useSpeechRecognition() {
     statusHint,
     engine,
     busy,
+    sttBlocked,
     start,
     stop,
     reset,
