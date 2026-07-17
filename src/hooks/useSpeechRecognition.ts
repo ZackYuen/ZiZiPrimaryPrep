@@ -66,11 +66,11 @@ function langFallbacks(lang: ListenLang, apple: boolean): string[] {
 }
 
 /**
- * Safari/iPhone:
- * - If Google STT is configured → record PCM on ●, Google yue-Hant-HK on ■
- * - Else → webkitSpeechRecognition started sync in the ● gesture
+ * When Google STT is configured (VITE_GOOGLE_SPEECH_API_KEY / VITE_GOOGLE_STT_URL):
+ * always use Google — ● records PCM, ■ sends to Google (yue-Hant-HK). Never fall
+ * back to iPhone/Safari webkitSpeechRecognition.
  *
- * Never use MediaRecorder as a fake "listening" path (no words).
+ * Otherwise → browser Web Speech (Safari/Chrome) started in the ● gesture.
  */
 export function useSpeechRecognition() {
   const apple = typeof navigator !== 'undefined' && isAppleWebKit()
@@ -334,7 +334,8 @@ export function useSpeechRecognition() {
   )
 
   useEffect(() => {
-    const preferGoogle = googleReady && (apple || !getRecognitionCtor())
+    // Google configured → always Google; skip iPhone built-in STT entirely.
+    const preferGoogle = googleReady
     setSupported(preferGoogle || !!getRecognitionCtor() || canUseMic())
     if (preferGoogle) setEngine('google')
     else if (apple) setEngine('safari')
@@ -429,18 +430,15 @@ export function useSpeechRecognition() {
     const hadText = !!(transcriptRef.current.trim() || interimRef.current.trim())
     hardStopSession()
     if (appleRef.current && !hadText && !sttBlocked) {
-      setStatusHint(
-        googleReady
-          ? '未出字。可再撳 ●；若 Safari 網頁聽寫唔得，請確認已設定 Google STT。'
-          : '未出字。請再撳 ●；私密瀏覽請改普通分頁。或以黃色 ★ 為準。',
-      )
+      setStatusHint('未出字。請再撳 ●；私密瀏覽請改普通分頁。或以黃色 ★ 為準。')
     }
-  }, [googleReady, hardStopSession, sttBlocked])
+  }, [hardStopSession, sttBlocked])
 
   const start = useCallback(
     (lang: ListenLang = 'yue-Hant-HK') => {
       listenLangRef.current = lang
-      const preferGoogle = googleReady && (appleRef.current || !getRecognitionCtor())
+      // Always Google when configured — never iPhone/Safari built-in STT.
+      const preferGoogle = googleReady
 
       sessionId.current += 1
       const sid = sessionId.current
@@ -522,7 +520,7 @@ export function useSpeechRecognition() {
       if (!Ctor) {
         setSttBlocked(true)
         setListening(false)
-        setError('呢部瀏覽器未支援網頁聽寫。可設定 Google STT，或撳黃色 ★。')
+        setError('呢部瀏覽器未支援網頁聽寫。請設定 Google STT（見 README），或撳黃色 ★。')
         return false
       }
 
@@ -534,7 +532,7 @@ export function useSpeechRecognition() {
       rec.maxAlternatives = 1
       rec.lang = langsRef.current[0]
       attachHandlers(rec, sid)
-      setStatusHint(appleRef.current ? '啟動 iPhone 聽寫…' : '啟動轉文字…')
+      setStatusHint(appleRef.current ? '啟動瀏覽器聽寫…' : '啟動轉文字…')
 
       try {
         rec.start()
@@ -567,7 +565,7 @@ export function useSpeechRecognition() {
 
       return true
     },
-    [attachHandlers, hardStopSession, scheduleRestart, stop],
+    [attachHandlers, googleReady, hardStopSession, scheduleRestart, stop],
   )
 
   return {
