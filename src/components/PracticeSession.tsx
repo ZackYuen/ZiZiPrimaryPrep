@@ -124,6 +124,7 @@ export function PracticeSession({
     statusHint,
     engine,
     busy: listenBusy,
+    sttBlocked,
     start: startListening,
     stop: stopListening,
     reset: resetListening,
@@ -220,6 +221,23 @@ export function PracticeSession({
     if (combined) setSpokenText(combined)
   }, [listening, listenTranscript, listenInterim])
 
+  const openKeyboardDictation = () => {
+    setComposeActive(true)
+    window.requestAnimationFrame(() => {
+      const el = dictationRef.current
+      if (!el) return
+      el.focus()
+      const end = el.value.length
+      el.setSelectionRange(end, end)
+    })
+  }
+
+  // If Safari blocks webpage STT, open the compose field so keyboard mic remains available.
+  useEffect(() => {
+    if (engine !== 'safari' || !sttBlocked) return
+    openKeyboardDictation()
+  }, [engine, sttBlocked])
+
   const speakFeedback = useMemo(() => {
     const heard = spokenText.trim()
     if (item.kind !== 'speak' || !heard) return null
@@ -229,18 +247,6 @@ export function PracticeSession({
         : item.sampleZh || item.sampleEn
     return softSpeakFeedback(heard, sample, listenLang === 'en-US' ? 'en' : 'zh')
   }, [item, spokenText, listenLang])
-
-  const openKeyboardDictation = () => {
-    setComposeActive(true)
-    // Focus must stay in the user-gesture stack for iOS keyboard to appear.
-    window.requestAnimationFrame(() => {
-      const el = dictationRef.current
-      if (!el) return
-      el.focus()
-      const end = el.value.length
-      el.setSelectionRange(end, end)
-    })
-  }
 
   useEffect(() => {
     if (reorderCorrect && !done) {
@@ -493,13 +499,13 @@ export function PracticeSession({
             <div className="speak-box">
               <p className="speak-box__guide">
                 {engine === 'safari'
-                  ? '撳 ● 開鍵盤 → 撳鍵盤麥克風講廣東話 → 爸爸媽媽撳黃色 ★'
+                  ? '撳 ● 直接用 iPhone 聽寫講廣東話 → 爸爸媽媽撳黃色 ★'
                   : '撳 ● 講，字會出現喺下面；爸爸媽媽再撳黃色 ★'}
               </p>
 
               <div
                 className={`listen-panel ${listening || composeActive ? 'is-listening' : ''} ${
-                  engine === 'safari' ? 'listen-panel--keyboard' : ''
+                  engine === 'safari' ? 'listen-panel--safari' : ''
                 }`}
               >
                 <div className="session__actions">
@@ -529,25 +535,25 @@ export function PracticeSession({
                   </button>
                 </div>
 
-                {!listening && !(engine === 'safari' && composeActive) ? (
+                {!listening ? (
                   <button
                     type="button"
                     className="primary-btn primary-btn--wide"
                     onClick={() => {
+                      // Start STT first so Safari rec.start() stays in this user gesture.
                       stop()
-                      unlockAudio()
-                      playSfx('tap')
                       setSpokenText('')
-                      if (engine === 'safari') {
-                        // iPhone Safari: built-in keyboard dictation is the reliable path.
-                        openKeyboardDictation()
-                      } else if (listenSupported) {
+                      setComposeActive(false)
+                      dictationRef.current?.blur()
+                      if (listenSupported) {
                         startListening(listenLang)
                       } else {
                         openKeyboardDictation()
                       }
+                      unlockAudio()
+                      playSfx('tap')
                     }}
-                    aria-label={engine === 'safari' ? '開鍵盤聽寫' : '開始聽你講'}
+                    aria-label="開始聽寫"
                   >
                     {KID.mic}
                   </button>
@@ -555,44 +561,39 @@ export function PracticeSession({
                   <button
                     type="button"
                     className="primary-btn primary-btn--wide listen-panel__stop"
-                    disabled={listenBusy && !listening && engine !== 'safari'}
+                    disabled={listenBusy && !listening}
                     onClick={() => {
                       playSfx('tap')
-                      if (listening) stopListening()
+                      stopListening()
                       setComposeActive(false)
                       dictationRef.current?.blur()
                     }}
-                    aria-label="停止"
+                    aria-label="停止聽寫"
                   >
-                    {listening
-                      ? `${KID.micStop} ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`
-                      : KID.micStop}
+                    {`${KID.micStop} ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`}
                   </button>
                 )}
 
                 <div className={`listen-panel__compose ${composeActive || listening ? 'is-active' : ''}`}>
-                  {(listening || composeActive) && (
+                  {listening && (
                     <p className="listen-panel__live">
-                      {engine === 'safari'
-                        ? composeActive
-                          ? '鍵盤聽寫 · 撳鍵盤麥克風 · 廣東話'
-                          : '連接中…'
-                        : `● ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}${
-                            sttAlive ? (heardSpeech ? ' · 聽到聲' : ' · 聽寫中') : ' · 啟動中'
-                          }`}
-                      {engine !== 'safari' && (
-                        <span className="listen-panel__lang">
-                          {' '}
-                          · Chrome ·{' '}
-                          {langConfirmed ? `引擎 ${activeLang}` : `要求 ${requestedLang}（未確認）`}
-                          {lastErrorCode ? ` · ${lastErrorCode}` : ''}
-                        </span>
-                      )}
+                      ● {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
+                      {sttAlive
+                        ? heardSpeech
+                          ? ' · 聽到聲'
+                          : ' · 聽寫中'
+                        : ' · 啟動聽寫'}
+                      <span className="listen-panel__lang">
+                        {' '}
+                        · {engine === 'safari' ? 'Safari' : 'Chrome'} ·{' '}
+                        {langConfirmed ? `引擎 ${activeLang}` : `要求 ${requestedLang}（未確認）`}
+                        {lastErrorCode ? ` · ${lastErrorCode}` : ''}
+                      </span>
                     </p>
                   )}
 
-                                    <label className="listen-panel__compose-label" htmlFor="speak-dictation">
-                    {engine === 'safari' ? '講出嚟嘅字' : '轉寫文字'}
+                  <label className="listen-panel__compose-label" htmlFor="speak-dictation">
+                    講出嚟嘅字
                   </label>
                   <textarea
                     id="speak-dictation"
@@ -604,6 +605,7 @@ export function PracticeSession({
                     onBlur={() => {
                       if (!listening) setComposeActive(false)
                     }}
+                    readOnly={listening}
                     lang={listenLang === 'en-US' ? 'en-US' : 'zh-Hant-HK'}
                     inputMode="text"
                     enterKeyHint="done"
@@ -612,26 +614,21 @@ export function PracticeSession({
                     spellCheck
                     rows={4}
                     placeholder={
-                      listenLang === 'en-US'
-                        ? 'Tap ●, then use the keyboard mic to speak…'
+                      listening
+                        ? '請大聲講… 字會顯示喺呢度'
                         : engine === 'safari'
-                          ? '撳 ● 開鍵盤，再撳鍵盤麥克風講…'
+                          ? '撳 ● 開始 iPhone 聽寫…'
                           : '撳 ● 開始講，字會顯示喺呢度…'
                     }
-                    aria-label={engine === 'safari' ? 'iPhone 鍵盤聽寫輸入' : '語音轉寫文字'}
+                    aria-label="聽寫文字"
                   />
 
-                  {engine === 'safari' && (
-                    <p className="listen-panel__kbd-tip" aria-hidden={!composeActive}>
-                      鍵盤底部／側邊有麥克風掣 → 用廣東話講 → 字會入呢個框
+                  {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
+                  {listenError ? <p className="listen-panel__error">{listenError}</p> : null}
+                  {sttBlocked && engine === 'safari' ? (
+                    <p className="listen-panel__kbd-tip">
+                      網頁聽寫未開成——可撳輸入框，再用鍵盤麥克風；或改用普通分頁（唔好用私密瀏覽）再撳 ●。
                     </p>
-                  )}
-
-                  {statusHint && engine !== 'safari' ? (
-                    <p className="listen-panel__hint">{statusHint}</p>
-                  ) : null}
-                  {listenError && engine !== 'safari' ? (
-                    <p className="listen-panel__error">{listenError}</p>
                   ) : null}
                 </div>
 
@@ -652,8 +649,8 @@ export function PracticeSession({
 
                 <p className="listen-panel__note">
                   {engine === 'safari'
-                    ? '用 iPhone 鍵盤麥克風聽寫 · 無字都得 · 完成撳下面黃色 ★'
-                    : '● 要網絡 · 講完撳 ■ · 完成撳下面黃色 ★'}
+                    ? '● 直接開 iPhone 聽寫 · 講完撳 ■ · 完成撳黃色 ★'
+                    : '● 要網絡 · 講完撳 ■ · 完成撳黃色 ★'}
                 </p>
               </div>
 
