@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { isGoogleSttConfigured, recognizeWithGoogle } from '../lib/googleStt'
+import { startPcmCapture, type PcmCaptureSession } from '../lib/pcmCapture'
 
 export type ListenLang = 'yue-Hant-HK' | 'en-US'
 
@@ -28,6 +30,8 @@ type SpeechRecognitionEventLike = {
 }
 
 type SpeechRecognitionCtor = new () => BrowserSpeechRecognition
+type Engine = 'safari' | 'chrome' | 'google' | 'none'
+type Mode = 'webspeech' | 'google'
 
 function getRecognitionCtor(): SpeechRecognitionCtor | null {
   if (typeof window === 'undefined') return null
@@ -62,15 +66,15 @@ function langFallbacks(lang: ListenLang, apple: boolean): string[] {
 }
 
 /**
- * Safari/iPhone: start webkitSpeechRecognition synchronously inside the ●
- * tap gesture. Do NOT await getUserMedia first — that breaks the gesture and
- * often yields service-not-allowed even when mic is Allow.
- * Do NOT fall back to MediaRecorder (steals the mic, no words).
+ * Safari/iPhone:
+ * - If Google STT is configured → record PCM on ●, Google yue-Hant-HK on ■
+ * - Else → webkitSpeechRecognition started sync in the ● gesture
  *
- * Mic Allow ≠ webpage 聽寫 working. Keyboard「粵」≠ 聽寫「廣東話」.
+ * Never use MediaRecorder as a fake "listening" path (no words).
  */
 export function useSpeechRecognition() {
   const apple = typeof navigator !== 'undefined' && isAppleWebKit()
+  const googleReady = isGoogleSttConfigured()
 
   const [supported, setSupported] = useState(false)
   const [listening, setListening] = useState(false)
@@ -85,8 +89,8 @@ export function useSpeechRecognition() {
   const [langConfirmed, setLangConfirmed] = useState(false)
   const [lastErrorCode, setLastErrorCode] = useState<string | null>(null)
   const [statusHint, setStatusHint] = useState('')
-  const [engine, setEngine] = useState<'safari' | 'chrome' | 'none'>('none')
-  const [busy] = useState(false)
+  const [engine, setEngine] = useState<Engine>('none')
+  const [busy, setBusy] = useState(false)
   const [sttBlocked, setSttBlocked] = useState(false)
 
   const sessionId = useRef(0)
@@ -104,8 +108,11 @@ export function useSpeechRecognition() {
   const interimRef = useRef('')
   const transcriptRef = useRef('')
   const appleRef = useRef(apple)
-  const sidRef = useRef(0)
   const requestedLangRef = useRef('yue-Hant-HK')
+  const modeRef = useRef<Mode>('webspeech')
+  const listenLangRef = useRef<ListenLang>('yue-Hant-HK')
+  const pcmSessionRef = useRef<PcmCaptureSession | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
   appleRef.current = apple
   requestedLangRef.current = requestedLang
@@ -148,8 +155,7 @@ export function useSpeechRecognition() {
           /* already started */
         }
       }
-      if (finalStop) rec.stop()
-      else rec.stop()
+      rec.stop()
     } catch {
       try {
         rec.abort()
@@ -167,10 +173,17 @@ export function useSpeechRecognition() {
     clearTimers()
     flushInterim()
     hardStopStt(true)
+    if (pcmSessionRef.current) {
+      void pcmSessionRef.current.stop().catch(() => undefined)
+      pcmSessionRef.current = null
+    }
+    abortRef.current?.abort()
+    abortRef.current = null
     setListening(false)
     setSttAlive(false)
     setElapsedSec(0)
     setHeardSpeech(false)
+    setBusy(false)
     setStatusHint('')
   }, [flushInterim, hardStopStt])
 
@@ -192,7 +205,6 @@ export function useSpeechRecognition() {
       try {
         rec.start()
       } catch {
-        // InvalidState — try once more shortly
         window.setTimeout(() => {
           if (sid !== sessionId.current || !wantListen.current || !recRef.current) return
           try {
@@ -212,16 +224,11 @@ export function useSpeechRecognition() {
         runningRef.current = true
         setSttAlive(true)
         setLangConfirmed(true)
-        // Read back whatever the engine accepted (may differ from request on Safari)
         const aliveLang = rec.lang || langsRef.current[langIdx.current]
         setActiveLang(aliveLang)
         setError(null)
         setLastErrorCode(null)
-        setStatusHint(
-          appleRef.current
-            ? `聽寫已啟動（引擎語言 ${aliveLang}）…請大聲講`
-            : `聽寫已啟動（${aliveLang}）…請大聲講`,
-        )
+        setStatusHint(`聽寫已啟動（${aliveLang}）…請大聲講`)
       }
 
       rec.onresult = (event) => {
@@ -233,14 +240,6 @@ export function useSpeechRecognition() {
           if (!piece) continue
           if (event.results[i].isFinal) finalChunk += piece
           else interimChunk += piece
-        }
-        if (!finalChunk && !interimChunk && event.results.length > 0) {
-          const last = event.results[event.results.length - 1]
-          const piece = last?.[0]?.transcript?.trim() ?? ''
-          if (piece) {
-            if (last.isFinal) finalChunk = piece
-            else interimChunk = piece
-          }
         }
         if (finalChunk || interimChunk) {
           setHeardSpeech(true)
@@ -271,7 +270,6 @@ export function useSpeechRecognition() {
         setLastErrorCode(code)
 
         if (code === 'not-allowed' || code === 'service-not-allowed' || code === 'audio-capture') {
-          // Mic can be Allow while webpage Speech Recognition still fails
           if (appleRef.current && (micOkRef.current || code === 'service-not-allowed')) {
             setError(null)
             if (restartCount.current < 4) {
@@ -285,9 +283,9 @@ export function useSpeechRecognition() {
               wantListen.current = false
               clearTimers()
               setStatusHint(
-                code === 'service-not-allowed'
-                  ? 'Safari 未能開網頁聽寫（私密瀏覽常見）。請改用普通分頁再撳 ●，或改用鍵盤麥克風。'
-                  : `聽寫未能啟動（${code}）。請改用普通分頁再撳 ●，或改用鍵盤麥克風。`,
+                googleReady
+                  ? 'Safari 網頁聽寫失敗。請設定 Google STT 後再試，或撳黃色 ★。'
+                  : 'Safari 未能開網頁聽寫（私密瀏覽常見）。可改普通分頁，或設定 Google STT。',
               )
             }
             return
@@ -318,11 +316,7 @@ export function useSpeechRecognition() {
             scheduleRestart(sid)
             return
           }
-          setStatusHint(
-            appleRef.current
-              ? `聽寫語言未就緒（${code}）。設定→一般→鍵盤→聽寫→下載「廣東話」。或撳下面黃色 ★。`
-              : `轉文字唔穩（${code}）——可試 EN，或撳下面黃色 ★。`,
-          )
+          setStatusHint(`聽寫語言未就緒（${code}）。或撳下面黃色 ★。`)
           scheduleRestart(sid)
         }
       }
@@ -336,19 +330,28 @@ export function useSpeechRecognition() {
         scheduleRestart(sid)
       }
     },
-    [flushInterim, scheduleRestart],
+    [flushInterim, googleReady, scheduleRestart],
   )
 
   useEffect(() => {
-    setSupported(!!getRecognitionCtor() || canUseMic())
-    setEngine(isAppleWebKit() ? 'safari' : getRecognitionCtor() ? 'chrome' : 'none')
+    const preferGoogle = googleReady && (apple || !getRecognitionCtor())
+    setSupported(preferGoogle || !!getRecognitionCtor() || canUseMic())
+    if (preferGoogle) setEngine('google')
+    else if (apple) setEngine('safari')
+    else if (getRecognitionCtor()) setEngine('chrome')
+    else setEngine('none')
+
     return () => {
       sessionId.current += 1
       wantListen.current = false
       clearTimers()
       hardStopStt(true)
+      if (pcmSessionRef.current) {
+        void pcmSessionRef.current.stop().catch(() => undefined)
+        pcmSessionRef.current = null
+      }
     }
-  }, [hardStopStt])
+  }, [apple, googleReady, hardStopStt])
 
   const reset = useCallback(() => {
     setTranscript('')
@@ -362,31 +365,85 @@ export function useSpeechRecognition() {
     setLangConfirmed(false)
     setLastErrorCode(null)
     setSttBlocked(false)
+    setBusy(false)
   }, [])
 
-  const stop = useCallback(() => {
+  const stop = useCallback(async () => {
+    const sidAtStop = sessionId.current
     sessionId.current += 1
+
+    if (modeRef.current === 'google') {
+      wantListen.current = false
+      clearTimers()
+      setListening(false)
+      setSttAlive(false)
+      const session = pcmSessionRef.current
+      pcmSessionRef.current = null
+      if (!session) {
+        setStatusHint('未錄到聲——請再撳 ●。')
+        return
+      }
+
+      setBusy(true)
+      setStatusHint('Google 轉文字中（廣東話）…')
+      abortRef.current?.abort()
+      const ac = new AbortController()
+      abortRef.current = ac
+
+      try {
+        const { pcm, sampleRate } = await session.stop()
+        if (pcm.length < sampleRate * 0.25) {
+          setBusy(false)
+          setStatusHint('錄音太短——請再撳 ● 講長啲。')
+          return
+        }
+        const result = await recognizeWithGoogle({
+          pcm,
+          sampleRate,
+          language: listenLangRef.current,
+          signal: ac.signal,
+        })
+        if (sidAtStop !== sessionId.current - 1 && sidAtStop !== sessionId.current) {
+          // A newer session may have started; still accept if no newer listen.
+        }
+        setTranscript(result.transcript)
+        transcriptRef.current = result.transcript
+        setHeardSpeech(true)
+        setLangConfirmed(true)
+        setActiveLang(result.languageCode || (listenLangRef.current === 'en-US' ? 'en-US' : 'yue-Hant-HK'))
+        setStatusHint('')
+        setError(null)
+        setSttBlocked(false)
+      } catch (err) {
+        if ((err as Error)?.name === 'AbortError') return
+        const msg = err instanceof Error ? err.message : 'Google 聽寫失敗'
+        setError(msg)
+        setStatusHint(`${msg} · 可再撳 ●，或用黃色 ★`)
+        setSttBlocked(true)
+      } finally {
+        setBusy(false)
+      }
+      return
+    }
+
     const hadText = !!(transcriptRef.current.trim() || interimRef.current.trim())
     hardStopSession()
     if (appleRef.current && !hadText && !sttBlocked) {
       setStatusHint(
-        '未出字。請再撳 ● 試 iPhone 聽寫；私密瀏覽請改普通分頁。或以黃色 ★ 為準。',
+        googleReady
+          ? '未出字。可再撳 ●；若 Safari 網頁聽寫唔得，請確認已設定 Google STT。'
+          : '未出字。請再撳 ●；私密瀏覽請改普通分頁。或以黃色 ★ 為準。',
       )
     }
-  }, [hardStopSession, sttBlocked])
+  }, [googleReady, hardStopSession, sttBlocked])
 
   const start = useCallback(
     (lang: ListenLang = 'yue-Hant-HK') => {
-      const Ctor = getRecognitionCtor()
-      if (!Ctor) {
-        setSttBlocked(true)
-        setError('呢部瀏覽器未支援網頁聽寫。可改用鍵盤麥克風，或撳黃色 ★。')
-        return false
-      }
+      listenLangRef.current = lang
+      const preferGoogle = googleReady && (appleRef.current || !getRecognitionCtor())
 
       sessionId.current += 1
       const sid = sessionId.current
-      sidRef.current = sid
       hardStopSession()
 
       wantListen.current = true
@@ -395,6 +452,7 @@ export function useSpeechRecognition() {
       restartCount.current = 0
       setError(null)
       setSttBlocked(false)
+      setBusy(false)
       setTranscript('')
       transcriptRef.current = ''
       interimRef.current = ''
@@ -405,11 +463,15 @@ export function useSpeechRecognition() {
       setListening(true)
       langsRef.current = langFallbacks(lang, appleRef.current)
       langIdx.current = 0
-      const firstLang = langsRef.current[0]
+      const firstLang = preferGoogle
+        ? lang === 'en-US'
+          ? 'en-US'
+          : 'yue-Hant-HK'
+        : langsRef.current[0]
       requestedLangRef.current = firstLang
       setRequestedLang(firstLang)
       setActiveLang(firstLang)
-      setLangConfirmed(false)
+      setLangConfirmed(preferGoogle)
       setLastErrorCode(null)
 
       startedAt.current = Date.now()
@@ -418,11 +480,53 @@ export function useSpeechRecognition() {
         if (sid !== sessionId.current || !wantListen.current) return
         setElapsedSec(Math.floor((Date.now() - startedAt.current) / 1000))
         if (Math.floor((Date.now() - startedAt.current) / 1000) >= 45) {
-          sessionId.current += 1
-          hardStopSession()
+          void stop()
         }
       }, 250)
 
+      if (preferGoogle) {
+        modeRef.current = 'google'
+        setEngine('google')
+        setStatusHint(
+          lang === 'en-US' ? 'Google 英文錄音中…撳 ■ 轉文字' : 'Google 廣東話錄音中…撳 ■ 轉文字',
+        )
+        // Keep gesture chain: first await should be getUserMedia.
+        void startPcmCapture()
+          .then((session) => {
+            if (sid !== sessionId.current || !wantListen.current) {
+              void session.stop().catch(() => undefined)
+              return
+            }
+            pcmSessionRef.current = session
+            micOkRef.current = true
+            setSttAlive(true)
+            setLangConfirmed(true)
+            setStatusHint(
+              lang === 'en-US' ? 'Google 英文錄音中…請講，完咗撳 ■' : 'Google 廣東話錄音中…請講，完咗撳 ■',
+            )
+          })
+          .catch((err) => {
+            if (sid !== sessionId.current) return
+            wantListen.current = false
+            setListening(false)
+            setSttAlive(false)
+            setSttBlocked(true)
+            setError(err instanceof Error ? err.message : '無法開麥克風')
+            setStatusHint('無法開麥克風。撳網址列「aA」→ 網站設定 → 麥克風 → 允許。')
+          })
+        return true
+      }
+
+      modeRef.current = 'webspeech'
+      const Ctor = getRecognitionCtor()
+      if (!Ctor) {
+        setSttBlocked(true)
+        setListening(false)
+        setError('呢部瀏覽器未支援網頁聽寫。可設定 Google STT，或撳黃色 ★。')
+        return false
+      }
+
+      setEngine(appleRef.current ? 'safari' : 'chrome')
       const rec = new Ctor()
       recRef.current = rec
       rec.continuous = appleRef.current ? false : !isMobileUa()
@@ -430,20 +534,10 @@ export function useSpeechRecognition() {
       rec.maxAlternatives = 1
       rec.lang = langsRef.current[0]
       attachHandlers(rec, sid)
+      setStatusHint(appleRef.current ? '啟動 iPhone 聽寫…' : '啟動轉文字…')
 
-      setStatusHint(
-        appleRef.current
-          ? lang === 'en-US'
-            ? '啟動 iPhone 英文聽寫…'
-            : '啟動 iPhone 廣東話聽寫…'
-          : '啟動轉文字…',
-      )
-
-      // Must stay inside the ● user-gesture stack (especially Safari).
-      let started = false
       try {
         rec.start()
-        started = true
       } catch {
         try {
           rec.abort()
@@ -452,13 +546,11 @@ export function useSpeechRecognition() {
         }
         try {
           rec.start()
-          started = true
         } catch {
           scheduleRestart(sid)
         }
       }
 
-      // Probe mic in parallel only — never gate rec.start() on it.
       if (canUseMic()) {
         void navigator.mediaDevices
           .getUserMedia({ audio: true, video: false })
@@ -473,9 +565,9 @@ export function useSpeechRecognition() {
           })
       }
 
-      return started
+      return true
     },
-    [attachHandlers, hardStopSession, scheduleRestart],
+    [attachHandlers, hardStopSession, scheduleRestart, stop],
   )
 
   return {
@@ -495,6 +587,7 @@ export function useSpeechRecognition() {
     engine,
     busy,
     sttBlocked,
+    googleConfigured: googleReady,
     start,
     stop,
     reset,
