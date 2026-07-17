@@ -55,9 +55,10 @@ export default {
     const content = payload?.content
     const sampleRateHertz = Number(payload?.sampleRateHertz) || 16000
     const languageCode = payload?.languageCode || 'yue-Hant-HK'
-    const alternativeLanguageCodes = Array.isArray(payload?.alternativeLanguageCodes)
-      ? payload.alternativeLanguageCodes
-      : ['yue-HK', 'zh-HK', 'zh-TW']
+    const model = payload?.model || 'latest_short'
+    const phrases = Array.isArray(payload?.phrases)
+      ? payload.phrases.filter((p) => typeof p === 'string' && p.length >= 2).slice(0, 40)
+      : []
 
     if (!content || typeof content !== 'string') {
       return Response.json({ error: 'Missing audio content' }, { status: 400, headers })
@@ -68,21 +69,27 @@ export default {
       return Response.json({ error: 'Audio too long' }, { status: 413, headers })
     }
 
+    const config = {
+      encoding: 'LINEAR16',
+      sampleRateHertz,
+      languageCode,
+      // Do not set alternativeLanguageCodes — zh-* alternatives hurt Cantonese.
+      enableAutomaticPunctuation: true,
+      model,
+      audioChannelCount: 1,
+      maxAlternatives: 1,
+    }
+    if (phrases.length) {
+      config.speechContexts = [{ phrases, boost: 15 }]
+    }
+
     const googleRes = await fetch(
       `https://speech.googleapis.com/v1/speech:recognize?key=${encodeURIComponent(env.GOOGLE_SPEECH_API_KEY)}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          config: {
-            encoding: 'LINEAR16',
-            sampleRateHertz,
-            languageCode,
-            alternativeLanguageCodes,
-            enableAutomaticPunctuation: true,
-            model: 'default',
-            audioChannelCount: 1,
-          },
+          config,
           audio: { content },
         }),
       },

@@ -113,6 +113,7 @@ export function useSpeechRecognition() {
   const listenLangRef = useRef<ListenLang>('yue-Hant-HK')
   const pcmSessionRef = useRef<PcmCaptureSession | null>(null)
   const abortRef = useRef<AbortController | null>(null)
+  const phrasesRef = useRef<string[]>([])
 
   appleRef.current = apple
   requestedLangRef.current = requestedLang
@@ -398,6 +399,7 @@ export function useSpeechRecognition() {
           pcm,
           sampleRate,
           language: listenLangRef.current,
+          phrases: phrasesRef.current,
           signal: ac.signal,
         })
         if (sidAtStop !== sessionId.current - 1 && sidAtStop !== sessionId.current) {
@@ -431,8 +433,9 @@ export function useSpeechRecognition() {
   }, [hardStopSession, sttBlocked])
 
   const start = useCallback(
-    (lang: ListenLang = 'yue-Hant-HK') => {
+    (lang: ListenLang = 'yue-Hant-HK', opts?: { phrases?: string[] }) => {
       listenLangRef.current = lang
+      phrasesRef.current = opts?.phrases?.filter(Boolean).slice(0, 40) ?? []
       // Always Google when configured — never iPhone/Safari built-in STT.
       const preferGoogle = googleReady
 
