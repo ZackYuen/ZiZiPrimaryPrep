@@ -13,7 +13,6 @@ const SCENE_SRC: Partial<Record<SceneId, string>> = {
   'broken-vase': 'scenes/broken-vase.jpg',
   playground: 'scenes/playground.jpg',
   sequence: 'scenes/sequence.jpg',
-  intro: 'scenes/drink.jpg',
 }
 
 type Props = {
