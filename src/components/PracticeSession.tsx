@@ -18,6 +18,7 @@ import {
 import { looksEnglish, useSpeech } from '../hooks/useSpeech'
 import { useSpeechRecognition, type ListenLang } from '../hooks/useSpeechRecognition'
 import { softSpeakFeedback } from '../lib/softSpeakFeedback'
+import { buildSttPhrases } from '../lib/googleStt'
 import { KID } from '../lib/kidLabels'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
 import { SceneArt } from './SceneArt'
@@ -534,7 +535,20 @@ export function PracticeSession({
                       setComposeActive(false)
                       dictationRef.current?.blur()
                       if (listenSupported) {
-                        startListening(listenLang)
+                        const phrases = buildSttPhrases([
+                          item.sampleZh,
+                          item.sampleEn,
+                          item.promptZh,
+                          item.promptEn,
+                          '袁碩孜',
+                          'Seth',
+                          '藍田靈糧',
+                          '幼稚園',
+                          '多謝老師',
+                          '我鍾意',
+                          '因為',
+                        ])
+                        startListening(listenLang, { phrases })
                       } else {
                         openKeyboardDictation()
                       }

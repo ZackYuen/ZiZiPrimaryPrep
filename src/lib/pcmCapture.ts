@@ -4,21 +4,18 @@ export type PcmCaptureSession = {
   stop: () => Promise<{ pcm: Int16Array; sampleRate: number }>
 }
 
+/** Linear-interpolation downsample — cleaner than block averaging for speech. */
 function downsample(input: Float32Array, inRate: number, outRate: number): Float32Array {
   if (inRate === outRate) return input
   const ratio = inRate / outRate
   const outLen = Math.max(1, Math.floor(input.length / ratio))
   const out = new Float32Array(outLen)
   for (let i = 0; i < outLen; i++) {
-    const start = Math.floor(i * ratio)
-    const end = Math.min(input.length, Math.floor((i + 1) * ratio))
-    let sum = 0
-    let n = 0
-    for (let j = start; j < end; j++) {
-      sum += input[j]
-      n++
-    }
-    out[i] = n ? sum / n : 0
+    const src = i * ratio
+    const i0 = Math.floor(src)
+    const i1 = Math.min(input.length - 1, i0 + 1)
+    const t = src - i0
+    out[i] = input[i0] * (1 - t) + input[i1] * t
   }
   return out
 }
@@ -40,10 +37,13 @@ export async function startPcmCapture(): Promise<PcmCaptureSession> {
     throw new Error('呢部電話唔支援錄音。')
   }
 
+  // Prefer clean voice for STT: light AGC, avoid heavy noise gates that smear
+  // Cantonese tones. Echo cancel still helps on speakerphone.
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: {
       echoCancellation: true,
-      noiseSuppression: true,
+      noiseSuppression: false,
+      autoGainControl: true,
       channelCount: 1,
     },
     video: false,
