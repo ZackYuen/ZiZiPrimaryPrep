@@ -1,4 +1,5 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { createPortal } from 'react-dom'
 import { playSfx } from '../hooks/useSfx'
 
 type Zone = 'pool' | 'order'
@@ -130,6 +131,8 @@ export function ReorderBoard({ pool, order, onChange, locked }: Props) {
   const onPointerMove = (e: ReactPointerEvent) => {
     const cur = dragRef.current
     if (!cur || e.pointerId !== cur.pointerId) return
+    // Keep scrolling locked while dragging on iOS.
+    e.preventDefault()
     const dx = e.clientX - originRef.current.x
     const dy = e.clientY - originRef.current.y
     if (!ghostOnRef.current && dx * dx + dy * dy > 36) {
@@ -217,6 +220,23 @@ export function ReorderBoard({ pool, order, onChange, locked }: Props) {
     clearHover()
   }
 
+  const ghost =
+    drag && ghostOn
+      ? createPortal(
+          <div
+            className="reorder__ghost chip chip--placed"
+            style={{
+              left: drag.x,
+              top: drag.y,
+            }}
+            aria-hidden
+          >
+            {drag.text}
+          </div>,
+          document.body,
+        )
+      : null
+
   return (
     <div className={`reorder ${drag ? 'is-dragging' : ''}`}>
       <p className="reorder__hint">拖詞排成句子</p>
@@ -283,18 +303,7 @@ export function ReorderBoard({ pool, order, onChange, locked }: Props) {
         {pool.length === 0 && <span className="reorder__placeholder">詞語都用晒啦</span>}
       </div>
 
-      {drag && ghostOn && (
-        <div
-          className="reorder__ghost chip chip--placed"
-          style={{
-            left: drag.x,
-            top: drag.y,
-          }}
-          aria-hidden
-        >
-          {drag.text}
-        </div>
-      )}
+      {ghost}
     </div>
   )
 }
