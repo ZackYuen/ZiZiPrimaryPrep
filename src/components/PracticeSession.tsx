@@ -122,6 +122,7 @@ export function PracticeSession({
     reset: resetListening,
   } = useSpeechRecognition()
   const [listenLang, setListenLang] = useState<ListenLang>('zh-HK')
+  const [manualTranscript, setManualTranscript] = useState('')
 
   const item = items[index]
   const isLast = index >= items.length - 1
@@ -162,6 +163,7 @@ export function PracticeSession({
     setCheckedFields({})
     stopListening()
     resetListening()
+    setManualTranscript('')
     setListenLang(_activity.promptEn && (!_activity.sampleZh || _activity.sampleZh === _activity.sampleEn) ? 'en-US' : 'zh-HK')
     setSortSelected(null)
     setSortPlacement({})
@@ -200,14 +202,15 @@ export function PracticeSession({
   }, [item, order])
 
   const speakFeedback = useMemo(() => {
-    const heard = `${listenTranscript} ${listenInterim}`.trim()
+    const heardFromStt = `${listenTranscript} ${listenInterim}`.trim()
+    const heard = heardFromStt || manualTranscript.trim()
     if (item.kind !== 'speak' || !heard) return null
     const sample =
       listenLang === 'en-US'
         ? item.sampleEn || item.sampleZh
         : item.sampleZh || item.sampleEn
     return softSpeakFeedback(heard, sample, listenLang === 'en-US' ? 'en' : 'zh')
-  }, [item, listenTranscript, listenInterim, listenLang])
+  }, [item, listenTranscript, listenInterim, manualTranscript, listenLang])
 
   useEffect(() => {
     if (reorderCorrect && !done) {
@@ -628,6 +631,32 @@ export function PracticeSession({
 
               {!listenSupported && (
                 <p className="speak-box__guide">呢部瀏覽器未支援語音辨識——直接撳綠色「★ 聽完就得」。</p>
+              )}
+              {engine === 'safari' && (
+                <div className="dictation-fallback">
+                  <p className="dictation-fallback__title">iPhone 替代：鍵盤聽寫（廣東話）</p>
+                  <p className="dictation-fallback__hint">
+                    如果 ● 無字，可撳鍵盤咪高峰做廣東話聽寫；貼上／輸入文字都得。
+                  </p>
+                  <textarea
+                    className="dictation-fallback__input"
+                    value={manualTranscript}
+                    onChange={(e) => setManualTranscript(e.target.value)}
+                    placeholder="例如：我叫袁碩孜，今年五歲，喺藍田靈糧幼稚園讀書。"
+                    rows={3}
+                    aria-label="Safari 替代聽寫輸入"
+                  />
+                  <div className="session__actions">
+                    <button
+                      type="button"
+                      className="pill-btn pill-btn--soft"
+                      onClick={() => setManualTranscript('')}
+                      aria-label="清除替代輸入"
+                    >
+                      清除輸入
+                    </button>
+                  </div>
+                </div>
               )}
               <div className="session__actions">
                 <button

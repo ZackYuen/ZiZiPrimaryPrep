@@ -57,7 +57,7 @@ function canUseMic(): boolean {
 
 function langFallbacks(lang: ListenLang, apple: boolean): string[] {
   if (lang === 'en-US') return ['en-US', 'en-GB', 'en-HK', 'en']
-  if (apple) return ['zh-HK', 'yue-HK', 'zh-TW']
+  if (apple) return ['yue-Hant-HK', 'yue-HK', 'zh-Hant-HK', 'zh-HK', 'zh-TW']
   return ['zh-HK', 'zh-TW', 'zh-Hans', 'zh-CN', 'yue-HK']
 }
 
@@ -273,7 +273,7 @@ export function useSpeechRecognition() {
           if (micOkRef.current && appleRef.current) {
             setError(null)
             setStatusHint(
-              `麥克風已開，但網頁聽寫未接通（${code}）。要求語言 ${requestedLangRef.current} 未確認啟動。請檢查聽寫「廣東話」。或撳綠色「★ 聽完就得」。`,
+              `麥克風已開，但網頁聽寫未接通（${code}）。要求語言 ${requestedLangRef.current} 未確認啟動。Safari 私密瀏覽常會封鎖網頁聽寫；可改用普通分頁，或撳綠色「★ 聽完就得」。`,
             )
             if (restartCount.current < 6) {
               scheduleRestart(sid)
@@ -281,7 +281,7 @@ export function useSpeechRecognition() {
               sttEnabled.current = false
               setLangConfirmed(false)
               setStatusHint(
-                `網頁聽寫未能啟動（${code}）——「${requestedLangRef.current}」只係要求語言，引擎未真正開。請爸爸媽媽聽完，撳綠色「★ 聽完就得」。`,
+                `網頁聽寫未能啟動（${code}）——「${requestedLangRef.current}」只係要求語言，引擎未真正開。Safari 私密瀏覽下常見，請改普通分頁，或撳綠色「★ 聽完就得」。`,
               )
             }
             return
