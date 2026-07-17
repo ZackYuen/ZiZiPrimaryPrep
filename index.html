@@ -15,9 +15,17 @@
     <script>
       // Pages serves branch root; built app is under /docs/
       if (location.hostname.endsWith('github.io')) {
-        var target = '/ZiZiPrimaryPrep/docs/'
-        if (!location.pathname.startsWith(target)) {
-          location.replace(target)
+        var ua = navigator.userAgent || ''
+        var m = ua.match(/OS (\d+)[_ ]/)
+        var ios = m ? parseInt(m[1], 10) : 99
+        // Old iPad/iPhone: classic boot page (no type=module)
+        if (/iP(hone|ad|od)/.test(ua) && ios > 0 && ios <= 11) {
+          location.replace('/ZiZiPrimaryPrep/docs/ipad.html')
+        } else {
+          var target = '/ZiZiPrimaryPrep/docs/'
+          if (!location.pathname.startsWith(target)) {
+            location.replace(target)
+          }
         }
       }
     </script>
