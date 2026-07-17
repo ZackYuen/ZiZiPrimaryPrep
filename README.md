@@ -89,7 +89,12 @@ iPhone Safari 網頁聽寫經常被拒。App 支援 **Google Cloud Speech-to-Tex
 
 **建議：** 面試練習優先用較新 iPhone／iPad；舊 iPad 當後備睇題同練習選擇／數學。
 
-同一網址即可：https://zackyuen.github.io/ZiZiPrimaryPrep/docs/
+同一網址即可：https://zackyuen.github.io/ZiZiPrimaryPrep/docs/  
+
+若仍空白，請直接開舊 iPad 專用頁：  
+https://zackyuen.github.io/ZiZiPrimaryPrep/docs/ipad.html  
+
+（iOS 10–11 會自動轉去呢頁，只用經典 JS，唔載入 type=module。）
 
 ## 原則（來自教材）
 
