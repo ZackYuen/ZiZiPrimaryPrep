@@ -33,9 +33,10 @@ function insertAt(list: string[], index: number, text: string): string[] {
 
 /**
  * Kid-friendly sentence reorder with pointer drag (works on iPhone Safari).
- * Drag pool → sentence, reorder inside sentence, or drag back to pool.
+ * On iOS 10 (no Pointer Events), falls back to tap-to-place.
  */
 export function ReorderBoard({ pool, order, onChange, locked }: Props) {
+  const canPointer = typeof window !== 'undefined' && 'PointerEvent' in window
   const [drag, setDrag] = useState<DragState | null>(null)
   const [insertAtIndex, setInsertAtIndex] = useState<number | null>(null)
   const [overPool, setOverPool] = useState(false)
@@ -48,6 +49,22 @@ export function ReorderBoard({ pool, order, onChange, locked }: Props) {
   const insertRef = useRef<number | null>(null)
   const overPoolRef = useRef(false)
   const dragRef = useRef<DragState | null>(null)
+
+  const tapMove = (from: Zone, fromIndex: number, text: string) => {
+    if (locked) return
+    playSfx('tap')
+    if (from === 'pool') {
+      onChange({
+        pool: removeAt(pool, fromIndex),
+        order: [...order, text],
+      })
+    } else {
+      onChange({
+        order: removeAt(order, fromIndex),
+        pool: [...pool, text],
+      })
+    }
+  }
 
   const clearHover = () => {
     insertRef.current = null
@@ -239,7 +256,7 @@ export function ReorderBoard({ pool, order, onChange, locked }: Props) {
 
   return (
     <div className={`reorder ${drag ? 'is-dragging' : ''}`}>
-      <p className="reorder__hint">拖詞排成句子</p>
+      <p className="reorder__hint">{canPointer ? '拖詞排成句子' : '撳詞組成句子'}</p>
 
       <div
         ref={orderRef}
@@ -247,7 +264,7 @@ export function ReorderBoard({ pool, order, onChange, locked }: Props) {
         aria-label="句子區"
       >
         {order.length === 0 && !drag && (
-          <span className="reorder__placeholder">拖詞語到這裡</span>
+          <span className="reorder__placeholder">{canPointer ? '拖詞語到這裡' : '撳下面詞語'}</span>
         )}
         {order.map((w, i) => (
           <span key={`slot-${i}`} className="reorder__slot">
@@ -261,11 +278,12 @@ export function ReorderBoard({ pool, order, onChange, locked }: Props) {
                 drag?.from === 'order' && drag.fromIndex === i ? 'is-dragging-source' : ''
               }`}
               disabled={locked}
-              style={{ touchAction: 'none' }}
-              onPointerDown={(e) => beginDrag(e, 'order', i, w)}
-              onPointerMove={onPointerMove}
-              onPointerUp={finishDrag}
-              onPointerCancel={cancelDrag}
+              style={{ touchAction: canPointer ? 'none' : 'manipulation' }}
+              onClick={canPointer ? undefined : () => tapMove('order', i, w)}
+              onPointerDown={canPointer ? (e) => beginDrag(e, 'order', i, w) : undefined}
+              onPointerMove={canPointer ? onPointerMove : undefined}
+              onPointerUp={canPointer ? finishDrag : undefined}
+              onPointerCancel={canPointer ? cancelDrag : undefined}
               aria-label={`句子：${w}`}
             >
               {w}
@@ -290,11 +308,12 @@ export function ReorderBoard({ pool, order, onChange, locked }: Props) {
               drag?.from === 'pool' && drag.fromIndex === i ? 'is-dragging-source' : ''
             }`}
             disabled={locked}
-            style={{ touchAction: 'none' }}
-            onPointerDown={(e) => beginDrag(e, 'pool', i, w)}
-            onPointerMove={onPointerMove}
-            onPointerUp={finishDrag}
-            onPointerCancel={cancelDrag}
+            style={{ touchAction: canPointer ? 'none' : 'manipulation' }}
+            onClick={canPointer ? undefined : () => tapMove('pool', i, w)}
+            onPointerDown={canPointer ? (e) => beginDrag(e, 'pool', i, w) : undefined}
+            onPointerMove={canPointer ? onPointerMove : undefined}
+            onPointerUp={canPointer ? finishDrag : undefined}
+            onPointerCancel={canPointer ? cancelDrag : undefined}
             aria-label={`詞語：${w}`}
           >
             {w}

@@ -1,0 +1,82 @@
+/**
+ * CSS fallbacks for iPad Safari / iOS 10.3.x (no flex gap, no dvh, no color-mix).
+ * Loaded after App.css so these can patch layout spacing.
+ */
+
+/* dvh → vh */
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.app-shell,
+.session {
+  min-height: auto;
+}
+
+@supports not (gap: 1rem) {
+  .session,
+  .session__layout,
+  .session__actions,
+  .session__badges,
+  .home-tools,
+  .reorder,
+  .reorder__sentence,
+  .reorder__pool,
+  .reorder__slot,
+  .sort-buckets,
+  .sort-bucket__items,
+  .listen-panel,
+  .speak-box,
+  .prompt-fields,
+  .math-pad,
+  .choice-list,
+  .listen-panel__chips {
+    /* approximate gap with child margins */
+  }
+
+  .session__actions > * + *,
+  .session__badges > * + *,
+  .reorder__pool > * + *,
+  .reorder__sentence > * + *,
+  .sort-bucket__items > * + *,
+  .listen-panel__chips > * + *,
+  .choice-list > * + *,
+  .prompt-fields > * + * {
+    margin-left: 0.45rem;
+  }
+
+  .session > * + *,
+  .session__layout > * + *,
+  .listen-panel > * + *,
+  .speak-box > * + *,
+  .reorder > * + *,
+  .sort-buckets > * + * {
+    margin-top: 0.55rem;
+  }
+
+  .session__actions,
+  .session__badges,
+  .reorder__pool,
+  .reorder__sentence,
+  .sort-bucket__items,
+  .listen-panel__chips {
+    margin-left: -0.2rem;
+  }
+
+  .session__actions > *,
+  .session__badges > *,
+  .reorder__pool > *,
+  .reorder__sentence > *,
+  .sort-bucket__items > *,
+  .listen-panel__chips > * {
+    margin: 0.25rem;
+  }
+}
+
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  .chip--placed {
+    background: #ffe0d0;
+    border-color: #f0a080;
+  }
+}
