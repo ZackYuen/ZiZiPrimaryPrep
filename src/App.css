@@ -929,6 +929,16 @@
   font-weight: 600;
 }
 
+.listen-panel__tts {
+  align-self: flex-start;
+  min-width: 3.2rem;
+}
+
+.listen-panel__tts:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
 .listen-panel__interim {
   color: var(--ink-soft);
   font-weight: 600;
