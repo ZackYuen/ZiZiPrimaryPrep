@@ -15,8 +15,9 @@ type RecognizeResult = {
 
 /**
  * Call Google Cloud Speech-to-Text.
- * Prefer VITE_GOOGLE_STT_URL (Cloudflare Worker / proxy) so the API key stays secret.
- * Optional VITE_GOOGLE_SPEECH_API_KEY is for local/dev only (referrer-restrict it).
+ * Prefer VITE_GOOGLE_STT_URL (proxy) when available.
+ * VITE_GOOGLE_SPEECH_API_KEY works without Cloudflare — restrict the key by
+ * HTTP referrer to zackyuen.github.io/* before enabling on Pages.
  */
 export async function recognizeWithGoogle(opts: {
   pcm: Int16Array

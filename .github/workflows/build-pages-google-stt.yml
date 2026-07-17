@@ -1,0 +1,86 @@
+name: Build Pages with Google STT
+
+# No Cloudflare needed.
+# Bakes VITE_GOOGLE_SPEECH_API_KEY into docs/ via GitHub Secret, then pushes docs/ to main.
+#
+# One-time setup:
+# 1. Google Cloud → enable Speech-to-Text → create API key
+#    Restrict: HTTP referrers zackyuen.github.io/* ; API = Speech-to-Text only
+# 2. GitHub → Settings → Secrets → Actions
+#    Name: VITE_GOOGLE_SPEECH_API_KEY  Value: your key
+# 3. Actions → "Build Pages with Google STT" → Run workflow
+#
+# After success: https://zackyuen.github.io/ZiZiPrimaryPrep/docs/
+# Speak ● should show Google 廣東話
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-pages-google-stt
+  cancel-in-progress: true
+
+jobs:
+  build-and-push-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Require Google Speech API key secret
+        env:
+          KEY: ${{ secrets.VITE_GOOGLE_SPEECH_API_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "::error::Missing GitHub Actions secret VITE_GOOGLE_SPEECH_API_KEY"
+            echo "Repo → Settings → Secrets and variables → Actions → New repository secret"
+            echo "Name: VITE_GOOGLE_SPEECH_API_KEY"
+            echo "Value: Google Cloud API key (Speech-to-Text only + referrer zackyuen.github.io/*)"
+            exit 1
+          fi
+          echo "Secret is set (length ${#KEY})."
+
+      - name: Install & build docs with Google STT
+        env:
+          VITE_GOOGLE_SPEECH_API_KEY: ${{ secrets.VITE_GOOGLE_SPEECH_API_KEY }}
+          VITE_GOOGLE_SPEECH_LANGUAGE: yue-Hant-HK
+        run: |
+          npm ci
+          npm run build
+          touch docs/.nojekyll
+          test -f docs/index.html
+          cp -R docs /tmp/zizi-docs-build
+          if grep -q "AIza" /tmp/zizi-docs-build/assets/*.js 2>/dev/null; then
+            echo "Build includes Google API key (expected for this path)."
+          else
+            echo "::warning::Could not confirm API key string in bundle — check the secret name."
+          fi
+
+      - name: Commit docs/ to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout -B main origin/main
+          rm -rf docs
+          cp -R /tmp/zizi-docs-build docs
+          git add docs
+          if git diff --staged --quiet; then
+            echo "No docs changes to commit."
+            exit 0
+          fi
+          git commit -m "build(docs): Google Cantonese STT for Pages (no Cloudflare)"
+          git push origin main
+          echo "Pushed docs/ to main. Site: https://zackyuen.github.io/ZiZiPrimaryPrep/docs/"
