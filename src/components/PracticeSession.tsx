@@ -28,6 +28,7 @@ import { SoundToggle } from './SoundToggle'
 import { AnalogClock } from './AnalogClock'
 import { CoinPurse } from './CoinPurse'
 import { JuneCalendar } from './JuneCalendar'
+import { ReorderBoard } from './ReorderBoard'
 
 type Props = {
   title: string
@@ -1180,44 +1181,19 @@ export function PracticeSession({
           )}
 
           {item.kind === 'reorder' && (
-            <div className="reorder">
-              <p className="reorder__hint">撳詞組成句子</p>
-              <div className="reorder__sentence">
-                {order.length === 0 && <span className="reorder__placeholder">句子會出現在這裡</span>}
-                {order.map((w, i) => (
-                  <button
-                    key={`${w}-${i}`}
-                    type="button"
-                    className="chip chip--placed"
-                    onClick={() => {
-                      playSfx('tap')
-                      setOrder((prev) => prev.filter((_, idx) => idx !== i))
-                      setPool((prev) => [...prev, w])
-                    }}
-                  >
-                    {w}
-                  </button>
-                ))}
-              </div>
-              <div className="reorder__pool">
-                {pool.map((w, i) => (
-                  <button
-                    key={`${w}-p-${i}`}
-                    type="button"
-                    className="chip"
-                    onClick={() => {
-                      playSfx('tap')
-                      setPool((prev) => prev.filter((_, idx) => idx !== i))
-                      setOrder((prev) => [...prev, w])
-                    }}
-                  >
-                    {w}
-                  </button>
-                ))}
-              </div>
+            <div className="reorder-wrap">
+              <ReorderBoard
+                pool={pool}
+                order={order}
+                locked={reorderCorrect && done}
+                onChange={({ pool: nextPool, order: nextOrder }) => {
+                  setPool(nextPool)
+                  setOrder(nextOrder)
+                }}
+              />
               {order.length > 0 && (
                 <p className={`math-feedback ${reorderCorrect ? 'is-ok' : ''}`}>
-                  {reorderCorrect ? '句子正確！好叻！' : '繼續調一調順序吧'}
+                  {reorderCorrect ? '句子正確！好叻！' : '繼續拖一拖順序吧'}
                 </p>
               )}
               {reorderCorrect && !done && (

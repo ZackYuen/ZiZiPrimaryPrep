@@ -73,6 +73,24 @@ iPhone Safari 網頁聽寫經常被拒。App 支援 **Google Cloud Speech-to-Tex
 
 冇 Cloudflare 帳號可完全跳過。有帳號先至需要：部署 `workers/google-stt`，再設 secret `VITE_GOOGLE_STT_URL`。
 
+## iPad（iOS 10.3.3）舊系統
+
+可以試，但呢部系統太舊，**唔會同新 iPhone 一樣齊全**。
+
+建置已加 `@vitejs/plugin-legacy`：舊 Safari 會自動載入 SystemJS legacy 包。
+
+| 功能 | iOS 10.3.3 |
+| --- | --- |
+| 字詞／Day 練習／選擇／數學 | 應該用得 |
+| 重組句子 | 用**撳**（無 Pointer Events，唔支援拖） |
+| Google 廣東話 STT | 可能唔穩（麥克風／網絡 API 好舊） |
+| TTS 朗讀 | 視系統有冇廣東話聲線 |
+| 版面 | 略簡（舊 Safari 無 flex `gap`） |
+
+**建議：** 面試練習優先用較新 iPhone／iPad；舊 iPad 當後備睇題同練習選擇／數學。
+
+同一網址即可：https://zackyuen.github.io/ZiZiPrimaryPrep/docs/
+
 ## 原則（來自教材）
 
 不是要全部做對，而是建立：面對難題的勇氣、清晰有禮的表達、答錯再試的態度。Level 4 不是必須完成。

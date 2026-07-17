@@ -1643,6 +1643,11 @@
 
 .reorder {
   margin-top: 1.15rem;
+  position: relative;
+}
+
+.reorder-wrap {
+  margin-top: 0;
 }
 
 .reorder__hint {
@@ -1655,12 +1660,31 @@
   min-height: 3.4rem;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.45rem;
   padding: 0.75rem;
   border-radius: 18px;
   background: rgba(126, 200, 227, 0.15);
   border: 2px dashed rgba(27, 58, 75, 0.15);
   margin-bottom: 0.75rem;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.reorder__sentence.is-drop-target,
+.reorder__pool.is-drop-target {
+  border-color: rgba(196, 92, 38, 0.55);
+  background: rgba(255, 184, 120, 0.22);
+}
+
+.reorder__pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  min-height: 2.8rem;
+  padding: 0.35rem;
+  border-radius: 16px;
+  border: 2px dashed transparent;
+  transition: border-color 0.12s ease, background 0.12s ease;
 }
 
 .reorder__placeholder {
@@ -1668,10 +1692,18 @@
   font-weight: 600;
 }
 
-.reorder__pool {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
+.reorder__slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.reorder__caret {
+  width: 0.28rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  background: #c45c26;
+  flex: 0 0 auto;
 }
 
 .chip {
@@ -1681,6 +1713,17 @@
   border: 2px solid rgba(27, 58, 75, 0.12);
   font-weight: 700;
   color: var(--ink);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.chip:active {
+  cursor: grabbing;
+}
+
+.chip.is-dragging-source {
+  opacity: 0.35;
 }
 
 .chip--placed {
@@ -1693,6 +1736,23 @@
   color: white;
   border-color: var(--ink);
 }
+
+.reorder__ghost {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  /* Center on the finger — portal to body so parent transforms don't offset it */
+  transform: translate(-50%, -50%);
+  margin: 0;
+  box-shadow: 0 10px 24px rgba(27, 58, 75, 0.22);
+  opacity: 0.96;
+  will-change: left, top;
+}
+
+.reorder.is-dragging {
+  cursor: grabbing;
+}
+
 
 .prompt-fields {
   margin-top: 1.15rem;
