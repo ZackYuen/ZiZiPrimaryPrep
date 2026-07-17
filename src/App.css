@@ -802,47 +802,6 @@
   cursor: default;
 }
 
-.dictation-fallback {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.75rem;
-  border-radius: 16px;
-  border: 2px solid rgba(27, 58, 75, 0.12);
-  background: rgba(255, 255, 255, 0.8);
-}
-
-.dictation-fallback__title {
-  margin: 0;
-  font-weight: 800;
-  color: #1b3a4b;
-}
-
-.dictation-fallback__hint {
-  margin: 0;
-  color: var(--ink-soft);
-  font-size: 0.9rem;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.dictation-fallback__input {
-  width: 100%;
-  padding: 0.65rem 0.75rem;
-  border-radius: 12px;
-  border: 2px solid rgba(27, 58, 75, 0.15);
-  background: white;
-  color: var(--ink);
-  font: inherit;
-  line-height: 1.4;
-  resize: vertical;
-}
-
-.dictation-fallback__input:focus {
-  outline: 3px solid rgba(126, 200, 227, 0.5);
-  border-color: rgba(27, 58, 75, 0.3);
-}
-
 .listen-panel {
   display: flex;
   flex-direction: column;
@@ -851,6 +810,10 @@
   border-radius: 20px;
   background: rgba(126, 200, 227, 0.14);
   border: 2px dashed rgba(27, 58, 75, 0.12);
+}
+
+.listen-panel--keyboard {
+  background: linear-gradient(180deg, rgba(255, 214, 102, 0.18), rgba(126, 200, 227, 0.14));
 }
 
 .listen-panel.is-listening {
@@ -880,6 +843,62 @@
   border-radius: 16px;
   background: white;
   border: 2px solid rgba(27, 58, 75, 0.1);
+}
+
+.listen-panel__compose {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem 0.85rem 0.85rem;
+  border-radius: 16px;
+  background: white;
+  border: 2px solid rgba(27, 58, 75, 0.1);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.listen-panel__compose.is-active {
+  border-color: rgba(196, 92, 38, 0.45);
+  box-shadow: 0 0 0 4px rgba(245, 200, 76, 0.28);
+}
+
+.listen-panel__compose-label {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+}
+
+.listen-panel__input {
+  width: 100%;
+  min-height: 6.2rem;
+  padding: 0.55rem 0.15rem;
+  border: none;
+  resize: vertical;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.45;
+  outline: none;
+}
+
+.listen-panel__input::placeholder {
+  color: rgba(27, 58, 75, 0.38);
+  font-weight: 600;
+  font-size: 0.98rem;
+}
+
+.listen-panel__kbd-tip {
+  margin: 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: 12px;
+  background: rgba(245, 200, 76, 0.22);
+  color: #8a6a12;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 .listen-panel__live {

@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useState, type CSSProperties, type DragEvent } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type DragEvent,
+} from 'react'
 import {
   checkClock,
   checkMath,
@@ -122,7 +129,9 @@ export function PracticeSession({
     reset: resetListening,
   } = useSpeechRecognition()
   const [listenLang, setListenLang] = useState<ListenLang>('yue-Hant-HK')
-  const [manualTranscript, setManualTranscript] = useState('')
+  const [spokenText, setSpokenText] = useState('')
+  const [composeActive, setComposeActive] = useState(false)
+  const dictationRef = useRef<HTMLTextAreaElement | null>(null)
 
   const item = items[index]
   const isLast = index >= items.length - 1
@@ -163,7 +172,8 @@ export function PracticeSession({
     setCheckedFields({})
     stopListening()
     resetListening()
-    setManualTranscript('')
+    setSpokenText('')
+    setComposeActive(false)
     setListenLang(
       _activity.promptEn && (!_activity.sampleZh || _activity.sampleZh === _activity.sampleEn) ? 'en-US' : 'yue-Hant-HK',
     )
@@ -203,16 +213,34 @@ export function PracticeSession({
     return order.length === item.correctOrder.length && order.every((w, i) => w === item.correctOrder![i])
   }, [item, order])
 
+  // Keep Chrome / webpage STT words in the same designed transcript field.
+  useEffect(() => {
+    if (!listening) return
+    const combined = [listenTranscript, listenInterim].filter(Boolean).join(' ').trim()
+    if (combined) setSpokenText(combined)
+  }, [listening, listenTranscript, listenInterim])
+
   const speakFeedback = useMemo(() => {
-    const heardFromStt = `${listenTranscript} ${listenInterim}`.trim()
-    const heard = heardFromStt || manualTranscript.trim()
+    const heard = spokenText.trim()
     if (item.kind !== 'speak' || !heard) return null
     const sample =
       listenLang === 'en-US'
         ? item.sampleEn || item.sampleZh
         : item.sampleZh || item.sampleEn
     return softSpeakFeedback(heard, sample, listenLang === 'en-US' ? 'en' : 'zh')
-  }, [item, listenTranscript, listenInterim, manualTranscript, listenLang])
+  }, [item, spokenText, listenLang])
+
+  const openKeyboardDictation = () => {
+    setComposeActive(true)
+    // Focus must stay in the user-gesture stack for iOS keyboard to appear.
+    window.requestAnimationFrame(() => {
+      const el = dictationRef.current
+      if (!el) return
+      el.focus()
+      const end = el.value.length
+      el.setSelectionRange(end, end)
+    })
+  }
 
   useEffect(() => {
     if (reorderCorrect && !done) {
@@ -463,175 +491,172 @@ export function PracticeSession({
 
           {item.kind === 'speak' && (
             <div className="speak-box">
-              <p className="speak-box__guide">細路講俾爸爸媽媽聽（電話聽字只係練習）</p>
+              <p className="speak-box__guide">
+                {engine === 'safari'
+                  ? '撳 ● 開鍵盤 → 撳鍵盤麥克風講廣東話 → 爸爸媽媽撳黃色 ★'
+                  : '撳 ● 講，字會出現喺下面；爸爸媽媽再撳黃色 ★'}
+              </p>
 
-              {listenSupported && (
-                <div className={`listen-panel ${listening ? 'is-listening' : ''}`}>
-                  <div className="session__actions">
-                    <button
-                      type="button"
-                      className={`pill-btn ${listenLang === 'yue-Hant-HK' ? '' : 'pill-btn--soft'}`}
-                      disabled={listening}
-                      onClick={() => {
-                        playSfx('tap')
-                        setListenLang('yue-Hant-HK')
-                      }}
-                      aria-label="廣東話"
-                    >
-                      {KID.cantonese}
-                    </button>
-                    <button
-                      type="button"
-                      className={`pill-btn ${listenLang === 'en-US' ? '' : 'pill-btn--soft'}`}
-                      disabled={listening}
-                      onClick={() => {
-                        playSfx('tap')
-                        setListenLang('en-US')
-                      }}
-                      aria-label="English"
-                    >
-                      {KID.english}
-                    </button>
-                  </div>
-                  {!listening && !listenBusy ? (
-                    <button
-                      type="button"
-                      className="primary-btn primary-btn--wide"
-                      onClick={() => {
-                        // Start STT first so rec.start() stays in the user-gesture stack
-                        stop()
+              <div
+                className={`listen-panel ${listening || composeActive ? 'is-listening' : ''} ${
+                  engine === 'safari' ? 'listen-panel--keyboard' : ''
+                }`}
+              >
+                <div className="session__actions">
+                  <button
+                    type="button"
+                    className={`pill-btn ${listenLang === 'yue-Hant-HK' ? '' : 'pill-btn--soft'}`}
+                    disabled={listening}
+                    onClick={() => {
+                      playSfx('tap')
+                      setListenLang('yue-Hant-HK')
+                    }}
+                    aria-label="廣東話"
+                  >
+                    {KID.cantonese}
+                  </button>
+                  <button
+                    type="button"
+                    className={`pill-btn ${listenLang === 'en-US' ? '' : 'pill-btn--soft'}`}
+                    disabled={listening}
+                    onClick={() => {
+                      playSfx('tap')
+                      setListenLang('en-US')
+                    }}
+                    aria-label="English"
+                  >
+                    {KID.english}
+                  </button>
+                </div>
+
+                {!listening && !(engine === 'safari' && composeActive) ? (
+                  <button
+                    type="button"
+                    className="primary-btn primary-btn--wide"
+                    onClick={() => {
+                      stop()
+                      unlockAudio()
+                      playSfx('tap')
+                      setSpokenText('')
+                      if (engine === 'safari') {
+                        // iPhone Safari: built-in keyboard dictation is the reliable path.
+                        openKeyboardDictation()
+                      } else if (listenSupported) {
                         startListening(listenLang)
-                        unlockAudio()
-                        playSfx('tap')
-                      }}
-                      aria-label="開始聽你講"
-                    >
-                      {KID.mic}
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="primary-btn primary-btn--wide listen-panel__stop"
-                      disabled={listenBusy && !listening}
-                      onClick={() => {
-                        if (listenBusy && !listening) return
-                        stopListening()
-                        playSfx('tap')
-                      }}
-                      aria-label={listenBusy && !listening ? '轉文字中' : '停止聽'}
-                    >
-                      {listenBusy && !listening
-                        ? `… ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`
-                        : `${KID.micStop} ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`}
-                    </button>
-                  )}
-                  <div className="listen-panel__transcript" aria-live="polite">
-                    {listening && (
-                      <p className="listen-panel__live">
-                        ● {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
-                        {sttAlive
-                          ? heardSpeech
-                            ? ' · 聽到聲'
-                            : ' · 聽寫中'
-                          : engine === 'safari'
-                            ? ' · 連接聽寫'
-                            : ' · 啟動中'}
+                      } else {
+                        openKeyboardDictation()
+                      }
+                    }}
+                    aria-label={engine === 'safari' ? '開鍵盤聽寫' : '開始聽你講'}
+                  >
+                    {KID.mic}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="primary-btn primary-btn--wide listen-panel__stop"
+                    disabled={listenBusy && !listening && engine !== 'safari'}
+                    onClick={() => {
+                      playSfx('tap')
+                      if (listening) stopListening()
+                      setComposeActive(false)
+                      dictationRef.current?.blur()
+                    }}
+                    aria-label="停止"
+                  >
+                    {listening
+                      ? `${KID.micStop} ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`
+                      : KID.micStop}
+                  </button>
+                )}
+
+                <div className={`listen-panel__compose ${composeActive || listening ? 'is-active' : ''}`}>
+                  {(listening || composeActive) && (
+                    <p className="listen-panel__live">
+                      {engine === 'safari'
+                        ? composeActive
+                          ? '鍵盤聽寫 · 撳鍵盤麥克風 · 廣東話'
+                          : '連接中…'
+                        : `● ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}${
+                            sttAlive ? (heardSpeech ? ' · 聽到聲' : ' · 聽寫中') : ' · 啟動中'
+                          }`}
+                      {engine !== 'safari' && (
                         <span className="listen-panel__lang">
                           {' '}
-                          · {engine === 'safari' ? 'Safari' : 'Chrome'} ·{' '}
-                          {langConfirmed
-                            ? `引擎 ${activeLang}`
-                            : `要求 ${requestedLang}（未確認）`}
+                          · Chrome ·{' '}
+                          {langConfirmed ? `引擎 ${activeLang}` : `要求 ${requestedLang}（未確認）`}
                           {lastErrorCode ? ` · ${lastErrorCode}` : ''}
                         </span>
-                      </p>
-                    )}
-                    {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
-                    {listening && !langConfirmed && engine === 'safari' ? (
-                      <p className="listen-panel__hint">
-                        畫面上嘅語言碼只係「要求」Safari 用邊種聽寫；未見到「引擎 xxx」前，其實未真正用到
-                        yue-Hant-HK。
-                      </p>
-                    ) : null}
-                    {engine === 'safari' && !listening && !listenTranscript ? (
-                      <p className="listen-panel__hint">
-                        麥克風允許之後，仲要：設定→一般→鍵盤→聽寫→下載「廣東話」。鍵盤「粵」同 Notes
-                        聽寫得，網頁都可能仍無字——無字就撳下面黃色 ★。
-                      </p>
-                    ) : null}
-                    {(listenTranscript || listenInterim) ? (
-                      <p className="listen-panel__text">
-                        {listenTranscript}
-                        {listenInterim ? (
-                          <span className="listen-panel__interim"> {listenInterim}</span>
-                        ) : null}
-                      </p>
-                    ) : (
-                      <p className="listen-panel__placeholder">
-                        {listening
-                          ? engine === 'safari'
-                            ? '請用廣東話大聲講…（保持到撳 ■）'
-                            : '請大聲講… 字會顯示喺呢度'
-                          : listenBusy
-                            ? '轉文字中，請稍等…'
-                            : engine === 'safari'
-                              ? '撳 ● 開始（要聽寫「廣東話」）'
-                              : '撳 ● 開始講（要用網絡）'}
-                      </p>
-                    )}
-                  </div>
-                  {listenError && <p className="listen-panel__error">{listenError}</p>}
-                  {speakFeedback && (
-                    <div className="listen-panel__feedback">
-                      <p>{speakFeedback.message}</p>
-                      {speakFeedback.matched.length > 0 && (
-                        <div className="listen-panel__chips">
-                          {speakFeedback.matched.map((k) => (
-                            <span key={k} className="listen-chip listen-chip--ok">
-                              {k}
-                            </span>
-                          ))}
-                        </div>
                       )}
-                    </div>
+                    </p>
                   )}
-                  <p className="listen-panel__note">
-                    {engine === 'safari'
-                      ? '● 保持到 ■ · 無字唔緊要 · 完成請撳下面黃色 ★'
-                      : '● 要網絡 · 講完撳 ■ · 完成請撳下面黃色 ★'}
-                  </p>
-                </div>
-              )}
 
-              {!listenSupported && (
-                <p className="speak-box__guide">呢部瀏覽器未支援語音辨識——直接撳下面黃色 ★。</p>
-              )}
-              {engine === 'safari' && (
-                <div className="dictation-fallback">
-                  <p className="dictation-fallback__title">iPhone 替代：鍵盤聽寫（廣東話）</p>
-                  <p className="dictation-fallback__hint">
-                    如果 ● 無字，可撳鍵盤咪高峰做廣東話聽寫；貼上／輸入文字都得。
-                  </p>
+                                    <label className="listen-panel__compose-label" htmlFor="speak-dictation">
+                    {engine === 'safari' ? '講出嚟嘅字' : '轉寫文字'}
+                  </label>
                   <textarea
-                    className="dictation-fallback__input"
-                    value={manualTranscript}
-                    onChange={(e) => setManualTranscript(e.target.value)}
-                    placeholder="例如：我叫袁碩孜，今年五歲，喺藍田靈糧幼稚園讀書。"
-                    rows={3}
-                    aria-label="Safari 替代聽寫輸入"
+                    id="speak-dictation"
+                    ref={dictationRef}
+                    className="listen-panel__input"
+                    value={spokenText}
+                    onChange={(e) => setSpokenText(e.target.value)}
+                    onFocus={() => setComposeActive(true)}
+                    onBlur={() => {
+                      if (!listening) setComposeActive(false)
+                    }}
+                    lang={listenLang === 'en-US' ? 'en-US' : 'zh-Hant-HK'}
+                    inputMode="text"
+                    enterKeyHint="done"
+                    autoCapitalize="sentences"
+                    autoCorrect="on"
+                    spellCheck
+                    rows={4}
+                    placeholder={
+                      listenLang === 'en-US'
+                        ? 'Tap ●, then use the keyboard mic to speak…'
+                        : engine === 'safari'
+                          ? '撳 ● 開鍵盤，再撳鍵盤麥克風講…'
+                          : '撳 ● 開始講，字會顯示喺呢度…'
+                    }
+                    aria-label={engine === 'safari' ? 'iPhone 鍵盤聽寫輸入' : '語音轉寫文字'}
                   />
-                  <div className="session__actions">
-                    <button
-                      type="button"
-                      className="pill-btn pill-btn--soft"
-                      onClick={() => setManualTranscript('')}
-                      aria-label="清除替代輸入"
-                    >
-                      清除輸入
-                    </button>
-                  </div>
+
+                  {engine === 'safari' && (
+                    <p className="listen-panel__kbd-tip" aria-hidden={!composeActive}>
+                      鍵盤底部／側邊有麥克風掣 → 用廣東話講 → 字會入呢個框
+                    </p>
+                  )}
+
+                  {statusHint && engine !== 'safari' ? (
+                    <p className="listen-panel__hint">{statusHint}</p>
+                  ) : null}
+                  {listenError && engine !== 'safari' ? (
+                    <p className="listen-panel__error">{listenError}</p>
+                  ) : null}
                 </div>
-              )}
+
+                {speakFeedback && (
+                  <div className="listen-panel__feedback">
+                    <p>{speakFeedback.message}</p>
+                    {speakFeedback.matched.length > 0 && (
+                      <div className="listen-panel__chips">
+                        {speakFeedback.matched.map((k) => (
+                          <span key={k} className="listen-chip listen-chip--ok">
+                            {k}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <p className="listen-panel__note">
+                  {engine === 'safari'
+                    ? '用 iPhone 鍵盤麥克風聽寫 · 無字都得 · 完成撳下面黃色 ★'
+                    : '● 要網絡 · 講完撳 ■ · 完成撳下面黃色 ★'}
+                </p>
+              </div>
+
               {!done ? (
                 <button
                   type="button"
@@ -639,6 +664,8 @@ export function PracticeSession({
                   onClick={() => {
                     unlockAudio()
                     stopListening()
+                    setComposeActive(false)
+                    dictationRef.current?.blur()
                     playSfx('correct')
                     onMarkDone(item.id, moduleKey)
                     setJustStar(true)

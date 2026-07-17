@@ -71,8 +71,8 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>電話聽講（練習提示）</h3>
           <p>
-            Safari／iPhone：即使麥克風已「允許」，網頁聽寫都可能無字（同 Notes 鍵盤聽寫唔同系統）。請確認「設定 → 一般 →
-            鍵盤 → 聽寫 → 廣東話」。App 會試聽寫，但無字唔緊要——聽完直接撳黃色 ★。
+            Safari／iPhone：撳 ● 會開 App 入面嘅輸入框同系統鍵盤；再撳鍵盤麥克風，用內建廣東話聽寫。字會直接入同一個講題框。
+            請確認「設定 → 一般 → 鍵盤 → 聽寫 → 廣東話」。講完爸爸媽媽撳黃色 ★。
           </p>
         </article>
         <article className="parent__item">
