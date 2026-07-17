@@ -491,7 +491,7 @@ export function PracticeSession({
 
           {item.kind === 'speak' && (
             <div className="speak-box">
-              <p className="speak-box__guide">● → ■ → ★</p>
+              <p className="speak-box__guide">● → ■ → ▶ → ★</p>
 
               <div
                 className={`listen-panel ${listening || composeActive || listenBusy ? 'is-listening' : ''} ${
@@ -610,6 +610,20 @@ export function PracticeSession({
                     <p className="listen-panel__hint">{statusHint}</p>
                   ) : null}
                 </div>
+
+                <button
+                  type="button"
+                  className="pill-btn listen-panel__tts"
+                  disabled={!spokenText.trim() || listening || listenBusy}
+                  onClick={() => {
+                    unlockAudio()
+                    playSfx('tap')
+                    speak(spokenText, listenLang === 'en-US' ? 'en-US' : 'zh-HK')
+                  }}
+                  aria-label={listenLang === 'en-US' ? 'Play transcript in English' : '朗讀聽寫文字'}
+                >
+                  {KID.listen}
+                </button>
 
                 {speakFeedback && (
                   <div className="listen-panel__feedback">

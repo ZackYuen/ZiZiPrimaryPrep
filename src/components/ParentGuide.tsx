@@ -71,7 +71,7 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>電話聽講（練習提示）</h3>
           <p>
-            撳 ● 錄音 → ■ 轉字（Google）→ 爸爸媽媽撳 ★。
+            撳 ● 錄音 → ■ 轉字（Google）→ ▶ 朗讀轉出嚟嘅字 → 爸爸媽媽撳 ★。
           </p>
         </article>
         <article className="parent__item">
