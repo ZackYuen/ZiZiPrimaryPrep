@@ -192,11 +192,11 @@ export function useSpeechRecognition() {
     const maxRestart = appleRef.current ? 25 : 30
     const delay = appleRef.current ? 700 : 400
     if (restartCount.current >= maxRestart) {
-      setStatusHint('聽寫多次斷線——再撳 ●，或撳下面黃色 ★')
+      setStatusHint('斷線——再撳 ● 或 ★')
       return
     }
     restartCount.current += 1
-    setStatusHint(appleRef.current ? `重連廣東話聽寫…（${restartCount.current}）` : '重連轉文字…')
+    setStatusHint('')
     if (restartTimer.current) window.clearTimeout(restartTimer.current)
     restartTimer.current = window.setTimeout(() => {
       if (sid !== sessionId.current || !wantListen.current || !sttEnabled.current) return
@@ -210,7 +210,7 @@ export function useSpeechRecognition() {
           try {
             recRef.current.start()
           } catch {
-            setStatusHint('聽寫重開失敗——再撳 ●，或撳下面黃色 ★')
+            setStatusHint('失敗——再撳 ● 或 ★')
           }
         }, 500)
       }
@@ -228,7 +228,7 @@ export function useSpeechRecognition() {
         setActiveLang(aliveLang)
         setError(null)
         setLastErrorCode(null)
-        setStatusHint(`聽寫已啟動（${aliveLang}）…請大聲講`)
+        setStatusHint('')
       }
 
       rec.onresult = (event) => {
@@ -273,7 +273,7 @@ export function useSpeechRecognition() {
           if (appleRef.current && (micOkRef.current || code === 'service-not-allowed')) {
             setError(null)
             if (restartCount.current < 4) {
-              setStatusHint(`重試 iPhone 聽寫…（${restartCount.current + 1}）`)
+              setStatusHint('重試中…')
               scheduleRestart(sid)
             } else {
               sttEnabled.current = false
@@ -282,11 +282,7 @@ export function useSpeechRecognition() {
               setListening(false)
               wantListen.current = false
               clearTimers()
-              setStatusHint(
-                googleReady
-                  ? 'Safari 網頁聽寫失敗。請設定 Google STT 後再試，或撳黃色 ★。'
-                  : 'Safari 未能開網頁聽寫（私密瀏覽常見）。可改普通分頁，或設定 Google STT。',
-              )
+              setStatusHint('聽寫失敗——再撳 ● 或 ★')
             }
             return
           }
@@ -295,12 +291,12 @@ export function useSpeechRecognition() {
           clearTimers()
           setListening(false)
           setSttBlocked(true)
-          setError('麥克風未允許。撳網址列「aA」→ 網站設定 → 麥克風 → 允許。')
+          setError('請允許麥克風')
           return
         }
 
         if (code === 'no-speech') {
-          setStatusHint('聽唔到聲——請繼續講…')
+          setStatusHint('')
           scheduleRestart(sid)
           return
         }
@@ -312,11 +308,11 @@ export function useSpeechRecognition() {
             setRequestedLang(rec.lang)
             setActiveLang(rec.lang)
             setLangConfirmed(false)
-            setStatusHint(`上一語言唔得（${code}），改要求 ${rec.lang}…`)
+            setStatusHint('')
             scheduleRestart(sid)
             return
           }
-          setStatusHint(`聽寫語言未就緒（${code}）。或撳下面黃色 ★。`)
+          setStatusHint('失敗——再撳 ● 或 ★')
           scheduleRestart(sid)
         }
       }
@@ -381,12 +377,12 @@ export function useSpeechRecognition() {
       const session = pcmSessionRef.current
       pcmSessionRef.current = null
       if (!session) {
-        setStatusHint('未錄到聲——請再撳 ●。')
+        setStatusHint('請再撳 ●')
         return
       }
 
       setBusy(true)
-      setStatusHint('Google 轉文字中（廣東話）…')
+      setStatusHint('')
       abortRef.current?.abort()
       const ac = new AbortController()
       abortRef.current = ac
@@ -395,7 +391,7 @@ export function useSpeechRecognition() {
         const { pcm, sampleRate } = await session.stop()
         if (pcm.length < sampleRate * 0.25) {
           setBusy(false)
-          setStatusHint('錄音太短——請再撳 ● 講長啲。')
+          setStatusHint('太短——再撳 ●')
           return
         }
         const result = await recognizeWithGoogle({
@@ -417,9 +413,9 @@ export function useSpeechRecognition() {
         setSttBlocked(false)
       } catch (err) {
         if ((err as Error)?.name === 'AbortError') return
-        const msg = err instanceof Error ? err.message : 'Google 聽寫失敗'
+        const msg = err instanceof Error ? err.message : 'Google 失敗'
         setError(msg)
-        setStatusHint(`${msg} · 可再撳 ●，或用黃色 ★`)
+        setStatusHint('可再撳 ●，或用 ★')
         setSttBlocked(true)
       } finally {
         setBusy(false)
@@ -430,7 +426,7 @@ export function useSpeechRecognition() {
     const hadText = !!(transcriptRef.current.trim() || interimRef.current.trim())
     hardStopSession()
     if (appleRef.current && !hadText && !sttBlocked) {
-      setStatusHint('未出字。請再撳 ●；私密瀏覽請改普通分頁。或以黃色 ★ 為準。')
+      setStatusHint('未出字——再撳 ● 或 ★')
     }
   }, [hardStopSession, sttBlocked])
 
@@ -485,9 +481,7 @@ export function useSpeechRecognition() {
       if (preferGoogle) {
         modeRef.current = 'google'
         setEngine('google')
-        setStatusHint(
-          lang === 'en-US' ? 'Google 英文錄音中…撳 ■ 轉文字' : 'Google 廣東話錄音中…撳 ■ 轉文字',
-        )
+        setStatusHint('')
         // Keep gesture chain: first await should be getUserMedia.
         void startPcmCapture()
           .then((session) => {
@@ -499,9 +493,7 @@ export function useSpeechRecognition() {
             micOkRef.current = true
             setSttAlive(true)
             setLangConfirmed(true)
-            setStatusHint(
-              lang === 'en-US' ? 'Google 英文錄音中…請講，完咗撳 ■' : 'Google 廣東話錄音中…請講，完咗撳 ■',
-            )
+            setStatusHint('')
           })
           .catch((err) => {
             if (sid !== sessionId.current) return
@@ -510,7 +502,7 @@ export function useSpeechRecognition() {
             setSttAlive(false)
             setSttBlocked(true)
             setError(err instanceof Error ? err.message : '無法開麥克風')
-            setStatusHint('無法開麥克風。撳網址列「aA」→ 網站設定 → 麥克風 → 允許。')
+            setStatusHint('請允許麥克風')
           })
         return true
       }
@@ -520,7 +512,7 @@ export function useSpeechRecognition() {
       if (!Ctor) {
         setSttBlocked(true)
         setListening(false)
-        setError('呢部瀏覽器未支援網頁聽寫。請設定 Google STT（見 README），或撳黃色 ★。')
+        setError('請設定 Google STT，或撳 ★。')
         return false
       }
 
@@ -532,7 +524,7 @@ export function useSpeechRecognition() {
       rec.maxAlternatives = 1
       rec.lang = langsRef.current[0]
       attachHandlers(rec, sid)
-      setStatusHint(appleRef.current ? '啟動瀏覽器聽寫…' : '啟動轉文字…')
+      setStatusHint('')
 
       try {
         rec.start()

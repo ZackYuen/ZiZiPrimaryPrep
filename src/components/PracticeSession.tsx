@@ -40,13 +40,13 @@ type Props = {
 }
 
 const METHOD_LABEL: Record<ActivityKind, string> = {
-  speak: '▶ 講',
-  choice: '○ 揀',
+  speak: '▶',
+  choice: '○',
   math: '123',
-  reorder: '↔ 排',
-  prompt: '✓ 做',
+  reorder: '↔',
+  prompt: '✓',
   sort: '＋－',
-  clock: '◎ 鐘',
+  clock: '◎',
   money: '$',
 }
 
@@ -115,17 +115,10 @@ export function PracticeSession({
     interim: listenInterim,
     error: listenError,
     elapsedSec,
-    sttAlive,
-    heardSpeech,
-    activeLang,
-    requestedLang,
-    langConfirmed,
-    lastErrorCode,
     statusHint,
     engine,
     busy: listenBusy,
     sttBlocked,
-    googleConfigured,
     start: startListening,
     stop: stopListening,
     reset: resetListening,
@@ -497,13 +490,7 @@ export function PracticeSession({
 
           {item.kind === 'speak' && (
             <div className="speak-box">
-              <p className="speak-box__guide">
-                {engine === 'google'
-                  ? '撳 ● 用 Google 錄音 → 撳 ■ 轉廣東話字 → 爸爸媽媽撳黃色 ★'
-                  : engine === 'safari'
-                    ? '撳 ● 講廣東話 → 爸爸媽媽撳黃色 ★'
-                    : '撳 ● 講，字會出現喺下面；爸爸媽媽再撳黃色 ★'}
-              </p>
+              <p className="speak-box__guide">● → ■ → ★</p>
 
               <div
                 className={`listen-panel ${listening || composeActive || listenBusy ? 'is-listening' : ''} ${
@@ -554,7 +541,7 @@ export function PracticeSession({
                       unlockAudio()
                       playSfx('tap')
                     }}
-                    aria-label="開始聽寫"
+                    aria-label="開始錄音"
                   >
                     {KID.mic}
                   </button>
@@ -570,43 +557,18 @@ export function PracticeSession({
                       setComposeActive(false)
                       dictationRef.current?.blur()
                     }}
-                    aria-label={listenBusy && !listening ? '轉文字中' : '停止聽寫'}
+                    aria-label={listenBusy && !listening ? '轉文字中' : '停止錄音'}
                   >
-                    {listenBusy && !listening
-                      ? `… ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`
-                      : `${KID.micStop} ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`}
+                    {listenBusy && !listening ? '…' : KID.micStop}{' '}
+                    {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
                   </button>
                 )}
 
                 <div
                   className={`listen-panel__compose ${
-                    composeActive || listening || listenBusy ? 'is-active' : ''
+                    composeActive || listening || listenBusy || spokenText ? 'is-active' : ''
                   }`}
                 >
-                  {(listening || listenBusy) && (
-                    <p className="listen-panel__live">
-                      ● {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
-                      {listenBusy && !listening
-                        ? ' · Google 轉文字中'
-                        : sttAlive
-                          ? heardSpeech
-                            ? ' · 聽到聲'
-                            : engine === 'google'
-                              ? ' · 錄音中'
-                              : ' · 聽寫中'
-                          : ' · 啟動聽寫'}
-                      <span className="listen-panel__lang">
-                        {' '}
-                        · {engine === 'google' ? 'Google' : engine === 'safari' ? 'Safari' : 'Chrome'} ·{' '}
-                        {langConfirmed ? `引擎 ${activeLang}` : `要求 ${requestedLang}（未確認）`}
-                        {lastErrorCode ? ` · ${lastErrorCode}` : ''}
-                      </span>
-                    </p>
-                  )}
-
-                  <label className="listen-panel__compose-label" htmlFor="speak-dictation">
-                    講出嚟嘅字
-                  </label>
                   <textarea
                     id="speak-dictation"
                     ref={dictationRef}
@@ -624,35 +586,14 @@ export function PracticeSession({
                     autoCapitalize="sentences"
                     autoCorrect="on"
                     spellCheck
-                    rows={4}
-                    placeholder={
-                      listening || listenBusy
-                        ? engine === 'google'
-                          ? '錄音中… 撳 ■ 送去 Google 轉廣東話'
-                          : '請大聲講… 字會顯示喺呢度'
-                        : engine === 'google'
-                          ? '撳 ● 錄音，撳 ■ 用 Google 轉廣東話字…'
-                          : '撳 ● 開始講，字會顯示喺呢度…'
-                    }
+                    rows={3}
+                    placeholder=""
                     aria-label="聽寫文字"
                   />
 
-                  {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
                   {listenError ? <p className="listen-panel__error">{listenError}</p> : null}
-                  {sttBlocked && engine === 'safari' ? (
-                    <p className="listen-panel__kbd-tip">
-                      網頁聽寫未開成——可撳輸入框用鍵盤麥克風；或設定 Google STT（見 README）；私密瀏覽請改普通分頁。
-                    </p>
-                  ) : null}
-                  {sttBlocked && engine === 'google' ? (
-                    <p className="listen-panel__kbd-tip">
-                      Google 聽寫失敗——檢查網絡同 API key；仍可用黃色 ★ 確認。
-                    </p>
-                  ) : null}
-                  {!googleConfigured ? (
-                    <p className="listen-panel__hint">
-                      未設定 Google STT 時會用瀏覽器聽寫；設定後會直接用 Google（見 README）。
-                    </p>
+                  {!listenError && statusHint && (sttBlocked || (!listening && !listenBusy)) ? (
+                    <p className="listen-panel__hint">{statusHint}</p>
                   ) : null}
                 </div>
 
@@ -670,12 +611,6 @@ export function PracticeSession({
                     )}
                   </div>
                 )}
-
-                <p className="listen-panel__note">
-                  {engine === 'google'
-                    ? '● 錄音 · ■ Google 廣東話轉文字（要網絡）· 完成撳黃色 ★'
-                    : '● 要網絡 · 講完撳 ■ · 完成撳黃色 ★'}
-                </p>
               </div>
 
               {!done ? (

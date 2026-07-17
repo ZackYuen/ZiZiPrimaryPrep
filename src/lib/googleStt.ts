@@ -66,7 +66,7 @@ export async function recognizeWithGoogle(opts: {
       throw new Error(data.error || `Google STT 失敗（${res.status}）`)
     }
     const transcript = (data.transcript || '').trim()
-    if (!transcript) throw new Error('Google 聽寫無字——請再講大聲啲。')
+    if (!transcript) throw new Error('無字——再講大聲啲')
     return { transcript, languageCode: data.languageCode || languageCode }
   }
 
@@ -97,7 +97,7 @@ export async function recognizeWithGoogle(opts: {
     .map((r) => r.alternatives?.[0]?.transcript || '')
     .join('')
     .trim()
-  if (!transcript) throw new Error('Google 聽寫無字——請再講大聲啲。')
+  if (!transcript) throw new Error('無字——再講大聲啲')
   return {
     transcript,
     languageCode: data.results?.[0]?.languageCode || languageCode,
