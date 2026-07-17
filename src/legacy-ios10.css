@@ -109,4 +109,10 @@
     background: #ffe0d0;
     border-color: #f0a080;
   }
+
+  .sort-bucket.is-ready,
+  .sort-bucket.is-drop-target {
+    background: #ffe8dc;
+    border-color: #e07a55;
+  }
 }

@@ -4,7 +4,6 @@ import {
   useRef,
   useState,
   type CSSProperties,
-  type DragEvent,
 } from 'react'
 import {
   checkClock,
@@ -29,6 +28,7 @@ import { AnalogClock } from './AnalogClock'
 import { CoinPurse } from './CoinPurse'
 import { JuneCalendar } from './JuneCalendar'
 import { ReorderBoard } from './ReorderBoard'
+import { SortBoard } from './SortBoard'
 
 type Props = {
   title: string
@@ -56,27 +56,6 @@ const MATH_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '/'] a
 const CLOCK_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', ':', '0', '00'] as const
 const MONEY_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '✓'] as const
 
-function bucketTitle(bucket: string): string {
-  if (bucket === '正面的') return '＋'
-  if (bucket === '負面的') return '－'
-  return bucket
-}
-
-function placeIntoBucket(
-  text: string,
-  bucket: string,
-  setSortPlacement: (fn: (prev: Record<string, string>) => Record<string, string>) => void,
-  setSortSelected: (v: string | null) => void,
-  setSortChecked: (v: boolean) => void,
-  setCoachMsg: (v: string | null) => void,
-) {
-  unlockAudio()
-  playSfx('tap')
-  setSortPlacement((prev) => ({ ...prev, [text]: bucket }))
-  setSortSelected(null)
-  setSortChecked(false)
-  setCoachMsg(null)
-}
 
 export function PracticeSession({
   title,
@@ -105,10 +84,8 @@ export function PracticeSession({
   const [order, setOrder] = useState<string[]>([])
   const [pool, setPool] = useState<string[]>([])
   const [checkedFields, setCheckedFields] = useState<Record<string, boolean>>({})
-  const [sortSelected, setSortSelected] = useState<string | null>(null)
   const [sortPlacement, setSortPlacement] = useState<Record<string, string>>({})
   const [sortChecked, setSortChecked] = useState(false)
-  const [dragWord, setDragWord] = useState<string | null>(null)
   const { speak, speakQueue, stop, voiceStatus } = useSpeech()
   const {
     supported: listenSupported,
@@ -174,10 +151,8 @@ export function PracticeSession({
     setListenLang(
       _activity.promptEn && (!_activity.sampleZh || _activity.sampleZh === _activity.sampleEn) ? 'en-US' : 'yue-Hant-HK',
     )
-    setSortSelected(null)
     setSortPlacement({})
     setSortChecked(false)
-    setDragWord(null)
     if (_activity.kind === 'reorder' && _activity.fragments) {
       const shuffled = [..._activity.fragments].sort(() => Math.random() - 0.5)
       setPool(shuffled)
@@ -393,22 +368,6 @@ export function PracticeSession({
     if (!canProceed() && !done) return
     if (!done && isSolved()) awardAndMaybeNext(true)
     else goNext()
-  }
-
-  const onDragStartWord = (text: string) => (e: DragEvent) => {
-    setDragWord(text)
-    setSortSelected(text)
-    e.dataTransfer.setData('text/plain', text)
-    e.dataTransfer.effectAllowed = 'move'
-  }
-
-  const onDropBucket = (bucket: string) => (e: DragEvent) => {
-    e.preventDefault()
-    if (sortChecked && sortCorrect) return
-    const text = e.dataTransfer.getData('text/plain') || dragWord || sortSelected
-    if (!text) return
-    placeIntoBucket(text, bucket, setSortPlacement, setSortSelected, setSortChecked, setCoachMsg)
-    setDragWord(null)
   }
 
   return (
@@ -1044,97 +1003,31 @@ export function PracticeSession({
           )}
 
           {item.kind === 'sort' && item.sortItems && item.buckets && (
-            <div className="sort-box">
-              <p className="reorder__hint">
-                {sortSelected
-                  ? `已揀「${sortSelected}」→ 再撳 ＋ 或 －`
-                  : '拖去 ＋ / － ，或者先撳詞再撳圓圈'}
-              </p>
-              <div className="sort-buckets">
-                {item.buckets.map((bucket) => (
-                  <button
-                    key={bucket}
-                    type="button"
-                    className={`sort-bucket ${sortSelected || dragWord ? 'is-ready' : ''}`}
-                    onClick={() => {
-                      if (!sortSelected || (sortChecked && sortCorrect)) return
-                      placeIntoBucket(
-                        sortSelected,
-                        bucket,
-                        setSortPlacement,
-                        setSortSelected,
-                        setSortChecked,
-                        setCoachMsg,
-                      )
-                    }}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={onDropBucket(bucket)}
-                  >
-                    <span className="sort-bucket__title" title={bucket}>
-                      {bucketTitle(bucket)}
-                    </span>
-                    <div className="sort-bucket__items">
-                      {item.sortItems!
-                        .filter((s) => sortPlacement[s.text] === bucket)
-                        .map((s) => {
-                          const wrongHere = sortChecked && !revealAnswer && s.bucket !== bucket
-                          const showOk =
-                            (sortChecked && sortCorrect) || revealAnswer
-                              ? s.bucket === bucket
-                              : false
-                          return (
-                            <button
-                              key={s.text}
-                              type="button"
-                              draggable={!(sortChecked && sortCorrect)}
-                              className={[
-                                'chip chip--placed',
-                                wrongHere ? 'is-sort-wrong' : '',
-                                showOk ? 'is-sort-ok' : '',
-                              ]
-                                .filter(Boolean)
-                                .join(' ')}
-                              onDragStart={onDragStartWord(s.text)}
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                if (sortChecked && sortCorrect) return
-                                playSfx('tap')
-                                setSortPlacement((prev) => {
-                                  const next = { ...prev }
-                                  delete next[s.text]
-                                  return next
-                                })
-                                setSortChecked(false)
-                              }}
-                            >
-                              {s.text}
-                            </button>
-                          )
-                        })}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <div className="reorder__pool">
-                {pool
-                  .filter((text) => !sortPlacement[text])
-                  .map((text) => (
-                    <button
-                      key={text}
-                      type="button"
-                      draggable={!(sortChecked && sortCorrect)}
-                      className={`chip ${sortSelected === text ? 'chip--active' : ''}`}
-                      onDragStart={onDragStartWord(text)}
-                      onClick={() => {
-                        if (sortChecked && sortCorrect) return
-                        playSfx('tap')
-                        setSortSelected((cur) => (cur === text ? null : text))
-                      }}
-                    >
-                      {text}
-                    </button>
-                  ))}
-              </div>
+            <div className="sort-wrap">
+              <SortBoard
+                buckets={item.buckets}
+                pool={pool}
+                placement={sortPlacement}
+                answerByText={Object.fromEntries(item.sortItems.map((s) => [s.text, s.bucket]))}
+                locked={sortChecked && sortCorrect}
+                checked={sortChecked}
+                reveal={revealAnswer}
+                onPlace={(text, bucket) => {
+                  unlockAudio()
+                  setSortPlacement((prev) => ({ ...prev, [text]: bucket }))
+                  setSortChecked(false)
+                  setCoachMsg(null)
+                }}
+                onReturn={(text) => {
+                  setSortPlacement((prev) => {
+                    const next = { ...prev }
+                    delete next[text]
+                    return next
+                  })
+                  setSortChecked(false)
+                  setCoachMsg(null)
+                }}
+              />
               <div className="session__actions">
                 <button
                   type="button"

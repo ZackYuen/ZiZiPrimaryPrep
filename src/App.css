@@ -1287,6 +1287,23 @@
   background: color-mix(in srgb, var(--accent, var(--coral)) 10%, white);
 }
 
+.sort-bucket.is-drop-target {
+  border-style: solid;
+  border-color: var(--accent, var(--coral));
+  background: color-mix(in srgb, var(--accent, var(--coral)) 18%, white);
+}
+
+.sort-box.is-dragging {
+  cursor: grabbing;
+}
+
+.sort-wrap {
+  margin-top: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .sort-bucket__title {
   display: block;
   font-family: var(--font-display);
