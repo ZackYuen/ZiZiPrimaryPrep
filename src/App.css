@@ -769,24 +769,78 @@
   line-height: 1.45;
 }
 
-/* Parent confirm for speak items — must read as a button, not a lone ★ icon */
+/* Speak-mode parent confirm: icon-only yellow star, bright before tap, dim after done */
 .speak-box__parent-star {
-  background: #2f8f57;
-  box-shadow: 0 8px 0 rgba(30, 100, 60, 0.35);
-  font-size: 1.2rem;
-  letter-spacing: 0.02em;
+  align-self: flex-start;
+  width: 3.1rem;
+  height: 3.1rem;
+  border: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f5c84c;
+  color: #8a6a12;
+  font-size: 1.8rem;
+  font-weight: 900;
+  box-shadow: 0 6px 0 rgba(138, 106, 18, 0.3);
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.12s ease;
 }
 
 .speak-box__parent-star:active {
-  box-shadow: 0 4px 0 rgba(30, 100, 60, 0.35);
+  transform: translateY(2px);
+  box-shadow: 0 4px 0 rgba(138, 106, 18, 0.3);
 }
 
 .speak-box__parent-star.is-done,
 .speak-box__parent-star:disabled {
-  background: #6fb88a;
-  box-shadow: 0 4px 0 rgba(30, 100, 60, 0.2);
-  opacity: 1;
-  color: white;
+  background: #f5c84c;
+  box-shadow: 0 4px 0 rgba(138, 106, 18, 0.16);
+  opacity: 0.42;
+  filter: saturate(0.75);
+  color: #8a6a12;
+  cursor: default;
+}
+
+.dictation-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.75rem;
+  border-radius: 16px;
+  border: 2px solid rgba(27, 58, 75, 0.12);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.dictation-fallback__title {
+  margin: 0;
+  font-weight: 800;
+  color: #1b3a4b;
+}
+
+.dictation-fallback__hint {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.dictation-fallback__input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 2px solid rgba(27, 58, 75, 0.15);
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.dictation-fallback__input:focus {
+  outline: 3px solid rgba(126, 200, 227, 0.5);
+  border-color: rgba(27, 58, 75, 0.3);
 }
 
 .listen-panel {
