@@ -111,6 +111,9 @@ export function PracticeSession({
     sttAlive,
     heardSpeech,
     activeLang,
+    requestedLang,
+    langConfirmed,
+    lastErrorCode,
     statusHint,
     engine,
     busy: listenBusy,
@@ -532,11 +535,21 @@ export function PracticeSession({
                             : ' · 啟動中'}
                         <span className="listen-panel__lang">
                           {' '}
-                          · {engine === 'safari' ? 'Safari' : 'Chrome'} · {activeLang}
+                          · {engine === 'safari' ? 'Safari' : 'Chrome'} ·{' '}
+                          {langConfirmed
+                            ? `引擎 ${activeLang}`
+                            : `要求 ${requestedLang}（未確認）`}
+                          {lastErrorCode ? ` · ${lastErrorCode}` : ''}
                         </span>
                       </p>
                     )}
                     {statusHint ? <p className="listen-panel__hint">{statusHint}</p> : null}
+                    {listening && !langConfirmed && engine === 'safari' ? (
+                      <p className="listen-panel__hint">
+                        畫面上嘅語言碼只係「要求」Safari 用邊種聽寫；未見到「引擎 xxx」前，其實未真正用到
+                        zh-HK。
+                      </p>
+                    ) : null}
                     {engine === 'safari' && !listening && !listenTranscript ? (
                       <p className="listen-panel__hint">
                         麥克風允許之後，仲要：設定→一般→鍵盤→聽寫→下載「廣東話」。鍵盤「粵」同 Notes

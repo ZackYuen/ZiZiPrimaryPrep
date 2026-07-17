@@ -80,6 +80,9 @@ export function useSpeechRecognition() {
   const [sttAlive, setSttAlive] = useState(false)
   const [heardSpeech, setHeardSpeech] = useState(false)
   const [activeLang, setActiveLang] = useState('zh-HK')
+  const [requestedLang, setRequestedLang] = useState('zh-HK')
+  const [langConfirmed, setLangConfirmed] = useState(false)
+  const [lastErrorCode, setLastErrorCode] = useState<string | null>(null)
   const [statusHint, setStatusHint] = useState('')
   const [engine, setEngine] = useState<'safari' | 'chrome' | 'none'>('none')
   const [busy] = useState(false)
@@ -100,8 +103,10 @@ export function useSpeechRecognition() {
   const transcriptRef = useRef('')
   const appleRef = useRef(apple)
   const sidRef = useRef(0)
+  const requestedLangRef = useRef('zh-HK')
 
   appleRef.current = apple
+  requestedLangRef.current = requestedLang
 
   const clearTimers = () => {
     if (tickTimer.current) {
@@ -204,8 +209,17 @@ export function useSpeechRecognition() {
         if (sid !== sessionId.current || !wantListen.current) return
         runningRef.current = true
         setSttAlive(true)
+        setLangConfirmed(true)
+        // Read back whatever the engine accepted (may differ from request on Safari)
+        const aliveLang = rec.lang || langsRef.current[langIdx.current]
+        setActiveLang(aliveLang)
         setError(null)
-        setStatusHint(appleRef.current ? '廣東話聽寫中…請大聲講' : '請大聲講…')
+        setLastErrorCode(null)
+        setStatusHint(
+          appleRef.current
+            ? `聽寫已啟動（引擎語言 ${aliveLang}）…請大聲講`
+            : `聽寫已啟動（${aliveLang}）…請大聲講`,
+        )
       }
 
       rec.onresult = (event) => {
@@ -252,20 +266,23 @@ export function useSpeechRecognition() {
         setSttAlive(false)
         const code = event.error
         if (code === 'aborted') return
+        setLastErrorCode(code)
 
         if (code === 'not-allowed' || code === 'service-not-allowed' || code === 'audio-capture') {
           // Mic can be Allow while webpage Speech Recognition still fails
           if (micOkRef.current && appleRef.current) {
             setError(null)
             setStatusHint(
-              '麥克風已開，但網頁聽寫未接通。請確認：設定→一般→鍵盤→聽寫→已下載「廣東話」。仍可講俾爸爸媽媽聽，撳 ★。',
+              `麥克風已開，但網頁聽寫未接通（${code}）。要求語言 ${requestedLangRef.current} 未確認啟動。請檢查聽寫「廣東話」。仍可用 ★。`,
             )
-            // Keep trying a few times — service-not-allowed is sometimes transient
             if (restartCount.current < 6) {
               scheduleRestart(sid)
             } else {
               sttEnabled.current = false
-              setStatusHint('網頁聽寫未能啟動——請爸爸媽媽聽完撳 ★（麥克風權限已 OK）')
+              setLangConfirmed(false)
+              setStatusHint(
+                `網頁聽寫未能啟動（${code}）——「${requestedLangRef.current}」只係要求語言，引擎未真正開。請爸爸媽媽聽完撳 ★。`,
+              )
             }
             return
           }
@@ -287,15 +304,17 @@ export function useSpeechRecognition() {
           if (langIdx.current < langsRef.current.length - 1) {
             langIdx.current += 1
             rec.lang = langsRef.current[langIdx.current]
+            setRequestedLang(rec.lang)
             setActiveLang(rec.lang)
-            setStatusHint(`改用 ${rec.lang}…`)
+            setLangConfirmed(false)
+            setStatusHint(`上一語言唔得（${code}），改要求 ${rec.lang}…`)
             scheduleRestart(sid)
             return
           }
           setStatusHint(
             appleRef.current
-              ? '聽寫語言未就緒。設定→一般→鍵盤→聽寫→下載「廣東話」（唔係淨係鍵盤粵）。或用 ★。'
-              : '轉文字唔穩——可試 EN，或用 ★。',
+              ? `聽寫語言未就緒（${code}）。設定→一般→鍵盤→聽寫→下載「廣東話」。或用 ★。`
+              : `轉文字唔穩（${code}）——可試 EN，或用 ★。`,
           )
           scheduleRestart(sid)
         }
@@ -333,6 +352,8 @@ export function useSpeechRecognition() {
     setElapsedSec(0)
     setHeardSpeech(false)
     setStatusHint('')
+    setLangConfirmed(false)
+    setLastErrorCode(null)
   }, [])
 
   const stop = useCallback(() => {
@@ -376,7 +397,12 @@ export function useSpeechRecognition() {
       setListening(true)
       langsRef.current = langFallbacks(lang, appleRef.current)
       langIdx.current = 0
-      setActiveLang(langsRef.current[0])
+      const firstLang = langsRef.current[0]
+      requestedLangRef.current = firstLang
+      setRequestedLang(firstLang)
+      setActiveLang(firstLang)
+      setLangConfirmed(false)
+      setLastErrorCode(null)
 
       startedAt.current = Date.now()
       if (tickTimer.current) window.clearInterval(tickTimer.current)
@@ -449,6 +475,9 @@ export function useSpeechRecognition() {
     sttAlive,
     heardSpeech,
     activeLang,
+    requestedLang,
+    langConfirmed,
+    lastErrorCode,
     statusHint,
     engine,
     busy,
