@@ -769,6 +769,26 @@
   line-height: 1.45;
 }
 
+/* Parent confirm for speak items — must read as a button, not a lone ★ icon */
+.speak-box__parent-star {
+  background: #2f8f57;
+  box-shadow: 0 8px 0 rgba(30, 100, 60, 0.35);
+  font-size: 1.2rem;
+  letter-spacing: 0.02em;
+}
+
+.speak-box__parent-star:active {
+  box-shadow: 0 4px 0 rgba(30, 100, 60, 0.35);
+}
+
+.speak-box__parent-star.is-done,
+.speak-box__parent-star:disabled {
+  background: #6fb88a;
+  box-shadow: 0 4px 0 rgba(30, 100, 60, 0.2);
+  opacity: 1;
+  color: white;
+}
+
 .listen-panel {
   display: flex;
   flex-direction: column;

@@ -10,7 +10,11 @@ export const KID = {
   listenEn: '▶ EN',
   check: '✓',
   peek: '?',
+  /** Bare star for places that already have surrounding text */
   starOk: '★',
+  /** Speak-mode parent confirm — must look like a tappable control, not decoration */
+  parentStar: '★ 聽完就得',
+  parentStarDone: '★ 已得',
   mic: '●',
   micStop: '■',
   micLabel: '●',
