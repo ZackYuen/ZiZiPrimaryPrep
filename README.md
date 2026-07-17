@@ -45,6 +45,40 @@ npm run preview
 
 預設：`袁碩孜` / `Seth Yuen` / `藍田靈糧`。可在 `src/data/content.ts` 的 `CHILD` 再改。
 
+## Google 廣東話 STT（建議 · 解決 Safari `service-not-allowed`）
+
+iPhone Safari 網頁聽寫經常被拒。App 支援 **Google Cloud Speech-to-Text**（`yue-Hant-HK`）：
+
+1. 撳 **●** 錄音  
+2. 撳 **■** 送去 Google 轉字  
+3. 字入同一個講題框  
+
+### 設定（推薦：Cloudflare Worker proxy）
+
+1. Google Cloud Console → 啟用 **Cloud Speech-to-Text API** → 建立 API key  
+2. 部署 worker：
+
+```bash
+cd workers/google-stt
+npx wrangler secret put GOOGLE_SPEECH_API_KEY
+npx wrangler deploy
+```
+
+3. 本機／建置時設定：
+
+```bash
+# .env.local
+VITE_GOOGLE_STT_URL=https://zizi-google-stt.<your-subdomain>.workers.dev
+```
+
+4. 若用 GitHub Actions 建置，喺 repo **Secrets** 加 `VITE_GOOGLE_STT_URL`（workflow 會注入）。
+
+不要把 API key 直接 commit 上 GitHub Pages。Worker proxy 先安全。
+
+### 開發捷徑（唔建議上線）
+
+`.env.local` 可暫時用 `VITE_GOOGLE_SPEECH_API_KEY=...`（請用 HTTP referrer 限制到 `zackyuen.github.io/*`）。
+
 ## 原則（來自教材）
 
 不是要全部做對，而是建立：面對難題的勇氣、清晰有禮的表達、答錯再試的態度。Level 4 不是必須完成。

@@ -125,6 +125,7 @@ export function PracticeSession({
     engine,
     busy: listenBusy,
     sttBlocked,
+    googleConfigured,
     start: startListening,
     stop: stopListening,
     reset: resetListening,
@@ -214,12 +215,11 @@ export function PracticeSession({
     return order.length === item.correctOrder.length && order.every((w, i) => w === item.correctOrder![i])
   }, [item, order])
 
-  // Keep Chrome / webpage STT words in the same designed transcript field.
+  // Keep STT / Google transcript in the designed speak field.
   useEffect(() => {
-    if (!listening) return
     const combined = [listenTranscript, listenInterim].filter(Boolean).join(' ').trim()
     if (combined) setSpokenText(combined)
-  }, [listening, listenTranscript, listenInterim])
+  }, [listenTranscript, listenInterim])
 
   const openKeyboardDictation = () => {
     setComposeActive(true)
@@ -498,21 +498,23 @@ export function PracticeSession({
           {item.kind === 'speak' && (
             <div className="speak-box">
               <p className="speak-box__guide">
-                {engine === 'safari'
-                  ? '撳 ● 直接用 iPhone 聽寫講廣東話 → 爸爸媽媽撳黃色 ★'
-                  : '撳 ● 講，字會出現喺下面；爸爸媽媽再撳黃色 ★'}
+                {engine === 'google'
+                  ? '撳 ● 錄音（Google 廣東話）→ 撳 ■ 轉文字 → 爸爸媽媽撳黃色 ★'
+                  : engine === 'safari'
+                    ? '撳 ● 直接用 iPhone 聽寫講廣東話 → 爸爸媽媽撳黃色 ★'
+                    : '撳 ● 講，字會出現喺下面；爸爸媽媽再撳黃色 ★'}
               </p>
 
               <div
-                className={`listen-panel ${listening || composeActive ? 'is-listening' : ''} ${
-                  engine === 'safari' ? 'listen-panel--safari' : ''
+                className={`listen-panel ${listening || composeActive || listenBusy ? 'is-listening' : ''} ${
+                  engine === 'google' || engine === 'safari' ? 'listen-panel--safari' : ''
                 }`}
               >
                 <div className="session__actions">
                   <button
                     type="button"
                     className={`pill-btn ${listenLang === 'yue-Hant-HK' ? '' : 'pill-btn--soft'}`}
-                    disabled={listening}
+                    disabled={listening || listenBusy}
                     onClick={() => {
                       playSfx('tap')
                       setListenLang('yue-Hant-HK')
@@ -524,7 +526,7 @@ export function PracticeSession({
                   <button
                     type="button"
                     className={`pill-btn ${listenLang === 'en-US' ? '' : 'pill-btn--soft'}`}
-                    disabled={listening}
+                    disabled={listening || listenBusy}
                     onClick={() => {
                       playSfx('tap')
                       setListenLang('en-US')
@@ -535,12 +537,11 @@ export function PracticeSession({
                   </button>
                 </div>
 
-                {!listening ? (
+                {!listening && !listenBusy ? (
                   <button
                     type="button"
                     className="primary-btn primary-btn--wide"
                     onClick={() => {
-                      // Start STT first so Safari rec.start() stays in this user gesture.
                       stop()
                       setSpokenText('')
                       setComposeActive(false)
@@ -563,29 +564,40 @@ export function PracticeSession({
                     className="primary-btn primary-btn--wide listen-panel__stop"
                     disabled={listenBusy && !listening}
                     onClick={() => {
+                      if (listenBusy && !listening) return
                       playSfx('tap')
-                      stopListening()
+                      void stopListening()
                       setComposeActive(false)
                       dictationRef.current?.blur()
                     }}
-                    aria-label="停止聽寫"
+                    aria-label={listenBusy && !listening ? '轉文字中' : '停止聽寫'}
                   >
-                    {`${KID.micStop} ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`}
+                    {listenBusy && !listening
+                      ? `… ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`
+                      : `${KID.micStop} ${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, '0')}`}
                   </button>
                 )}
 
-                <div className={`listen-panel__compose ${composeActive || listening ? 'is-active' : ''}`}>
-                  {listening && (
+                <div
+                  className={`listen-panel__compose ${
+                    composeActive || listening || listenBusy ? 'is-active' : ''
+                  }`}
+                >
+                  {(listening || listenBusy) && (
                     <p className="listen-panel__live">
                       ● {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
-                      {sttAlive
-                        ? heardSpeech
-                          ? ' · 聽到聲'
-                          : ' · 聽寫中'
-                        : ' · 啟動聽寫'}
+                      {listenBusy && !listening
+                        ? ' · Google 轉文字中'
+                        : sttAlive
+                          ? heardSpeech
+                            ? ' · 聽到聲'
+                            : engine === 'google'
+                              ? ' · 錄音中'
+                              : ' · 聽寫中'
+                          : ' · 啟動聽寫'}
                       <span className="listen-panel__lang">
                         {' '}
-                        · {engine === 'safari' ? 'Safari' : 'Chrome'} ·{' '}
+                        · {engine === 'google' ? 'Google' : engine === 'safari' ? 'Safari' : 'Chrome'} ·{' '}
                         {langConfirmed ? `引擎 ${activeLang}` : `要求 ${requestedLang}（未確認）`}
                         {lastErrorCode ? ` · ${lastErrorCode}` : ''}
                       </span>
@@ -603,9 +615,9 @@ export function PracticeSession({
                     onChange={(e) => setSpokenText(e.target.value)}
                     onFocus={() => setComposeActive(true)}
                     onBlur={() => {
-                      if (!listening) setComposeActive(false)
+                      if (!listening && !listenBusy) setComposeActive(false)
                     }}
-                    readOnly={listening}
+                    readOnly={listening || listenBusy}
                     lang={listenLang === 'en-US' ? 'en-US' : 'zh-Hant-HK'}
                     inputMode="text"
                     enterKeyHint="done"
@@ -614,11 +626,15 @@ export function PracticeSession({
                     spellCheck
                     rows={4}
                     placeholder={
-                      listening
-                        ? '請大聲講… 字會顯示喺呢度'
-                        : engine === 'safari'
-                          ? '撳 ● 開始 iPhone 聽寫…'
-                          : '撳 ● 開始講，字會顯示喺呢度…'
+                      listening || listenBusy
+                        ? engine === 'google'
+                          ? '錄音中… 撳 ■ 送去 Google 轉廣東話'
+                          : '請大聲講… 字會顯示喺呢度'
+                        : engine === 'google'
+                          ? '撳 ● 錄音，撳 ■ 用 Google 轉廣東話字…'
+                          : engine === 'safari'
+                            ? '撳 ● 開始 iPhone 聽寫…'
+                            : '撳 ● 開始講，字會顯示喺呢度…'
                     }
                     aria-label="聽寫文字"
                   />
@@ -627,7 +643,12 @@ export function PracticeSession({
                   {listenError ? <p className="listen-panel__error">{listenError}</p> : null}
                   {sttBlocked && engine === 'safari' ? (
                     <p className="listen-panel__kbd-tip">
-                      網頁聽寫未開成——可撳輸入框，再用鍵盤麥克風；或改用普通分頁（唔好用私密瀏覽）再撳 ●。
+                      網頁聽寫未開成——可撳輸入框用鍵盤麥克風；或設定 Google STT（見 README）；私密瀏覽請改普通分頁。
+                    </p>
+                  ) : null}
+                  {engine !== 'google' && !googleConfigured ? (
+                    <p className="listen-panel__hint">
+                      想 bypass Safari service-not-allowed：設定 Google Cloud Speech（yue-Hant-HK），見 README。
                     </p>
                   ) : null}
                 </div>
@@ -648,9 +669,11 @@ export function PracticeSession({
                 )}
 
                 <p className="listen-panel__note">
-                  {engine === 'safari'
-                    ? '● 直接開 iPhone 聽寫 · 講完撳 ■ · 完成撳黃色 ★'
-                    : '● 要網絡 · 講完撳 ■ · 完成撳黃色 ★'}
+                  {engine === 'google'
+                    ? '● 錄音 · ■ Google 廣東話轉文字（要網絡）· 完成撳黃色 ★'
+                    : engine === 'safari'
+                      ? '● 直接開 iPhone 聽寫 · 講完撳 ■ · 完成撳黃色 ★'
+                      : '● 要網絡 · 講完撳 ■ · 完成撳黃色 ★'}
                 </p>
               </div>
 
