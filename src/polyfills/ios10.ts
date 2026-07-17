@@ -77,6 +77,70 @@
     }
   }
 
+  // String.padStart / padEnd (Safari < 11 / iOS < 11)
+  if (typeof String.prototype.padStart !== 'function') {
+    String.prototype.padStart = function padStart(targetLength: number, padString?: string) {
+      const str = String(this)
+      let pad = padString === undefined ? ' ' : String(padString)
+      if (pad.length === 0) pad = ' '
+      const len = targetLength >> 0
+      if (str.length >= len) return str
+      const fillLen = len - str.length
+      let fill = ''
+      while (fill.length < fillLen) fill += pad
+      return fill.slice(0, fillLen) + str
+    }
+  }
+  if (typeof String.prototype.padEnd !== 'function') {
+    String.prototype.padEnd = function padEnd(targetLength: number, padString?: string) {
+      const str = String(this)
+      let pad = padString === undefined ? ' ' : String(padString)
+      if (pad.length === 0) pad = ' '
+      const len = targetLength >> 0
+      if (str.length >= len) return str
+      const fillLen = len - str.length
+      let fill = ''
+      while (fill.length < fillLen) fill += pad
+      return str + fill.slice(0, fillLen)
+    }
+  }
+
+  // DOMException constructor (missing / incomplete on some old WebKit)
+  try {
+    // eslint-disable-next-line no-new
+    new DOMException('t', 'AbortError')
+  } catch {
+    ;(window as unknown as { DOMException: unknown }).DOMException = function DOMExceptionShim(
+      this: Error,
+      message?: string,
+      name?: string,
+    ) {
+      const err = new Error(message || '')
+      err.name = name || 'Error'
+      return err
+    }
+  }
+
+  // Event constructor (iOS 10 often needs createEvent)
+  try {
+    // eslint-disable-next-line no-new
+    new Event('abort')
+  } catch {
+    ;(window as unknown as { Event: unknown }).Event = function EventShim(
+      this: Event,
+      type: string,
+    ) {
+      const evt = document.createEvent('Event')
+      evt.initEvent(type, true, true)
+      return evt
+    }
+  }
+
+  // globalThis
+  if (typeof (window as Window & { globalThis?: unknown }).globalThis === 'undefined') {
+    ;(window as unknown as { globalThis: Window }).globalThis = window
+  }
+
   // getUserMedia shim (iOS 10 often lacks navigator.mediaDevices)
   const nav = navigator as Navigator & {
     mediaDevices?: MediaDevices
@@ -96,7 +160,7 @@
       if (!legacy) {
         return Promise.reject(new Error('呢部 iPad 唔支援麥克風'))
       }
-      return new Promise((resolve, reject) => {
+      return new Promise(function (resolve, reject) {
         legacy.call(nav, constraints, resolve, reject)
       })
     }

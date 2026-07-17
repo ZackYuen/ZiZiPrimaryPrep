@@ -132,8 +132,18 @@ export function useSpeech() {
   useEffect(() => {
     if (!('speechSynthesis' in window)) return
     refreshVoices()
-    window.speechSynthesis.addEventListener('voiceschanged', refreshVoices)
-    return () => window.speechSynthesis.removeEventListener('voiceschanged', refreshVoices)
+    const synth = window.speechSynthesis as SpeechSynthesis & {
+      onvoiceschanged: (() => void) | null
+    }
+    if (typeof synth.addEventListener === 'function') {
+      synth.addEventListener('voiceschanged', refreshVoices)
+      return () => synth.removeEventListener('voiceschanged', refreshVoices)
+    }
+    // iOS 10: property handler instead of EventTarget
+    synth.onvoiceschanged = refreshVoices
+    return () => {
+      synth.onvoiceschanged = null
+    }
   }, [refreshVoices])
 
   const stop = useCallback(() => {

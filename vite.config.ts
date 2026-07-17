@@ -96,6 +96,11 @@ function ipadLegacyBoot(): Plugin {
         color: #1b3a4b;
         line-height: 1.5;
       }
+      /* Old WebKit can freeze SPA views at opacity:0 after navigation */
+      .session, .session__card, .parent, .vocab-card, .module-card {
+        opacity: 1 !important;
+        animation: none !important;
+      }
     </style>
   </head>
   <body>

@@ -1,7 +1,54 @@
 /**
  * CSS fallbacks for iPad Safari / iOS 10.3.x (no flex gap, no dvh, no color-mix).
  * Loaded after App.css so these can patch layout spacing.
+ *
+ * Critical: WebKit on iOS 10 often leaves `animation-fill-mode: both` stuck at
+ * `from { opacity: 0 }` after SPA navigations — session/parent/vocab look blank.
+ * Redefine keyframes AND disable entrance animations on routed views.
  */
+
+@keyframes rise-in {
+  from,
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop {
+  from,
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Kill entrance animations that can freeze at opacity:0 on old WebKit */
+.session,
+.session__card,
+.session__coach,
+.parent,
+.vocab-card,
+.vocab-stage,
+.hero,
+.hero__brand,
+.hero__name,
+.hero__figure,
+.hero__tag,
+.hero__stars,
+.home-main,
+.mock-cta,
+.vocab-cta,
+.module-grid,
+.module-card,
+.day-card,
+.parent-link,
+.mock-cta__art,
+.vocab-cta__badge {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
 
 /* dvh → vh */
 #root {
@@ -15,26 +62,6 @@
 }
 
 @supports not (gap: 1rem) {
-  .session,
-  .session__layout,
-  .session__actions,
-  .session__badges,
-  .home-tools,
-  .reorder,
-  .reorder__sentence,
-  .reorder__pool,
-  .reorder__slot,
-  .sort-buckets,
-  .sort-bucket__items,
-  .listen-panel,
-  .speak-box,
-  .prompt-fields,
-  .math-pad,
-  .choice-list,
-  .listen-panel__chips {
-    /* approximate gap with child margins */
-  }
-
   .session__actions > * + *,
   .session__badges > * + *,
   .reorder__pool > * + *,

@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { DayCard } from './components/DayCard'
 import { PracticeSession } from './components/PracticeSession'
 import { ParentGuide } from './components/ParentGuide'
 import { VocabSession } from './components/VocabSession'
 import { Mascot } from './components/Mascot'
 import { SoundToggle } from './components/SoundToggle'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { CHILD, days, getDay, mockInterview, type DayId } from './data/content'
 import { useProgress } from './hooks/useProgress'
 import { playSfx, unlockAudio } from './hooks/useSfx'
@@ -21,78 +22,100 @@ export default function App() {
   const [view, setView] = useState<View>({ name: 'home' })
   const { progress, markDone, reset } = useProgress()
 
+  const goHome = () => {
+    try {
+      unlockAudio()
+      playSfx('whoosh')
+      setView({ name: 'home' })
+    } catch (err) {
+      console.error('go home failed', err)
+      setView({ name: 'home' })
+    }
+  }
+
   const go = (next: View) => {
-    unlockAudio()
-    playSfx(next.name === 'home' ? 'whoosh' : 'tap')
-    setView(next)
+    try {
+      unlockAudio()
+      playSfx(next.name === 'home' ? 'whoosh' : 'tap')
+      setView(next)
+    } catch (err) {
+      console.error('navigation failed', err)
+      setView(next)
+    }
+  }
+
+  function shell(homeClass: boolean, children: ReactNode) {
+    return (
+      <div className={homeClass ? 'app-shell app-shell--home' : 'app-shell'}>
+        <ErrorBoundary onReset={goHome}>{children}</ErrorBoundary>
+      </div>
+    )
   }
 
   if (view.name === 'parent') {
-    return (
-      <div className="app-shell">
-        <ParentGuide stars={progress.stars} onReset={reset} onBack={() => go({ name: 'home' })} />
-      </div>
+    return shell(
+      false,
+      <ParentGuide stars={progress.stars} onReset={reset} onBack={() => go({ name: 'home' })} />,
     )
   }
 
   if (view.name === 'vocab') {
-    return (
-      <div className="app-shell">
-        <VocabSession
-          completed={progress.completed}
-          onMarkDone={markDone}
-          onBack={() => go({ name: 'home' })}
-        />
-      </div>
+    return shell(
+      false,
+      <VocabSession
+        completed={progress.completed}
+        onMarkDone={markDone}
+        onBack={() => go({ name: 'home' })}
+      />,
     )
   }
 
   if (view.name === 'mock') {
-    return (
-      <div className="app-shell">
-        <PracticeSession
-          title="模擬面試"
-          accent="#1B3A4B"
-          items={mockInterview}
-          moduleKey="mock"
-          completed={progress.completed}
-          onMarkDone={markDone}
-          onBack={() => go({ name: 'home' })}
-          celebrate
-        />
-      </div>
+    return shell(
+      false,
+      <PracticeSession
+        title="模擬面試"
+        accent="#1B3A4B"
+        items={mockInterview}
+        moduleKey="mock"
+        completed={progress.completed}
+        onMarkDone={markDone}
+        onBack={() => go({ name: 'home' })}
+        celebrate
+      />,
     )
   }
 
   if (view.name === 'day') {
     const day = getDay(view.id)
     if (!day) {
-      return (
-        <div className="app-shell">
+      return shell(
+        false,
+        <>
           <button type="button" className="ghost-btn" onClick={() => go({ name: 'home' })}>
             ← 返回
           </button>
           <p>找不到這一天的練習。</p>
-        </div>
+        </>,
       )
     }
-    return (
-      <div className="app-shell">
-        <PracticeSession
-          title={day.title}
-          accent={day.accent}
-          items={day.activities}
-          moduleKey={day.id}
-          completed={progress.completed}
-          onMarkDone={markDone}
-          onBack={() => go({ name: 'home' })}
-        />
-      </div>
+    return shell(
+      false,
+      <PracticeSession
+        title={day.title}
+        accent={day.accent}
+        items={day.activities}
+        moduleKey={day.id}
+        completed={progress.completed}
+        onMarkDone={markDone}
+        onBack={() => go({ name: 'home' })}
+      />,
     )
   }
 
-  return (
-    <div className="app-shell app-shell--home">
+  return shell(
+    true,
+    <>
       <div className="sky" aria-hidden>
         <span className="sky__sun" />
         <span className="sky__cloud sky__cloud--a" />
@@ -115,7 +138,7 @@ export default function App() {
           <Mascot mood="wave" size={150} />
         </div>
         <h1 className="hero__name">{CHILD.nameShort}</h1>
-        <p className="hero__fullname">
+        <p className="hero__figure">
           {CHILD.nameZh} · {CHILD.fullNameEn}
         </p>
         <p className="hero__tag">
@@ -128,11 +151,7 @@ export default function App() {
       </header>
 
       <main className="home-main">
-        <button
-          type="button"
-          className="mock-cta"
-          onClick={() => go({ name: 'mock' })}
-        >
+        <button type="button" className="mock-cta" onClick={() => go({ name: 'mock' })}>
           <span className="mock-cta__art" aria-hidden>
             <Mascot mood="cheer" size={64} />
           </span>
@@ -170,6 +189,6 @@ export default function App() {
           P 家長
         </button>
       </main>
-    </div>
+    </>,
   )
 }

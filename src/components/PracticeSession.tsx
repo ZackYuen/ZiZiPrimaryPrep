@@ -221,9 +221,15 @@ export function PracticeSession({
     window.requestAnimationFrame(() => {
       const el = dictationRef.current
       if (!el) return
-      el.focus()
-      const end = el.value.length
-      el.setSelectionRange(end, end)
+      try {
+        el.focus()
+        const end = el.value.length
+        if (typeof el.setSelectionRange === 'function') {
+          el.setSelectionRange(end, end)
+        }
+      } catch {
+        /* old WebKit may reject focus/selection */
+      }
     })
   }
 
