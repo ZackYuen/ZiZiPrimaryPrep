@@ -71,9 +71,8 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>電話聽講（練習提示）</h3>
           <p>
-            Safari／iPhone：撳 ● 若已設定 Google STT，會錄音再用 Google Cloud Speech（`yue-Hant-HK`）轉字，唔依賴 Safari
-            網頁聽寫。未設定時會試 Apple 網頁聽寫；若出現 service-not-allowed，請改普通分頁，或依 README 設定 Google。
-            講完爸爸媽媽撳黃色 ★。
+            已設定 Google STT 時，撳 ● 會直接用 Google Cloud Speech（`yue-Hant-HK`）錄音轉字，唔再用
+            iPhone／Safari 內建網頁聽寫。講完爸爸媽媽撳黃色 ★。
           </p>
         </article>
         <article className="parent__item">

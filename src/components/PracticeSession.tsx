@@ -499,9 +499,9 @@ export function PracticeSession({
             <div className="speak-box">
               <p className="speak-box__guide">
                 {engine === 'google'
-                  ? '撳 ● 錄音（Google 廣東話）→ 撳 ■ 轉文字 → 爸爸媽媽撳黃色 ★'
+                  ? '撳 ● 用 Google 錄音 → 撳 ■ 轉廣東話字 → 爸爸媽媽撳黃色 ★'
                   : engine === 'safari'
-                    ? '撳 ● 直接用 iPhone 聽寫講廣東話 → 爸爸媽媽撳黃色 ★'
+                    ? '撳 ● 講廣東話 → 爸爸媽媽撳黃色 ★'
                     : '撳 ● 講，字會出現喺下面；爸爸媽媽再撳黃色 ★'}
               </p>
 
@@ -632,9 +632,7 @@ export function PracticeSession({
                           : '請大聲講… 字會顯示喺呢度'
                         : engine === 'google'
                           ? '撳 ● 錄音，撳 ■ 用 Google 轉廣東話字…'
-                          : engine === 'safari'
-                            ? '撳 ● 開始 iPhone 聽寫…'
-                            : '撳 ● 開始講，字會顯示喺呢度…'
+                          : '撳 ● 開始講，字會顯示喺呢度…'
                     }
                     aria-label="聽寫文字"
                   />
@@ -646,9 +644,14 @@ export function PracticeSession({
                       網頁聽寫未開成——可撳輸入框用鍵盤麥克風；或設定 Google STT（見 README）；私密瀏覽請改普通分頁。
                     </p>
                   ) : null}
-                  {engine !== 'google' && !googleConfigured ? (
+                  {sttBlocked && engine === 'google' ? (
+                    <p className="listen-panel__kbd-tip">
+                      Google 聽寫失敗——檢查網絡同 API key；仍可用黃色 ★ 確認。
+                    </p>
+                  ) : null}
+                  {!googleConfigured ? (
                     <p className="listen-panel__hint">
-                      想 bypass Safari service-not-allowed：設定 Google Cloud Speech（yue-Hant-HK），見 README。
+                      未設定 Google STT 時會用瀏覽器聽寫；設定後會直接用 Google（見 README）。
                     </p>
                   ) : null}
                 </div>
@@ -671,9 +674,7 @@ export function PracticeSession({
                 <p className="listen-panel__note">
                   {engine === 'google'
                     ? '● 錄音 · ■ Google 廣東話轉文字（要網絡）· 完成撳黃色 ★'
-                    : engine === 'safari'
-                      ? '● 直接開 iPhone 聽寫 · 講完撳 ■ · 完成撳黃色 ★'
-                      : '● 要網絡 · 講完撳 ■ · 完成撳黃色 ★'}
+                    : '● 要網絡 · 講完撳 ■ · 完成撳黃色 ★'}
                 </p>
               </div>
 
