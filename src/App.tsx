@@ -8,7 +8,9 @@ import { SoundToggle } from './components/SoundToggle'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { CHILD, days, getDay, mockInterview, type DayId } from './data/content'
 import { useProgress } from './hooks/useProgress'
+import { useBackgroundMusic } from './hooks/useBackgroundMusic'
 import { playSfx, unlockAudio } from './hooks/useSfx'
+import { ensureBgm, setBgmMood, startBgm } from './lib/bgm'
 import './App.css'
 
 type View =
@@ -18,14 +20,40 @@ type View =
   | { name: 'vocab' }
   | { name: 'parent' }
 
+function dayNumber(id: DayId): number {
+  const n = Number(String(id).replace(/\D/g, ''))
+  return Number.isFinite(n) ? n : 0
+}
+
 export default function App() {
   const [view, setView] = useState<View>({ name: 'home' })
   const { progress, markDone, reset } = useProgress()
 
+  const bgmPlace =
+    view.name === 'day'
+      ? 'day'
+      : view.name === 'mock'
+        ? 'mock'
+        : view.name === 'vocab'
+          ? 'vocab'
+          : view.name === 'parent'
+            ? 'parent'
+            : 'home'
+
+  useBackgroundMusic({
+    place: bgmPlace,
+    day: view.name === 'day' ? dayNumber(view.id) : 0,
+    stars: progress.stars,
+    mood: view.name === 'home' ? 'wave' : view.name === 'parent' ? 'practice' : undefined,
+  })
+
   const goHome = () => {
     try {
       unlockAudio()
+      ensureBgm()
+      startBgm()
       playSfx('whoosh')
+      setBgmMood('wave')
       setView({ name: 'home' })
     } catch (err) {
       console.error('go home failed', err)
@@ -36,6 +64,8 @@ export default function App() {
   const go = (next: View) => {
     try {
       unlockAudio()
+      ensureBgm()
+      startBgm()
       playSfx(next.name === 'home' ? 'whoosh' : 'tap')
       setView(next)
     } catch (err) {

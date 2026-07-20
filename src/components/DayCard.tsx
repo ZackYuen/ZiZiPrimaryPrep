@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import type { DayPlan } from '../data/content'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
+import { ensureBgm, startBgm } from '../lib/bgm'
 
 type Props = {
   day: DayPlan
@@ -87,6 +88,8 @@ export function DayCard({ day, doneCount, total, onOpen, delay = 0 }: Props) {
       }
       onClick={() => {
         unlockAudio()
+        ensureBgm()
+        startBgm()
         playSfx('tap')
         onOpen()
       }}

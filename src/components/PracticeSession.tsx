@@ -20,6 +20,7 @@ import { softSpeakFeedback } from '../lib/softSpeakFeedback'
 import { buildSttPhrases } from '../lib/googleStt'
 import { KID } from '../lib/kidLabels'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
+import { duckBgm, setBgmMood } from '../lib/bgm'
 import { SceneArt } from './SceneArt'
 import { Confetti } from './Confetti'
 import { Mascot } from './Mascot'
@@ -129,6 +130,27 @@ export function PracticeSession({
       : mathResult === 'no' || wrongAttempts > 0 || (sortChecked && !sortCorrect)
         ? 'think'
         : 'happy'
+
+  useEffect(() => {
+    if (listening || listenBusy) {
+      setBgmMood('listen')
+      duckBgm(4000)
+      return
+    }
+    if (justStar || (celebrate && isLast && done)) {
+      setBgmMood(celebrate && isLast ? 'celebrate' : 'cheer')
+      return
+    }
+    if (mascotMood === 'cheer') {
+      setBgmMood('cheer')
+      return
+    }
+    if (mascotMood === 'think') {
+      setBgmMood('think')
+      return
+    }
+    setBgmMood('practice')
+  }, [listening, listenBusy, justStar, celebrate, isLast, done, mascotMood])
 
   const resetInteraction = (_activity: Activity) => {
     setShowSample(false)

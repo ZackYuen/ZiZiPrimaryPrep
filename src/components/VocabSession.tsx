@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { vocabCategories } from '../data/content'
 import { useSpeech } from '../hooks/useSpeech'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
+import { ensureBgm, setBgmMood, startBgm } from '../lib/bgm'
 import { KID } from '../lib/kidLabels'
 import { Mascot } from './Mascot'
 import { SoundToggle } from './SoundToggle'
@@ -20,6 +21,10 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
   const [burst, setBurst] = useState(false)
   const { speak, stop } = useSpeech()
 
+  useEffect(() => {
+    setBgmMood(burst ? 'cheer' : 'practice')
+  }, [burst, catIndex, itemIndex])
+
   const cat = vocabCategories[catIndex]
   const item = cat.items[itemIndex]
   const cardId = `vocab-${cat.id}-${itemIndex}`
@@ -28,10 +33,15 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
   const next = () => {
     stop()
     unlockAudio()
+    ensureBgm()
+    startBgm()
     playSfx(done ? 'whoosh' : 'star')
     if (!done) {
       onMarkDone(cardId, 'vocab')
       setBurst(true)
+      setBgmMood('cheer')
+    } else {
+      setBgmMood('practice')
     }
     setFlipped(false)
     if (itemIndex < cat.items.length - 1) {

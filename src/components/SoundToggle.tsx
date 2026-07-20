@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getSfxMuted, playSfx, setSfxMuted, unlockAudio } from '../hooks/useSfx'
+import { ensureBgm, syncBgmMute } from '../lib/bgm'
 import { KID } from '../lib/kidLabels'
 
 type Props = {
@@ -17,14 +18,18 @@ export function SoundToggle({ className = '' }: Props) {
     <button
       type="button"
       className={`sound-toggle ${muted ? 'is-muted' : ''} ${className}`}
-      aria-label={muted ? '開啟音效' : '關閉音效'}
+      aria-label={muted ? '開啟音樂／音效' : '關閉音樂／音效'}
       aria-pressed={!muted}
       onClick={() => {
         unlockAudio()
         const next = !muted
         setMuted(next)
         setSfxMuted(next)
-        if (!next) playSfx('tap')
+        syncBgmMute()
+        if (!next) {
+          ensureBgm()
+          playSfx('tap')
+        }
       }}
     >
       <span className="sound-toggle__icon" aria-hidden>

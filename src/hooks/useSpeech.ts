@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { duckBgm } from '../lib/bgm'
 
 export type SpeakLang = 'zh-HK' | 'en-US'
 
@@ -177,6 +178,7 @@ export function useSpeech() {
     (text: string, lang: SpeakLang = 'zh-HK') => {
       stop()
       if (lang === 'zh-HK') setVoiceStatus(buildVoiceStatus('zh-HK'))
+      duckBgm(Math.min(12000, 1800 + text.trim().length * 80))
       speakOne(text, lang)
     },
     [speakOne, stop],
@@ -189,6 +191,7 @@ export function useSpeech() {
       const cleaned = parts.map((p) => p.trim()).filter(Boolean)
       if (!cleaned.length) return
       if (lang === 'zh-HK') setVoiceStatus(buildVoiceStatus('zh-HK'))
+      duckBgm(Math.min(16000, 2000 + cleaned.join('').length * 70))
       queueRef.current = cleaned
       queueLangRef.current = lang
       playingQueue.current = true
