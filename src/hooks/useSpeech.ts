@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { duckBgm } from '../lib/bgm'
+import { isGoogleTtsConfigured, synthesizeGoogleTts } from '../lib/googleTts'
+import { playMp3Bytes, stopTtsAudio, unlockAudio } from './useSfx'
 
 export type SpeakLang = 'zh-HK' | 'en-US'
 
@@ -162,6 +164,13 @@ function pickVoice(lang: SpeakLang): SpeechSynthesisVoice | undefined {
 }
 
 function buildVoiceStatus(): VoiceStatus {
+  if (isGoogleTtsConfigured()) {
+    return {
+      name: 'Google 粵語 Chirp3',
+      isCantonese: true,
+      tip: 'Safari 用唔到 iPhone Siri 聲音 2（Apple 限制網頁）。改用 Google 高質粵語。',
+    }
+  }
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     return { name: null, isCantonese: false, tip: '呢部瀏覽器未支援朗讀。' }
   }
@@ -253,6 +262,8 @@ export function useSpeech() {
   })
   const queueRef = useRef<Chunk[]>([])
   const playingQueue = useRef(false)
+  const genRef = useRef(0)
+  const abortRef = useRef<AbortController | null>(null)
 
   const refreshVoices = useCallback(() => {
     setVoiceStatus(buildVoiceStatus())
@@ -289,66 +300,104 @@ export function useSpeech() {
   }, [refreshVoices])
 
   const stop = useCallback(() => {
+    genRef.current += 1
+    abortRef.current?.abort()
+    abortRef.current = null
     queueRef.current = []
     playingQueue.current = false
+    stopTtsAudio()
     if ('speechSynthesis' in window) window.speechSynthesis.cancel()
   }, [])
 
   const speakOne = useCallback((text: string, lang: SpeakLang, onEnd?: () => void) => {
-    if (!('speechSynthesis' in window) || !text.trim()) {
+    const trimmed = text.trim()
+    if (!trimmed) {
       onEnd?.()
       return
     }
+    const gen = genRef.current
     const apple = isAppleWebKit()
-    const synth = window.speechSynthesis
-    synth.getVoices()
+    unlockAudio()
 
-    const start = () => {
-      const u = new SpeechSynthesisUtterance(text.trim())
-      const voice = pickVoice(lang)
-      u.rate = apple ? 1 : lang === 'zh-HK' ? 0.92 : 0.95
-      u.pitch = 1
-      if (voice) {
-        const skip =
-          (lang === 'en-US' && isChineseVoice(voice)) ||
-          (lang === 'zh-HK' && isEnglishVoice(voice) && !isHkCantoneseVoice(voice))
-        if (!skip) {
-          u.voice = voice
-          u.lang = voice.lang || (lang === 'en-US' ? 'en-US' : 'zh-HK')
+    const finish = () => {
+      if (gen !== genRef.current) return
+      onEnd?.()
+    }
+
+    const speakBrowser = () => {
+      if (!('speechSynthesis' in window)) {
+        finish()
+        return
+      }
+      const synth = window.speechSynthesis
+      synth.getVoices()
+      const start = () => {
+        if (gen !== genRef.current) return
+        const u = new SpeechSynthesisUtterance(trimmed)
+        const voice = pickVoice(lang)
+        u.rate = apple ? 1 : lang === 'zh-HK' ? 0.92 : 0.95
+        u.pitch = 1
+        if (voice) {
+          const skip =
+            (lang === 'en-US' && isChineseVoice(voice)) ||
+            (lang === 'zh-HK' && isEnglishVoice(voice) && !isHkCantoneseVoice(voice))
+          if (!skip) {
+            u.voice = voice
+            u.lang = voice.lang || (lang === 'en-US' ? 'en-US' : 'zh-HK')
+          } else {
+            u.lang = lang === 'en-US' ? 'en-US' : 'zh-HK'
+          }
         } else {
           u.lang = lang === 'en-US' ? 'en-US' : 'zh-HK'
         }
-      } else {
-        u.lang = lang === 'en-US' ? 'en-US' : 'zh-HK'
+        u.onend = finish
+        u.onerror = finish
+        synth.speak(u)
       }
-      u.onend = () => onEnd?.()
-      u.onerror = () => onEnd?.()
-      synth.speak(u)
+      if (apple && synth.getVoices().length === 0) {
+        let done = false
+        const run = () => {
+          if (done) return
+          done = true
+          if (typeof synth.removeEventListener === 'function') {
+            synth.removeEventListener('voiceschanged', run)
+          }
+          start()
+        }
+        if (typeof synth.addEventListener === 'function') {
+          synth.addEventListener('voiceschanged', run)
+        }
+        window.setTimeout(run, 280)
+        return
+      }
+      start()
     }
 
-    if (apple && synth.getVoices().length === 0) {
-      let done = false
-      const run = () => {
-        if (done) return
-        done = true
-        if (typeof synth.removeEventListener === 'function') {
-          synth.removeEventListener('voiceschanged', run)
+    if (isGoogleTtsConfigured()) {
+      const ac = new AbortController()
+      abortRef.current = ac
+      void (async () => {
+        try {
+          const bytes = await synthesizeGoogleTts(trimmed, lang, ac.signal)
+          if (gen !== genRef.current) return
+          await playMp3Bytes(bytes)
+          finish()
+        } catch (err) {
+          if (gen !== genRef.current) return
+          if (err instanceof DOMException && err.name === 'AbortError') return
+          speakBrowser()
         }
-        start()
-      }
-      if (typeof synth.addEventListener === 'function') {
-        synth.addEventListener('voiceschanged', run)
-      }
-      window.setTimeout(run, 280)
+      })()
       return
     }
-    start()
+    speakBrowser()
   }, [])
 
   const speakChunks = useCallback(
     (chunks: Chunk[]) => {
       const cleaned = chunks.filter((c) => c.text.trim())
       if (!cleaned.length) return
+      unlockAudio()
       const apple = isAppleWebKit()
       const synth = 'speechSynthesis' in window ? window.speechSynthesis : null
       synth?.getVoices()

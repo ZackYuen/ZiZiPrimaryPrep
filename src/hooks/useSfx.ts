@@ -108,4 +108,79 @@ export function playSfx(name: SfxName) {
   }
 }
 
+let ttsSource: AudioBufferSourceNode | null = null
+let ttsAudio: HTMLAudioElement | null = null
+
+export function stopTtsAudio() {
+  if (ttsSource) {
+    try {
+      ttsSource.stop()
+    } catch {
+      /* already stopped */
+    }
+    ttsSource = null
+  }
+  if (ttsAudio) {
+    try {
+      ttsAudio.pause()
+      ttsAudio.removeAttribute('src')
+      ttsAudio.load()
+    } catch {
+      /* ignore */
+    }
+    ttsAudio = null
+  }
+}
+
+/** Play Google TTS MP3. Uses the unlocked Web Audio context so iOS allows it after the tap. */
+export async function playMp3Bytes(bytes: Uint8Array): Promise<void> {
+  stopTtsAudio()
+  const c = getCtx()
+  if (c) {
+    if (c.state === 'suspended') await c.resume()
+    try {
+      const copy = new ArrayBuffer(bytes.byteLength)
+      new Uint8Array(copy).set(bytes)
+      const buf = await c.decodeAudioData(copy)
+      await new Promise<void>((resolve, reject) => {
+        const src = c.createBufferSource()
+        ttsSource = src
+        src.buffer = buf
+        src.connect(c.destination)
+        src.onended = () => {
+          if (ttsSource === src) ttsSource = null
+          resolve()
+        }
+        try {
+          src.start()
+        } catch (err) {
+          ttsSource = null
+          reject(err)
+        }
+      })
+      return
+    } catch {
+      /* fall through to HTMLAudioElement */
+    }
+  }
+  const copy = new Uint8Array(bytes.byteLength)
+  copy.set(bytes)
+  const url = URL.createObjectURL(new Blob([copy], { type: 'audio/mpeg' }))
+  const audio = new Audio(url)
+  ttsAudio = audio
+  await new Promise<void>((resolve, reject) => {
+    audio.onended = () => {
+      URL.revokeObjectURL(url)
+      if (ttsAudio === audio) ttsAudio = null
+      resolve()
+    }
+    audio.onerror = () => {
+      URL.revokeObjectURL(url)
+      if (ttsAudio === audio) ttsAudio = null
+      reject(new Error('朗讀播放失敗'))
+    }
+    void audio.play().catch(reject)
+  })
+}
+
 muted = getSfxMuted()
