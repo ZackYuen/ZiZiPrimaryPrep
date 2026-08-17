@@ -89,7 +89,7 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>點樣先有真正粵語朗讀？</h3>
           <p>
-            iPhone／iPad 會<strong>指定用系統廣東話 Sin-Ji／善怡</strong>（唔係瀏覽器預設英文／普通話）。請下載<strong>優質／增強</strong>：設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文（香港）→ 優質或增強。練習頁會顯示「朗讀聲：…」，應見到 Sin-Ji、善怡，或帶 Premium／優質。
+            iPhone／iPad 優先用你喺系統揀嘅<strong>Siri 聲音 2</strong>廣東話（設定 → 輔助使用 → 朗讀內容 → 聲音 → 廣東話（香港）→ Siri → 聲音 2）。練習頁「朗讀聲」應顯示 Siri／聲音 2。Safari 列唔到 Siri 聲就唔會硬綁精簡版善怡，改用系統預設。
           </p>
         </article>
       </div>
