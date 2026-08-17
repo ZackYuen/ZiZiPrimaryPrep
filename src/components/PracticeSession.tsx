@@ -478,7 +478,14 @@ export function PracticeSession({
               onClick={() => {
                 unlockAudio()
                 playSfx('tap')
-                speak(item.promptZh, looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK')
+                if (item.promptEn) {
+                  speakQueue(
+                    [item.promptZh, item.promptEn],
+                    looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK',
+                  )
+                } else {
+                  speak(item.promptZh, looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK')
+                }
               }}
               aria-label="聽題目"
             >
