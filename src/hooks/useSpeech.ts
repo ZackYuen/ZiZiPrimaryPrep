@@ -21,7 +21,8 @@ function isAppleWebKit(): boolean {
 }
 
 function voiceBlob(v: SpeechSynthesisVoice): string {
-  return `${v.lang} ${v.name}`.toLowerCase()
+  const uri = typeof v.voiceURI === 'string' ? v.voiceURI : ''
+  return `${v.lang} ${v.name} ${uri}`.toLowerCase()
 }
 
 function isEnglishVoice(v: SpeechSynthesisVoice): boolean {
@@ -44,28 +45,45 @@ function scoreCantoneseVoice(v: SpeechSynthesisVoice): number {
     score += 80
   }
   if (/\b(sinji|meijia|美嘉|善怡|迦娜)\b/i.test(v.name)) score += 40
+  if (/premium|優質/.test(b)) score += 30
+  if (/enhanced|增強/.test(b)) score += 20
   if (v.localService) score += 5
+  if (/compact|精簡/.test(b)) score -= 40
   if (/zh([-_]?cn)|putonghua|mandarin|普通话|普通話|汉语|漢語/.test(b) && !/hk|yue|cantonese|香港/.test(b)) {
     score -= 50
   }
   return score
 }
 
+function isCompactVoice(v: SpeechSynthesisVoice): boolean {
+  return /compact|精簡/.test(voiceBlob(v))
+}
+
+/** Downloaded iOS 「優質／增強」中文（香港）— not the on-device Compact pack. */
+function isPremiumYueVoice(v: SpeechSynthesisVoice): boolean {
+  if (scoreCantoneseVoice(v) < 80) return false
+  if (isCompactVoice(v)) return false
+  return /premium|enhanced|優質|增強/.test(voiceBlob(v))
+}
+
+function bestPremiumYue(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
+  return voices
+    .filter(isPremiumYueVoice)
+    .sort((a, b) => scoreCantoneseVoice(b) - scoreCantoneseVoice(a))[0]
+}
+
 /**
- * iPhone: return undefined so Safari uses the **system default** voice for
- * utterance.lang (中文香港 / English). Forcing a voice + custom rate/pitch
- * is what made Cantonese sound harsh.
- *
- * Desktop: still pick a matching voice, but English must never be a Chinese voice.
+ * iPhone: if 「優質／增強」中文（香港） is downloaded, use it. Otherwise leave
+ * voice unset so Safari uses the system default (often Compact until the pack
+ * is installed). Desktop still ranks Cantonese voices, never English-as-Yue.
  */
 function pickVoice(lang: SpeakLang): SpeechSynthesisVoice | undefined {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return undefined
-  if (isAppleWebKit()) return undefined
-
   const voices = window.speechSynthesis.getVoices()
   if (!voices.length) return undefined
 
   if (lang === 'en-US') {
+    if (isAppleWebKit()) return undefined
     const ranked = voices
       .filter(isEnglishVoice)
       .map((v) => {
@@ -81,6 +99,10 @@ function pickVoice(lang: SpeakLang): SpeechSynthesisVoice | undefined {
     return ranked[0]?.v
   }
 
+  if (isAppleWebKit()) {
+    return bestPremiumYue(voices)
+  }
+
   const ranked = voices
     .map((v) => ({ v, score: scoreCantoneseVoice(v) }))
     .filter((x) => x.score > 0)
@@ -93,10 +115,14 @@ function buildVoiceStatus(): VoiceStatus {
     return { name: null, isCantonese: false, tip: '呢部瀏覽器未支援朗讀。' }
   }
   if (isAppleWebKit()) {
+    const premium = bestPremiumYue(window.speechSynthesis.getVoices())
+    if (premium) {
+      return { name: premium.name, isCantonese: true, tip: null }
+    }
     return {
       name: 'iPhone 系統粵語',
       isCantonese: true,
-      tip: '用緊 iPhone 預設中文（香港）。若唔似粵語，去「設定 → 輔助使用 → 朗讀內容 → 聲音」加入中文香港。',
+      tip: '請下載「中文（香港）優質／增強」：設定 → 輔助使用 → 朗讀內容 → 聲音。未下載會用精簡版，聽落會硬啲。',
     }
   }
   const voice = pickVoice('zh-HK')
@@ -118,34 +144,53 @@ function buildVoiceStatus(): VoiceStatus {
 }
 
 export function looksEnglish(text: string): boolean {
-  const letters = (text.match(/[a-zA-Z]/g) ?? []).length
-  const cjk = (text.match(/[\u4e00-\u9fff]/g) ?? []).length
-  return letters > 0 && letters >= cjk
+  if (/[\u4e00-\u9fff]/.test(text)) return false
+  return /[A-Za-z]/.test(text)
+}
+
+function looksLikeEnglishSentence(s: string): boolean {
+  const t = s.trim()
+  if (!/^[A-Za-z]/.test(t)) return false
+  return /[A-Za-z][A-Za-z'’.-]*\s+[A-Za-z]/.test(t) || /^[A-Z][A-Za-z'’.,!? ]{8,}$/.test(t)
 }
 
 type Chunk = { text: string; lang: SpeakLang }
 
-/** Never send English through a Cantonese voice — split mixed lines. */
+/**
+ * iOS Premium 中文（香港）handles 口語 particles and 中英夾雜 in one utterance.
+ * Only split when a Chinese cue is followed by a full English sentence
+ * (e.g. 「跟住講英文：My name is Seth.」).
+ */
 export function chunksForSpeech(text: string, fallback: SpeakLang): Chunk[] {
   const raw = text.trim()
   if (!raw) return []
   const hasLatin = /[A-Za-z]/.test(raw)
   const hasCjk = /[\u4e00-\u9fff]/.test(raw)
+  if (fallback === 'en-US' && !hasCjk) return [{ text: raw, lang: 'en-US' }]
   if (hasLatin && !hasCjk) return [{ text: raw, lang: 'en-US' }]
-  if (hasCjk && !hasLatin) return [{ text: raw, lang: fallback === 'en-US' ? 'en-US' : 'zh-HK' }]
-  if (!hasLatin) return [{ text: raw, lang: fallback }]
+  if (!hasLatin) return [{ text: raw, lang: 'zh-HK' }]
 
-  const parts = raw.match(/[\u4e00-\u9fff][\u4e00-\u9fff0-9\s，。、！？：；「」『』（）—…·]{0,}|[A-Za-z][A-Za-z0-9'’.,!?;:"\-()\s]*/g)
-  if (!parts || parts.length < 2) {
-    return [{ text: raw, lang: looksEnglish(raw) ? 'en-US' : fallback }]
+  const colon = raw.search(/[：:]/)
+  if (colon >= 0) {
+    const after = raw.slice(colon + 1)
+    if (looksLikeEnglishSentence(after)) {
+      const before = raw.slice(0, colon + 1).trim()
+      const chunks: Chunk[] = []
+      if (before) chunks.push({ text: before, lang: 'zh-HK' })
+      chunks.push({ text: after.trim(), lang: 'en-US' })
+      return chunks
+    }
   }
-  return parts
-    .map((p) => p.trim())
-    .filter(Boolean)
-    .map((p) => ({
-      text: p,
-      lang: /[A-Za-z]/.test(p) && !/[\u4e00-\u9fff]/.test(p) ? 'en-US' : 'zh-HK',
-    }))
+
+  const cue = raw.match(/^([\u4e00-\u9fff][^A-Za-z]{0,40})([A-Z][\s\S]+)$/)
+  if (cue && looksLikeEnglishSentence(cue[2])) {
+    return [
+      { text: cue[1].trim(), lang: 'zh-HK' },
+      { text: cue[2].trim(), lang: 'en-US' },
+    ]
+  }
+
+  return [{ text: raw, lang: 'zh-HK' }]
 }
 
 export function useSpeech() {
