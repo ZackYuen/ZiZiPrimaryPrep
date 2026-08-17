@@ -2,6 +2,7 @@ import type { Activity, ActivityKind, SceneId } from '../data/content'
 
 export type HintVisualId =
   | 'me'
+  | 'intro'
   | 'family'
   | 'school'
   | 'teacher'
@@ -20,9 +21,12 @@ export type HintVisualId =
   | 'feelings'
   | 'zoo'
   | 'job'
+  | 'policeman'
+  | 'uniform'
+  | 'football'
   | 'clock'
   | 'coins'
-  | 'english'
+  | 'like-blue'
   | 'talk'
   | 'sort'
   | 'reorder'
@@ -61,7 +65,7 @@ const SCENE_VISUAL: Partial<Record<SceneId, HintVisualId>> = {
   'broken-vase': 'vase',
   playground: 'park',
   sequence: 'story',
-  intro: 'me',
+  intro: 'intro',
 }
 
 const ID_VISUAL: Record<string, HintVisualId> = {
@@ -74,12 +78,12 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'd5-story1': 'share',
   'd5-story2': 'vase',
   'd6-dad': 'family',
-  'd1-zh-basic': 'me',
-  'd1-zh-like': 'happy',
+  'd1-zh-basic': 'intro',
+  'd1-zh-like': 'like-blue',
   'd1-zh-family': 'family',
   'd1-zh-dream': 'teacher',
-  'd1-en-basic': 'english',
-  'd1-en-like': 'english',
+  'd1-en-basic': 'intro',
+  'd1-en-like': 'like-blue',
   'd1-en-family': 'family',
   'd1-en-dream': 'teacher',
   day2: 'talk',
@@ -108,10 +112,10 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'd5-hobby': 'happy',
   'd6-ming': 'story',
   'd6-ming2': 'talk',
-  'd6-en1': 'english',
-  'd6-en2': 'english',
-  'd6-en3': 'english',
-  'd6-en4': 'english',
+  'd6-en1': 'policeman',
+  'd6-en2': 'uniform',
+  'd6-en3': 'football',
+  'd6-en4': 'policeman',
 }
 
 const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
@@ -270,7 +274,11 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (item.kind === 'prompt') return 'move'
   if (item.calendarDay) return 'weekend'
   const p = `${item.promptZh} ${item.promptEn || ''} ${item.cue || ''}`
-  if (/zoo|elephant|monkey|動物/.test(p)) return 'zoo'
+  if (/policeman|police|警察/.test(p)) return 'policeman'
+  if (/uniform|制服/.test(p)) return 'uniform'
+  if (/football|zoo|elephant|monkey|動物/.test(p)) return /football|park/.test(p) ? 'football' : 'zoo'
+  if (/self-introduction|Say your name|我叫袁|我叫碩/.test(p)) return 'intro'
+  if (/I like|鍾意藍色|畫畫/.test(p)) return 'like-blue'
   if (/school|kindergarten|老師|幼稚園|課室/.test(p)) return 'school'
   if (/family|家人|爸爸|媽媽/.test(p)) return 'family'
   if (/park|公園|跑步/.test(p)) return 'park'
@@ -279,7 +287,6 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (/angry|嬲|憤怒|搶/.test(p)) return 'angry'
   if (/happy|開心|興奮/.test(p)) return 'happy'
   if (/job|工作|老師/.test(p)) return 'job'
-  if (/[A-Za-z]{3,}/.test(item.promptZh) && item.kind !== 'math') return 'english'
   if (item.kind === 'math') {
     if (math?.op === '-') return 'minus'
     if (math?.op === '+') return 'plus'

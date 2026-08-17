@@ -504,6 +504,13 @@ export function PracticeSession({
             hint={teach}
             open={helpOpen}
             step={helpStep}
+            hideArt={
+              !item.scene &&
+              !item.clock &&
+              !item.coins &&
+              item.calendarDay == null &&
+              !(item.kind === 'math' && teach.math)
+            }
             onToggle={() => {
               unlockAudio()
               playSfx('flip')

@@ -7,6 +7,8 @@ type Props = {
   hint: TeachHint
   open: boolean
   step: 1 | 2
+  /** Picture already shown above the question — don't repeat A/B-style clutter. */
+  hideArt?: boolean
   onToggle: () => void
   onMore: () => void
   onSpeak: (text: string) => void
@@ -16,7 +18,7 @@ type Props = {
  * Always-available kid help: picture first, then a spoken clue.
  * Parents still have the separate P sample button.
  */
-export function KidHelp({ hint, open, step, onToggle, onMore, onSpeak }: Props) {
+export function KidHelp({ hint, open, step, hideArt, onToggle, onMore, onSpeak }: Props) {
   const line = step >= 2 ? hint.moreLine : hint.kidLine
   return (
     <div className={`kid-help ${open ? 'is-open' : ''}`}>
@@ -26,7 +28,7 @@ export function KidHelp({ hint, open, step, onToggle, onMore, onSpeak }: Props) 
       </button>
       {open && (
         <div className="kid-help__panel">
-          <HintPicture visual={hint.visual} size={240} />
+          {!hideArt && <HintPicture visual={hint.visual} size={240} />}
           {hint.math && <MathDots model={hint.math} />}
           <p className="kid-help__line">{line}</p>
           <div className="session__actions">
