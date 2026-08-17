@@ -57,9 +57,15 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
       <h3 className="parent__h3">答錯點樣教</h3>
       <div className="parent__list">
         <article className="parent__item">
+          <h3>卡住點算</h3>
+          <p>
+            每題都有圖。碩孜撳「? 幫我」就會出圖同淺提示，仲會讀出嚟。答錯一次都會自動出圖。睇完提示，下一題掣就開，唔會停死。
+          </p>
+        </article>
+        <article className="parent__item">
           <h3>唔會一次錯就揭曉</h3>
           <p>
-            選擇題／數學：第一次答錯只會鼓勵「再試一次」，唔顯示正確答案。第二次錯先出小提示；碩孜按「睇睇答案」先揭曉。答啱先有星星。
+            選擇題／數學：答錯會出圖同淺提示，唔會即刻揭曉答案。再錯可以撳「?」睇答案。答啱先有星星；睇完提示都可以去下一題。
           </p>
         </article>
         <article className="parent__item">

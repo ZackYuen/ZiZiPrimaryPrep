@@ -6,6 +6,8 @@ import { ensureBgm, setBgmMood, startBgm } from '../lib/bgm'
 import { KID } from '../lib/kidLabels'
 import { Mascot } from './Mascot'
 import { SoundToggle } from './SoundToggle'
+import { HintPicture } from './HintPicture'
+import { vocabVisual } from '../lib/teachHint'
 import { Confetti } from './Confetti'
 
 type Props = {
@@ -96,6 +98,7 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
           }}
         >
           <p className="vocab-card__cat">{cat.title}</p>
+          <HintPicture visual={vocabVisual(cat.id, item.zh)} size={180} />
           <p className="vocab-card__zh">{item.zh}</p>
           <p className={`vocab-card__en ${flipped ? 'is-show' : ''}`}>{item.en}</p>
           <p className="vocab-card__hint">{flipped ? '↺' : '↻ EN'}</p>

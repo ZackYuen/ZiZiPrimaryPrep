@@ -30,6 +30,10 @@ import { CoinPurse } from './CoinPurse'
 import { JuneCalendar } from './JuneCalendar'
 import { ReorderBoard } from './ReorderBoard'
 import { SortBoard } from './SortBoard'
+import { HintPicture } from './HintPicture'
+import { MathDots } from './MathDots'
+import { KidHelp } from './KidHelp'
+import { resolveTeachHint } from '../lib/teachHint'
 
 type Props = {
   title: string
@@ -87,6 +91,9 @@ export function PracticeSession({
   const [checkedFields, setCheckedFields] = useState<Record<string, boolean>>({})
   const [sortPlacement, setSortPlacement] = useState<Record<string, string>>({})
   const [sortChecked, setSortChecked] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
+  const [helpStep, setHelpStep] = useState<1 | 2>(1)
+  const [helped, setHelped] = useState(false)
   const { speak, speakQueue, stop, voiceStatus } = useSpeech()
   const {
     supported: listenSupported,
@@ -175,6 +182,9 @@ export function PracticeSession({
     )
     setSortPlacement({})
     setSortChecked(false)
+    setHelpOpen(false)
+    setHelpStep(1)
+    setHelped(false)
     if (_activity.kind === 'reorder' && _activity.fragments) {
       const shuffled = [..._activity.fragments].sort(() => Math.random() - 0.5)
       setPool(shuffled)
@@ -287,27 +297,27 @@ export function PracticeSession({
     return done
   }
 
+  const teach = useMemo(() => resolveTeachHint(item), [item])
+
   const canProceed = (): boolean => {
     if (done) return true
-    if (item.kind === 'speak') return false
-    if (item.kind === 'choice' || item.kind === 'math' || item.kind === 'clock' || item.kind === 'money') {
-      return isSolved() || revealAnswer
-    }
-    if (item.kind === 'reorder') return reorderCorrect
-    if (item.kind === 'sort') return (sortChecked && sortCorrect) || revealAnswer
+    if (isSolved() || revealAnswer || helped) return true
+    if (item.kind === 'speak') return showSample || !!spokenText.trim()
     if (item.kind === 'prompt') return isSolved()
     return false
   }
 
   const registerWrong = (extraTip?: string) => {
+    setHelped(true)
+    setHelpOpen(true)
     setWrongAttempts((n) => {
       const next = n + 1
       if (next === 1) {
-        setCoachMsg('唔緊要，再試一次！你可以嘅！')
-      } else if (next === 2) {
-        setCoachMsg(extraTip || item.tip || '再諗一諗。需要可以請爸爸媽媽一齊傾。')
+        setCoachMsg('唔緊要，睇圖再試一次！')
+        setHelpStep(1)
       } else {
-        setCoachMsg('想睇答案都得——勇敢嘗試已經好叻！')
+        setHelpStep(2)
+        setCoachMsg(extraTip || item.tip || teach.moreLine)
       }
       return next
     })
@@ -387,7 +397,13 @@ export function PracticeSession({
   const handlePrimary = () => {
     unlockAudio()
     playSfx('tap')
-    if (!canProceed() && !done) return
+    if (!done && !canProceed()) {
+      setHelped(true)
+      setHelpOpen(true)
+      speak(teach.kidLine, 'zh-HK')
+      playSfx('flip')
+      return
+    }
     if (!done && isSolved()) awardAndMaybeNext(true)
     else goNext()
   }
@@ -441,7 +457,14 @@ export function PracticeSession({
           </div>
 
           {item.scene && <SceneArt scene={item.scene} alt={item.promptZh} />}
+          {!item.scene && !item.clock && !item.coins && item.calendarDay == null && !(item.kind === 'math' && teach.math) && (
+            <div className="hint-pic-wrap">
+              <HintPicture visual={teach.visual} />
+            </div>
+          )}
+          {item.kind === 'math' && teach.math && <MathDots model={teach.math} />}
           {item.clock && <AnalogClock hour={item.clock.hour} minute={item.clock.minute} />}
+          {item.clock && <p className="kid-help__caption">短針＝點鐘　長針＝分鐘</p>}
           {item.coins && item.purseOwner && <CoinPurse owner={item.purseOwner} coins={item.coins} />}
           {item.calendarDay != null && <JuneCalendar highlightDay={item.calendarDay} />}
 
@@ -476,6 +499,33 @@ export function PracticeSession({
               </button>
             )}
           </div>
+
+          <KidHelp
+            hint={teach}
+            open={helpOpen}
+            step={helpStep}
+            onToggle={() => {
+              unlockAudio()
+              playSfx('flip')
+              const next = !helpOpen
+              setHelpOpen(next)
+              if (next) {
+                setHelped(true)
+                speak(helpStep >= 2 ? teach.moreLine : teach.kidLine, 'zh-HK')
+              }
+            }}
+            onMore={() => {
+              playSfx('tap')
+              setHelpStep(2)
+              setHelped(true)
+              speak(teach.moreLine, 'zh-HK')
+            }}
+            onSpeak={(text) => {
+              unlockAudio()
+              playSfx('tap')
+              speak(text, 'zh-HK')
+            }}
+          />
 
           {item.kind === 'speak' && (
             <div className="speak-box">
@@ -791,7 +841,7 @@ export function PracticeSession({
                 )
               })}
               {coachMsg && <p className={`math-feedback ${solvedChoice ? 'is-ok' : 'is-no'}`}>{coachMsg}</p>}
-              {!solvedChoice && !revealAnswer && wrongAttempts >= 2 && (
+              {!solvedChoice && !revealAnswer && wrongAttempts >= 1 && (
                 <button
                   type="button"
                   className="pill-btn pill-btn--soft"
@@ -855,7 +905,7 @@ export function PracticeSession({
                   {mathResult === 'ok' ? '答對啦！好努力！' : coachMsg}
                 </p>
               )}
-              {mathResult !== 'ok' && !revealAnswer && wrongAttempts >= 2 && (
+              {mathResult !== 'ok' && !revealAnswer && wrongAttempts >= 1 && (
                 <button
                   type="button"
                   className="pill-btn pill-btn--soft"
@@ -931,7 +981,7 @@ export function PracticeSession({
                   {mathResult === 'ok' ? '答對啦！好努力！' : coachMsg}
                 </p>
               )}
-              {mathResult !== 'ok' && !revealAnswer && wrongAttempts >= 2 && (
+              {mathResult !== 'ok' && !revealAnswer && wrongAttempts >= 1 && (
                 <button
                   type="button"
                   className="pill-btn pill-btn--soft"
@@ -1003,7 +1053,7 @@ export function PracticeSession({
                   {mathResult === 'ok' ? '答對啦！好努力！' : coachMsg}
                 </p>
               )}
-              {mathResult !== 'ok' && !revealAnswer && wrongAttempts >= 2 && (
+              {mathResult !== 'ok' && !revealAnswer && wrongAttempts >= 1 && (
                 <button
                   type="button"
                   className="pill-btn pill-btn--soft"
@@ -1074,7 +1124,7 @@ export function PracticeSession({
                 >
                   {KID.check}
                 </button>
-                {!sortCorrect && !revealAnswer && wrongAttempts >= 2 && (
+                {!sortCorrect && !revealAnswer && wrongAttempts >= 1 && (
                   <button
                     type="button"
                     className="pill-btn pill-btn--soft"
@@ -1187,11 +1237,20 @@ export function PracticeSession({
         <button
           type="button"
           className="primary-btn primary-btn--wide"
-          disabled={!done && !canProceed()}
           onClick={handlePrimary}
-          aria-label={done ? (isLast ? '完成回主頁' : '下一題') : isLast ? '完成今日' : '下一題'}
+          aria-label={
+            done
+              ? isLast
+                ? '完成回主頁'
+                : '下一題'
+              : !canProceed()
+                ? '幫我睇圖'
+                : isLast
+                  ? '完成今日'
+                  : '下一題'
+          }
         >
-          {done ? (isLast ? KID.doneHome : KID.next) : isLast ? KID.doneToday : KID.next}
+          {done ? (isLast ? KID.doneHome : KID.next) : !canProceed() ? KID.help : isLast ? KID.doneToday : KID.next}
         </button>
       </footer>
 

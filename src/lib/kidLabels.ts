@@ -10,6 +10,7 @@ export const KID = {
   listenEn: '▶ EN',
   check: '✓',
   peek: '?',
+  help: '?',
   starOk: '★',
   mic: '●',
   micStop: '■',
