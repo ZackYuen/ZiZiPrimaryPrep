@@ -1,4 +1,6 @@
-export type TtsLang = 'zh-HK' | 'en-US'
+import { prepareSpokenText, type SpeakLang as TtsLang } from './speakText'
+
+export type { TtsLang }
 
 export function isGoogleTtsConfigured(): boolean {
   const key = import.meta.env.VITE_GOOGLE_SPEECH_API_KEY as string | undefined
@@ -66,12 +68,12 @@ export async function synthesizeGoogleTts(
   lang: TtsLang,
   signal?: AbortSignal,
 ): Promise<Uint8Array> {
-  const trimmed = text.trim()
-  if (!trimmed) throw new Error('無字')
+  const prepared = prepareSpokenText(text, lang)
+  if (!prepared) throw new Error('無字')
   const key = (import.meta.env.VITE_GOOGLE_SPEECH_API_KEY as string | undefined)?.trim()
   if (!key) throw new Error('未設定 Google TTS')
 
-  const ck = cacheKey(trimmed, lang)
+  const ck = cacheKey(prepared, lang)
   const hit = cache.get(ck)
   if (hit) return hit
 
@@ -81,7 +83,7 @@ export async function synthesizeGoogleTts(
   for (const voiceName of voices) {
     try {
       const bytes = await synthesizeOnce({
-        text: trimmed.slice(0, 4000),
+        text: prepared.slice(0, 4000),
         languageCode,
         voiceName,
         apiKey: key,

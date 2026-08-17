@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { duckBgm } from '../lib/bgm'
 import { isGoogleTtsConfigured, synthesizeGoogleTts } from '../lib/googleTts'
+import { prepareSpokenText } from '../lib/speakText'
 import { playMp3Bytes, stopTtsAudio, unlockAudio } from './useSfx'
 
 export type SpeakLang = 'zh-HK' | 'en-US'
@@ -227,31 +228,37 @@ export function chunksForSpeech(text: string, fallback: SpeakLang): Chunk[] {
   if (!raw) return []
   const hasLatin = /[A-Za-z]/.test(raw)
   const hasCjk = /[\u4e00-\u9fff]/.test(raw)
-  if (fallback === 'en-US' && !hasCjk) return [{ text: raw, lang: 'en-US' }]
-  if (hasLatin && !hasCjk) return [{ text: raw, lang: 'en-US' }]
-  if (!hasLatin) return [{ text: raw, lang: 'zh-HK' }]
-
-  const colon = raw.search(/[：:]/)
-  if (colon >= 0) {
-    const after = raw.slice(colon + 1)
-    if (looksLikeEnglishSentence(after)) {
-      const before = raw.slice(0, colon + 1).trim()
-      const chunks: Chunk[] = []
-      if (before) chunks.push({ text: before, lang: 'zh-HK' })
-      chunks.push({ text: after.trim(), lang: 'en-US' })
-      return chunks
+  let chunks: Chunk[]
+  if (fallback === 'en-US' && !hasCjk) chunks = [{ text: raw, lang: 'en-US' }]
+  else if (hasLatin && !hasCjk) chunks = [{ text: raw, lang: 'en-US' }]
+  else if (!hasLatin) chunks = [{ text: raw, lang: 'zh-HK' }]
+  else {
+    const colon = raw.search(/[：:]/)
+    if (colon >= 0) {
+      const after = raw.slice(colon + 1)
+      if (looksLikeEnglishSentence(after)) {
+        const before = raw.slice(0, colon + 1).trim()
+        chunks = []
+        if (before) chunks.push({ text: before, lang: 'zh-HK' })
+        chunks.push({ text: after.trim(), lang: 'en-US' })
+      } else {
+        chunks = [{ text: raw, lang: 'zh-HK' }]
+      }
+    } else {
+      const cue = raw.match(/^([\u4e00-\u9fff][^A-Za-z]{0,40})([A-Z][\s\S]+)$/)
+      if (cue && looksLikeEnglishSentence(cue[2])) {
+        chunks = [
+          { text: cue[1].trim(), lang: 'zh-HK' },
+          { text: cue[2].trim(), lang: 'en-US' },
+        ]
+      } else {
+        chunks = [{ text: raw, lang: 'zh-HK' }]
+      }
     }
   }
-
-  const cue = raw.match(/^([\u4e00-\u9fff][^A-Za-z]{0,40})([A-Z][\s\S]+)$/)
-  if (cue && looksLikeEnglishSentence(cue[2])) {
-    return [
-      { text: cue[1].trim(), lang: 'zh-HK' },
-      { text: cue[2].trim(), lang: 'en-US' },
-    ]
-  }
-
-  return [{ text: raw, lang: 'zh-HK' }]
+  return chunks
+    .map((c) => ({ ...c, text: prepareSpokenText(c.text, c.lang) }))
+    .filter((c) => c.text.trim())
 }
 
 export function useSpeech() {

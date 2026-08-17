@@ -89,7 +89,7 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>點樣先有真正粵語朗讀？</h3>
           <p>
-            iPhone Safari <strong>用唔到 Siri 聲音 2</strong>（Apple 禁止網頁用 Siri／優質語音包，只得精簡版善怡）。所以朗讀改用 <strong>Google 高質粵語 Chirp3</strong>，口語同中英夾雜會自然過舊聲。練習頁「朗讀聲」應顯示 Google 粵語 Chirp3。
+            iPhone Safari <strong>用唔到 Siri 聲音 2</strong>（Apple 禁止網頁用 Siri／優質語音包）。所以朗讀用 <strong>Google 高質粵語 Chirp3</strong>，口語同中英夾雜會自然過精簡版善怡。填空底線同箭嘴唔會讀出嚟。
           </p>
         </article>
       </div>
