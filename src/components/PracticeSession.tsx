@@ -499,6 +499,13 @@ export function PracticeSession({
               </button>
             )}
           </div>
+          {(voiceStatus.name || voiceStatus.tip) && (
+            <p className="choice-voice-tip">
+              {voiceStatus.name ? `朗讀聲：${voiceStatus.name}` : null}
+              {voiceStatus.name && voiceStatus.tip ? ' · ' : null}
+              {voiceStatus.tip}
+            </p>
+          )}
 
           <KidHelp
             hint={teach}
@@ -784,7 +791,7 @@ export function PracticeSession({
                   {KID.listenAll}
                 </button>
               </div>
-              {voiceStatus.tip && (
+              {voiceStatus.tip && !voiceStatus.name && (
                 <p className="choice-voice-tip">粵語提示：{voiceStatus.tip}</p>
               )}
               {item.choices.map((c, i) => {

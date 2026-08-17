@@ -35,74 +35,58 @@ function isChineseVoice(v: SpeechSynthesisVoice): boolean {
   return /zh|yue|cantonese|chinese|中文|粵|普通話|普通话/.test(voiceBlob(v))
 }
 
+/** Apple HK Cantonese is Sin-Ji / 善怡. Mei-Jia / 美嘉 is Taiwan Mandarin — do not treat as Yue. */
+function isHkCantoneseVoice(v: SpeechSynthesisVoice): boolean {
+  const b = voiceBlob(v)
+  if (/eloquence/.test(b)) return false
+  if (
+    /zh([-_]?cn)|zh([-_]?tw)|putonghua|mandarin|ting-?ting|mei-?jia|meijia|美嘉|婷婷|普通话|普通話/.test(b) &&
+    !/hk|yue|cantonese|sin[-.\s]?ji|善怡|香港/.test(b)
+  ) {
+    return false
+  }
+  return (
+    /yue([-_]|$)/.test(b) ||
+    /zh([-_]?hk)/.test(b) ||
+    /sin[-.\s]?ji|善怡/.test(b) ||
+    b.includes('cantonese') ||
+    b.includes('粵語') ||
+    b.includes('广东话') ||
+    b.includes('廣東話') ||
+    b.includes('hong kong') ||
+    b.includes('hongkong') ||
+    (v.lang || '').toLowerCase() === 'zh-hk' ||
+    (v.name || '').toLowerCase() === 'zh-hk'
+  )
+}
+
 function scoreCantoneseVoice(v: SpeechSynthesisVoice): number {
   const b = voiceBlob(v)
   let score = 0
+  if (!isHkCantoneseVoice(v)) {
+    if (/zh([-_]?cn)|zh([-_]?tw)|putonghua|mandarin|普通话|普通話|汉语|漢語|ting-?ting|mei-?jia/.test(b)) {
+      return -100
+    }
+    return 0
+  }
   if (/yue([-_]|$)/.test(b) || b.includes('cantonese') || b.includes('粵語') || b.includes('广东话') || b.includes('廣東話')) {
     score += 100
   }
   if (/zh([-_]?hk)/.test(b) || b.includes('hong kong') || b.includes('hongkong') || b.includes('香港')) {
-    score += 80
+    score += 90
   }
-  if (/\b(sinji|meijia|美嘉|善怡|迦娜)\b/i.test(v.name)) score += 40
-  if (/premium|優質/.test(b)) score += 30
-  if (/enhanced|增強/.test(b)) score += 20
+  if (/sin[-.\s]?ji|善怡/.test(b)) score += 50
+  if (/premium|優質/.test(b)) score += 40
+  if (/enhanced|增強/.test(b)) score += 28
+  if (/\bsiri\b/.test(b) && !/compact|精簡/.test(b)) score += 16
+  if (v.default) score += 8
   if (v.localService) score += 5
-  if (/compact|精簡/.test(b)) score -= 40
-  if (/zh([-_]?cn)|putonghua|mandarin|普通话|普通話|汉语|漢語/.test(b) && !/hk|yue|cantonese|香港/.test(b)) {
-    score -= 50
-  }
+  if (/compact|精簡/.test(b)) score -= 35
+  if (/eloquence/.test(b)) score -= 80
   return score
 }
 
-function isCompactVoice(v: SpeechSynthesisVoice): boolean {
-  return /compact|精簡/.test(voiceBlob(v))
-}
-
-/** Downloaded iOS 「優質／增強」中文（香港）— not the on-device Compact pack. */
-function isPremiumYueVoice(v: SpeechSynthesisVoice): boolean {
-  if (scoreCantoneseVoice(v) < 80) return false
-  if (isCompactVoice(v)) return false
-  return /premium|enhanced|優質|增強/.test(voiceBlob(v))
-}
-
-function bestPremiumYue(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
-  return voices
-    .filter(isPremiumYueVoice)
-    .sort((a, b) => scoreCantoneseVoice(b) - scoreCantoneseVoice(a))[0]
-}
-
-/**
- * iPhone: if 「優質／增強」中文（香港） is downloaded, use it. Otherwise leave
- * voice unset so Safari uses the system default (often Compact until the pack
- * is installed). Desktop still ranks Cantonese voices, never English-as-Yue.
- */
-function pickVoice(lang: SpeakLang): SpeechSynthesisVoice | undefined {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return undefined
-  const voices = window.speechSynthesis.getVoices()
-  if (!voices.length) return undefined
-
-  if (lang === 'en-US') {
-    if (isAppleWebKit()) return undefined
-    const ranked = voices
-      .filter(isEnglishVoice)
-      .map((v) => {
-        const b = voiceBlob(v)
-        let s = 0
-        if (/en([-_]?us)/.test(b)) s += 50
-        if (/en([-_]?gb)/.test(b)) s += 40
-        if (/en([-_]?hk)/.test(b)) s += 35
-        if (v.localService) s += 10
-        return { v, s }
-      })
-      .sort((a, b) => b.s - a.s)
-    return ranked[0]?.v
-  }
-
-  if (isAppleWebKit()) {
-    return bestPremiumYue(voices)
-  }
-
+function bestYueVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
   const ranked = voices
     .map((v) => ({ v, score: scoreCantoneseVoice(v) }))
     .filter((x) => x.score > 0)
@@ -110,36 +94,62 @@ function pickVoice(lang: SpeakLang): SpeechSynthesisVoice | undefined {
   return ranked[0]?.v
 }
 
+function bestEnglishVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
+  const ranked = voices
+    .filter(isEnglishVoice)
+    .map((v) => {
+      const b = voiceBlob(v)
+      let s = 0
+      if (/en([-_]?us)/.test(b)) s += 50
+      if (/en([-_]?gb)/.test(b)) s += 40
+      if (/en([-_]?hk)/.test(b)) s += 35
+      if (v.localService) s += 10
+      if (/eloquence/.test(b)) s -= 40
+      return { v, s }
+    })
+    .sort((a, b) => b.s - a.s)
+  return ranked[0]?.v
+}
+
+/**
+ * Always attach a real zh-HK / Sin-Ji voice on iPhone. Leaving voice unset
+ * makes Safari use the device-language default (English / 普通話 / Eloquence),
+ * which is the "old" voice — not iPhone 廣東話.
+ */
+function pickVoice(lang: SpeakLang): SpeechSynthesisVoice | undefined {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return undefined
+  const voices = window.speechSynthesis.getVoices()
+  if (!voices.length) return undefined
+  if (lang === 'en-US') return bestEnglishVoice(voices)
+  return bestYueVoice(voices)
+}
+
 function buildVoiceStatus(): VoiceStatus {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     return { name: null, isCantonese: false, tip: '呢部瀏覽器未支援朗讀。' }
   }
-  if (isAppleWebKit()) {
-    const premium = bestPremiumYue(window.speechSynthesis.getVoices())
-    if (premium) {
-      return { name: premium.name, isCantonese: true, tip: null }
-    }
-    return {
-      name: 'iPhone 系統粵語',
-      isCantonese: true,
-      tip: '請下載「中文（香港）優質／增強」：設定 → 輔助使用 → 朗讀內容 → 聲音。未下載會用精簡版，聽落會硬啲。',
-    }
-  }
+  window.speechSynthesis.getVoices()
   const voice = pickVoice('zh-HK')
   if (!voice) {
     return {
       name: null,
       isCantonese: false,
-      tip: '未找到粵語聲線。請加入「中文（香港）」語音，或用 iPhone Safari。',
+      tip: isAppleWebKit()
+        ? '未找到 iPhone 廣東話（Sin-Ji／善怡）。設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文（香港）→ 下載優質／增強。'
+        : '未找到粵語聲線。請加入「中文（香港）」語音，或用 iPhone Safari。',
     }
   }
-  const isCantonese = scoreCantoneseVoice(voice) >= 80
+  const b = voiceBlob(voice)
+  const premium = /premium|enhanced|優質|增強/.test(b)
+  const compact = /compact|精簡/.test(b)
   return {
     name: voice.name,
-    isCantonese,
-    tip: isCantonese
+    isCantonese: true,
+    tip: premium
       ? null
-      : `而家用緊「${voice.name}」，可能係普通話。建議用 iPhone 系統粵語，或 Chrome 香港聲線。`,
+      : compact
+        ? `而家用緊「${voice.name}」（精簡）。下載優質／增強會更自然：設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文（香港）。`
+        : null,
   }
 }
 
@@ -208,17 +218,31 @@ export function useSpeech() {
 
   useEffect(() => {
     if (!('speechSynthesis' in window)) return
-    refreshVoices()
     const synth = window.speechSynthesis as SpeechSynthesis & {
       onvoiceschanged: (() => void) | null
     }
+    synth.getVoices()
+    refreshVoices()
+    const poll = window.setInterval(() => {
+      if (synth.getVoices().length) {
+        refreshVoices()
+        window.clearInterval(poll)
+      }
+    }, 200)
+    const stopPoll = window.setTimeout(() => window.clearInterval(poll), 4000)
     if (typeof synth.addEventListener === 'function') {
       synth.addEventListener('voiceschanged', refreshVoices)
-      return () => synth.removeEventListener('voiceschanged', refreshVoices)
+      return () => {
+        synth.removeEventListener('voiceschanged', refreshVoices)
+        window.clearInterval(poll)
+        window.clearTimeout(stopPoll)
+      }
     }
     synth.onvoiceschanged = refreshVoices
     return () => {
       synth.onvoiceschanged = null
+      window.clearInterval(poll)
+      window.clearTimeout(stopPoll)
     }
   }, [refreshVoices])
 
@@ -234,34 +258,60 @@ export function useSpeech() {
       return
     }
     const apple = isAppleWebKit()
-    const u = new SpeechSynthesisUtterance(text.trim())
-    u.lang = lang === 'en-US' ? 'en-US' : 'zh-HK'
-    // iPhone default voices sound worse when rate/pitch are tweaked.
-    u.rate = apple ? 1 : lang === 'zh-HK' ? 0.92 : 0.95
-    u.pitch = 1
-    const voice = pickVoice(lang)
-    if (voice) {
-      if (lang === 'en-US' && isChineseVoice(voice)) {
-        // Never attach a Cantonese/Mandarin voice to English.
-      } else if (lang === 'zh-HK' && isEnglishVoice(voice) && !isChineseVoice(voice)) {
-        // Skip English-only voice for Cantonese.
+    const synth = window.speechSynthesis
+    synth.getVoices()
+
+    const start = () => {
+      const u = new SpeechSynthesisUtterance(text.trim())
+      const voice = pickVoice(lang)
+      u.rate = apple ? 1 : lang === 'zh-HK' ? 0.92 : 0.95
+      u.pitch = 1
+      if (voice) {
+        const skip =
+          (lang === 'en-US' && isChineseVoice(voice)) ||
+          (lang === 'zh-HK' && isEnglishVoice(voice) && !isHkCantoneseVoice(voice))
+        if (!skip) {
+          u.voice = voice
+          u.lang = voice.lang || (lang === 'en-US' ? 'en-US' : 'zh-HK')
+        } else {
+          u.lang = lang === 'en-US' ? 'en-US' : 'zh-HK'
+        }
       } else {
-        u.voice = voice
+        u.lang = lang === 'en-US' ? 'en-US' : 'zh-HK'
       }
+      u.onend = () => onEnd?.()
+      u.onerror = () => onEnd?.()
+      synth.speak(u)
     }
-    u.onend = () => onEnd?.()
-    u.onerror = () => onEnd?.()
-    const kick = () => window.speechSynthesis.speak(u)
-    // iOS often drops the first speak() if it follows cancel() immediately.
-    if (apple) window.setTimeout(kick, 50)
-    else kick()
+
+    if (apple && synth.getVoices().length === 0) {
+      let done = false
+      const run = () => {
+        if (done) return
+        done = true
+        if (typeof synth.removeEventListener === 'function') {
+          synth.removeEventListener('voiceschanged', run)
+        }
+        start()
+      }
+      if (typeof synth.addEventListener === 'function') {
+        synth.addEventListener('voiceschanged', run)
+      }
+      window.setTimeout(run, 280)
+      return
+    }
+    start()
   }, [])
 
   const speakChunks = useCallback(
     (chunks: Chunk[]) => {
-      stop()
       const cleaned = chunks.filter((c) => c.text.trim())
       if (!cleaned.length) return
+      const apple = isAppleWebKit()
+      const synth = 'speechSynthesis' in window ? window.speechSynthesis : null
+      synth?.getVoices()
+      const needGap = Boolean(apple && synth && (synth.speaking || synth.pending))
+      stop()
       setVoiceStatus(buildVoiceStatus())
       duckBgm(Math.min(16000, 1800 + cleaned.reduce((n, c) => n + c.text.length, 0) * 80))
       queueRef.current = cleaned.slice(1)
@@ -275,7 +325,9 @@ export function useSpeech() {
         }
         speakOne(piece.text, piece.lang, next)
       }
-      speakOne(cleaned[0].text, cleaned[0].lang, next)
+      const go = () => speakOne(cleaned[0].text, cleaned[0].lang, next)
+      if (needGap) window.setTimeout(go, 80)
+      else go()
     },
     [speakOne, stop],
   )
