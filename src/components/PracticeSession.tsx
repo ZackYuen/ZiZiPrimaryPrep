@@ -94,7 +94,7 @@ export function PracticeSession({
   const [helpOpen, setHelpOpen] = useState(false)
   const [helpStep, setHelpStep] = useState<1 | 2>(1)
   const [helped, setHelped] = useState(false)
-  const { speak, speakQueue, stop, voiceStatus } = useSpeech()
+  const { speak, speakQueue, stop } = useSpeech()
   const {
     supported: listenSupported,
     listening,
@@ -499,13 +499,6 @@ export function PracticeSession({
               </button>
             )}
           </div>
-          {(voiceStatus.name || voiceStatus.tip) && (
-            <p className="choice-voice-tip">
-              {voiceStatus.name ? `朗讀聲：${voiceStatus.name}` : null}
-              {voiceStatus.name && voiceStatus.tip ? ' · ' : null}
-              {voiceStatus.tip}
-            </p>
-          )}
 
           <KidHelp
             hint={teach}
@@ -791,9 +784,6 @@ export function PracticeSession({
                   {KID.listenAll}
                 </button>
               </div>
-              {voiceStatus.tip && !voiceStatus.name && (
-                <p className="choice-voice-tip">粵語提示：{voiceStatus.tip}</p>
-              )}
               {item.choices.map((c, i) => {
                 const selected = picked === i
                 const triedWrong = wrongPicks.includes(i)
