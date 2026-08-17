@@ -35,20 +35,22 @@ function isChineseVoice(v: SpeechSynthesisVoice): boolean {
   return /zh|yue|cantonese|chinese|中文|粵|普通話|普通话/.test(voiceBlob(v))
 }
 
-/** Apple HK Cantonese is Sin-Ji / 善怡. Mei-Jia / 美嘉 is Taiwan Mandarin — do not treat as Yue. */
+/** Apple HK Cantonese: Siri 聲音 2, 善怡, 阿成, Fung, Wing. Mei-Jia / 美嘉 is Taiwan Mandarin. */
 function isHkCantoneseVoice(v: SpeechSynthesisVoice): boolean {
   const b = voiceBlob(v)
   if (/eloquence/.test(b)) return false
   if (
     /zh([-_]?cn)|zh([-_]?tw)|putonghua|mandarin|ting-?ting|mei-?jia|meijia|美嘉|婷婷|普通话|普通話/.test(b) &&
-    !/hk|yue|cantonese|sin[-.\s]?ji|善怡|香港/.test(b)
+    !/hk|yue|cantonese|sin[-.\s]?ji|善怡|阿成|香港/.test(b)
   ) {
     return false
   }
   return (
     /yue([-_]|$)/.test(b) ||
     /zh([-_]?hk)/.test(b) ||
-    /sin[-.\s]?ji|善怡/.test(b) ||
+    /sin[-.\s]?ji|善怡|阿成/.test(b) ||
+    (/\bsiri\b/.test(b) && /zh|yue|hk|cantonese|香港|廣東|粤/.test(b)) ||
+    /聲音\s*[12]/.test(b) ||
     b.includes('cantonese') ||
     b.includes('粵語') ||
     b.includes('广东话') ||
@@ -58,6 +60,23 @@ function isHkCantoneseVoice(v: SpeechSynthesisVoice): boolean {
     (v.lang || '').toLowerCase() === 'zh-hk' ||
     (v.name || '').toLowerCase() === 'zh-hk'
   )
+}
+
+function isCompactVoice(v: SpeechSynthesisVoice): boolean {
+  return /compact|精簡/.test(voiceBlob(v))
+}
+
+/** Spoken Content 「Siri → 聲音 2」— the neural HK voice the family prefers. */
+function isSiriVoice2(v: SpeechSynthesisVoice): boolean {
+  if (!isHkCantoneseVoice(v)) return false
+  const b = voiceBlob(v)
+  return /聲音\s*2|voice\s*2|siri[\s._-]*2|\bvoice2\b/.test(b)
+}
+
+function isSiriYueVoice(v: SpeechSynthesisVoice): boolean {
+  if (!isHkCantoneseVoice(v) || isCompactVoice(v)) return false
+  const b = voiceBlob(v)
+  return /\bsiri\b/.test(b) || /聲音\s*[12]/.test(b)
 }
 
 function scoreCantoneseVoice(v: SpeechSynthesisVoice): number {
@@ -75,13 +94,15 @@ function scoreCantoneseVoice(v: SpeechSynthesisVoice): number {
   if (/zh([-_]?hk)/.test(b) || b.includes('hong kong') || b.includes('hongkong') || b.includes('香港')) {
     score += 90
   }
-  if (/sin[-.\s]?ji|善怡/.test(b)) score += 50
+  if (isSiriVoice2(v)) score += 260
+  else if (isSiriYueVoice(v)) score += 180
+  if (/阿成|\bfung\b|\bwing\b/.test(b)) score += 36
+  if (/sin[-.\s]?ji|善怡/.test(b)) score += 18
   if (/premium|優質/.test(b)) score += 40
-  if (/enhanced|增強/.test(b)) score += 28
-  if (/\bsiri\b/.test(b) && !/compact|精簡/.test(b)) score += 16
-  if (v.default) score += 8
+  if (/enhanced|已強化|增強/.test(b)) score += 28
+  if (v.default) score += 24
   if (v.localService) score += 5
-  if (/compact|精簡/.test(b)) score -= 35
+  if (/compact|精簡/.test(b)) score -= 50
   if (/eloquence/.test(b)) score -= 80
   return score
 }
@@ -91,7 +112,24 @@ function bestYueVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | un
     .map((v) => ({ v, score: scoreCantoneseVoice(v) }))
     .filter((x) => x.score > 0)
     .sort((a, b) => b.score - a.score)
-  return ranked[0]?.v
+    .map((x) => x.v)
+  if (!ranked.length) return undefined
+
+  const siri2 = ranked.find(isSiriVoice2)
+  if (siri2) return siri2
+  const siri = ranked.find(isSiriYueVoice)
+  if (siri) return siri
+
+  const best = ranked[0]
+  // Do not pin Compact 善怡 on iPhone — that overrides Spoken Content 「Siri 聲音 2」.
+  if (isAppleWebKit() && isCompactVoice(best) && !isSiriYueVoice(best)) {
+    const nonCompact = ranked.find((v) => !isCompactVoice(v))
+    if (nonCompact) return nonCompact
+    const selected = ranked.find((v) => v.default)
+    if (selected) return selected
+    return undefined
+  }
+  return best
 }
 
 function bestEnglishVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
@@ -112,9 +150,8 @@ function bestEnglishVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice 
 }
 
 /**
- * Always attach a real zh-HK / Sin-Ji voice on iPhone. Leaving voice unset
- * makes Safari use the device-language default (English / 普通話 / Eloquence),
- * which is the "old" voice — not iPhone 廣東話.
+ * Prefer iPhone Spoken Content 「Siri 聲音 2」. Never pin Compact 善怡 on Apple —
+ * that forces the old voice and overrides the Siri neural pack.
  */
 function pickVoice(lang: SpeakLang): SpeechSynthesisVoice | undefined {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return undefined
@@ -132,24 +169,29 @@ function buildVoiceStatus(): VoiceStatus {
   const voice = pickVoice('zh-HK')
   if (!voice) {
     return {
-      name: null,
-      isCantonese: false,
+      name: isAppleWebKit() ? 'iPhone 系統粵語（Siri 聲音 2）' : null,
+      isCantonese: isAppleWebKit(),
       tip: isAppleWebKit()
-        ? '未找到 iPhone 廣東話（Sin-Ji／善怡）。設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文（香港）→ 下載優質／增強。'
+        ? '用系統預設廣東話（你已揀 Siri 聲音 2 就會用佢）。若聽落仍係舊聲，去設定 → 輔助使用 → 朗讀內容 → 聲音 → 廣東話（香港）確認 Siri 聲音 2 已剔。'
         : '未找到粵語聲線。請加入「中文（香港）」語音，或用 iPhone Safari。',
     }
   }
   const b = voiceBlob(voice)
-  const premium = /premium|enhanced|優質|增強/.test(b)
-  const compact = /compact|精簡/.test(b)
+  const siri2 = isSiriVoice2(voice)
+  const siri = isSiriYueVoice(voice)
+  const compact = isCompactVoice(voice)
   return {
     name: voice.name,
     isCantonese: true,
-    tip: premium
+    tip: siri2
       ? null
-      : compact
-        ? `而家用緊「${voice.name}」（精簡）。下載優質／增強會更自然：設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文（香港）。`
-        : null,
+      : siri
+        ? `而家用緊「${voice.name}」。若想用 Siri 聲音 2，請喺設定剔返佢。`
+        : compact
+          ? `而家用緊「${voice.name}」（精簡）。請下載並剔 Siri 聲音 2：設定 → 輔助使用 → 朗讀內容 → 聲音 → 廣東話（香港）。`
+          : /premium|優質|enhanced|已強化|增強/.test(b)
+            ? `而家用緊「${voice.name}」。Safari 若列到 Siri 聲音 2 會自動改用。`
+            : null,
   }
 }
 
