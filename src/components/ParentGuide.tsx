@@ -89,10 +89,8 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>點樣先有真正粵語朗讀？</h3>
           <p>
-            而家用瀏覽器 Web Speech（免費、唔使 API key），會優先揀 yue-Hant-HK / yue-HK / zh-HK /
-            Cantonese 聲線；Chrome／Edge 通常最好。若聽到普通話，請喺系統加入「中文（香港）」語音。
-            更高質（要收費／後端）：Google Cloud TTS 嘅 <code>yue-HK</code> 聲線，或
-            cantonese.ai。
+            iPhone／iPad 而家用<strong>系統預設</strong>「中文（香港）」聲線（唔再硬揀其他聲）。英文句子會用英文聲讀，唔會用粵語讀英文。
+            若粵語唔似：設定 → 輔助使用 → 朗讀內容 → 聲音 → 加入中文（香港）。
           </p>
         </article>
       </div>

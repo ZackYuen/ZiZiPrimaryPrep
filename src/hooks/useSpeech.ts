@@ -12,27 +12,26 @@ export type VoiceStatus = {
   tip: string | null
 }
 
-/**
- * Cantonese TTS sourcing (best → OK for this static GitHub Pages app):
- *
- * 1. **Best quality (needs API key / backend):** Google Cloud Text-to-Speech
- *    voices under language code `yue-HK` (Chinese Hong Kong / Cantonese),
- *    e.g. `yue-HK-Standard-A` / Chirp3-HD. See:
- *    https://docs.cloud.google.com/text-to-speech/docs/list-voices-and-types
- *    Specialized: https://docs.cantonese.ai/text-to-speech
- *
- * 2. **Best free in-browser (what we use now):** Web Speech API
- *    `speechSynthesis` with explicit Cantonese voice pick:
- *    prefer `yue*` / name contains Cantonese / `zh-HK`.
- *    Chrome/Edge on desktop often ships Google 粵語香港; iPhone Safari often
- *    has「美嘉 / Sinji」etc. after adding 中文（香港）in system settings.
- *
- * 3. **Avoid:** falling back to `zh-CN` / Putonghua for HK interview prep —
- *    kids hear the wrong readings. We only fall back if no HK/yue voice exists.
- */
+function isAppleWebKit(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const ua = navigator.userAgent
+  if (/iPhone|iPad|iPod/i.test(ua)) return true
+  if (/Safari/i.test(ua) && !/Chrome|Chromium|Edg|OPR|CriOS|FxiOS/i.test(ua)) return true
+  return typeof navigator.vendor === 'string' && navigator.vendor.includes('Apple')
+}
 
 function voiceBlob(v: SpeechSynthesisVoice): string {
   return `${v.lang} ${v.name}`.toLowerCase()
+}
+
+function isEnglishVoice(v: SpeechSynthesisVoice): boolean {
+  return /^(en\b)|english|samantha|karen|daniel|moira|rishi|veena|fred|nicky|gordon/i.test(
+    voiceBlob(v),
+  )
+}
+
+function isChineseVoice(v: SpeechSynthesisVoice): boolean {
+  return /zh|yue|cantonese|chinese|中文|粵|普通話|普通话/.test(voiceBlob(v))
 }
 
 function scoreCantoneseVoice(v: SpeechSynthesisVoice): number {
@@ -44,60 +43,68 @@ function scoreCantoneseVoice(v: SpeechSynthesisVoice): number {
   if (/zh([-_]?hk)/.test(b) || b.includes('hong kong') || b.includes('hongkong') || b.includes('香港')) {
     score += 80
   }
-  // Known device voice names that speak Cantonese
   if (/\b(sinji|meijia|美嘉|善怡|迦娜)\b/i.test(v.name)) score += 40
-  // Prefer local offline voices when available
   if (v.localService) score += 5
-  // Penalize clear Mandarin-only voices
   if (/zh([-_]?cn)|putonghua|mandarin|普通话|普通話|汉语|漢語/.test(b) && !/hk|yue|cantonese|香港/.test(b)) {
     score -= 50
   }
   return score
 }
 
+/**
+ * iPhone: return undefined so Safari uses the **system default** voice for
+ * utterance.lang (中文香港 / English). Forcing a voice + custom rate/pitch
+ * is what made Cantonese sound harsh.
+ *
+ * Desktop: still pick a matching voice, but English must never be a Chinese voice.
+ */
 function pickVoice(lang: SpeakLang): SpeechSynthesisVoice | undefined {
-  if (!('speechSynthesis' in window)) return undefined
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return undefined
+  if (isAppleWebKit()) return undefined
+
   const voices = window.speechSynthesis.getVoices()
   if (!voices.length) return undefined
 
   if (lang === 'en-US') {
-    const enScore = (v: SpeechSynthesisVoice) => {
-      const b = voiceBlob(v)
-      let s = 0
-      if (/en([-_]?hk)/.test(b)) s += 50
-      if (/en([-_]?gb)/.test(b)) s += 40
-      if (/en([-_]?us)/.test(b)) s += 35
-      if (b.startsWith('en')) s += 20
-      if (v.localService) s += 5
-      return s
-    }
-    return [...voices].sort((a, b) => enScore(b) - enScore(a))[0]
+    const ranked = voices
+      .filter(isEnglishVoice)
+      .map((v) => {
+        const b = voiceBlob(v)
+        let s = 0
+        if (/en([-_]?us)/.test(b)) s += 50
+        if (/en([-_]?gb)/.test(b)) s += 40
+        if (/en([-_]?hk)/.test(b)) s += 35
+        if (v.localService) s += 10
+        return { v, s }
+      })
+      .sort((a, b) => b.s - a.s)
+    return ranked[0]?.v
   }
 
-  const ranked = [...voices]
+  const ranked = voices
     .map((v) => ({ v, score: scoreCantoneseVoice(v) }))
     .filter((x) => x.score > 0)
     .sort((a, b) => b.score - a.score)
-
-  if (ranked[0]) return ranked[0].v
-
-  // Last resort: any Chinese voice (may be Mandarin — UI will tip parents)
-  return voices.find((v) => /zh|chinese|中文/.test(voiceBlob(v)))
+  return ranked[0]?.v
 }
 
-function buildVoiceStatus(lang: SpeakLang): VoiceStatus {
-  if (!('speechSynthesis' in window)) {
+function buildVoiceStatus(): VoiceStatus {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     return { name: null, isCantonese: false, tip: '呢部瀏覽器未支援朗讀。' }
   }
-  const voice = pickVoice(lang)
-  if (lang !== 'zh-HK') {
-    return { name: voice?.name ?? null, isCantonese: false, tip: null }
+  if (isAppleWebKit()) {
+    return {
+      name: 'iPhone 系統粵語',
+      isCantonese: true,
+      tip: '用緊 iPhone 預設中文（香港）。若唔似粵語，去「設定 → 輔助使用 → 朗讀內容 → 聲音」加入中文香港。',
+    }
   }
+  const voice = pickVoice('zh-HK')
   if (!voice) {
     return {
       name: null,
       isCantonese: false,
-      tip: '未找到粵語聲線。請喺手機／電腦加入「中文（香港）」語音，或用 Chrome。',
+      tip: '未找到粵語聲線。請加入「中文（香港）」語音，或用 iPhone Safari。',
     }
   }
   const isCantonese = scoreCantoneseVoice(voice) >= 80
@@ -106,7 +113,7 @@ function buildVoiceStatus(lang: SpeakLang): VoiceStatus {
     isCantonese,
     tip: isCantonese
       ? null
-      : `而家用緊「${voice.name}」，可能係普通話。建議安裝／選用香港粵語聲線（系統語言加入中文香港；Chrome 通常較好）。`,
+      : `而家用緊「${voice.name}」，可能係普通話。建議用 iPhone 系統粵語，或 Chrome 香港聲線。`,
   }
 }
 
@@ -116,18 +123,42 @@ export function looksEnglish(text: string): boolean {
   return letters > 0 && letters >= cjk
 }
 
+type Chunk = { text: string; lang: SpeakLang }
+
+/** Never send English through a Cantonese voice — split mixed lines. */
+export function chunksForSpeech(text: string, fallback: SpeakLang): Chunk[] {
+  const raw = text.trim()
+  if (!raw) return []
+  const hasLatin = /[A-Za-z]/.test(raw)
+  const hasCjk = /[\u4e00-\u9fff]/.test(raw)
+  if (hasLatin && !hasCjk) return [{ text: raw, lang: 'en-US' }]
+  if (hasCjk && !hasLatin) return [{ text: raw, lang: fallback === 'en-US' ? 'en-US' : 'zh-HK' }]
+  if (!hasLatin) return [{ text: raw, lang: fallback }]
+
+  const parts = raw.match(/[\u4e00-\u9fff][\u4e00-\u9fff0-9\s，。、！？：；「」『』（）—…·]{0,}|[A-Za-z][A-Za-z0-9'’.,!?;:"\-()\s]*/g)
+  if (!parts || parts.length < 2) {
+    return [{ text: raw, lang: looksEnglish(raw) ? 'en-US' : fallback }]
+  }
+  return parts
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p) => ({
+      text: p,
+      lang: /[A-Za-z]/.test(p) && !/[\u4e00-\u9fff]/.test(p) ? 'en-US' : 'zh-HK',
+    }))
+}
+
 export function useSpeech() {
   const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>({
     name: null,
     isCantonese: false,
     tip: null,
   })
-  const queueRef = useRef<string[]>([])
-  const queueLangRef = useRef<SpeakLang>('zh-HK')
+  const queueRef = useRef<Chunk[]>([])
   const playingQueue = useRef(false)
 
   const refreshVoices = useCallback(() => {
-    setVoiceStatus(buildVoiceStatus('zh-HK'))
+    setVoiceStatus(buildVoiceStatus())
   }, [])
 
   useEffect(() => {
@@ -140,7 +171,6 @@ export function useSpeech() {
       synth.addEventListener('voiceschanged', refreshVoices)
       return () => synth.removeEventListener('voiceschanged', refreshVoices)
     }
-    // iOS 10: property handler instead of EventTarget
     synth.onvoiceschanged = refreshVoices
     return () => {
       synth.onvoiceschanged = null
@@ -158,44 +188,39 @@ export function useSpeech() {
       onEnd?.()
       return
     }
+    const apple = isAppleWebKit()
     const u = new SpeechSynthesisUtterance(text.trim())
-    u.lang = lang === 'zh-HK' ? 'zh-HK' : 'en-US'
-    // Slightly slower helps a 5-year-old catch choice words
-    u.rate = lang === 'zh-HK' ? 0.88 : 0.92
-    u.pitch = 1.05
+    u.lang = lang === 'en-US' ? 'en-US' : 'zh-HK'
+    // iPhone default voices sound worse when rate/pitch are tweaked.
+    u.rate = apple ? 1 : lang === 'zh-HK' ? 0.92 : 0.95
+    u.pitch = 1
     const voice = pickVoice(lang)
     if (voice) {
-      u.voice = voice
-      // Some engines honor voice.lang over utterance.lang
-      if (voice.lang) u.lang = voice.lang
+      if (lang === 'en-US' && isChineseVoice(voice)) {
+        // Never attach a Cantonese/Mandarin voice to English.
+      } else if (lang === 'zh-HK' && isEnglishVoice(voice) && !isChineseVoice(voice)) {
+        // Skip English-only voice for Cantonese.
+      } else {
+        u.voice = voice
+      }
     }
     u.onend = () => onEnd?.()
     u.onerror = () => onEnd?.()
-    window.speechSynthesis.speak(u)
+    const kick = () => window.speechSynthesis.speak(u)
+    // iOS often drops the first speak() if it follows cancel() immediately.
+    if (apple) window.setTimeout(kick, 50)
+    else kick()
   }, [])
 
-  const speak = useCallback(
-    (text: string, lang: SpeakLang = 'zh-HK') => {
+  const speakChunks = useCallback(
+    (chunks: Chunk[]) => {
       stop()
-      if (lang === 'zh-HK') setVoiceStatus(buildVoiceStatus('zh-HK'))
-      duckBgm(Math.min(12000, 1800 + text.trim().length * 80))
-      speakOne(text, lang)
-    },
-    [speakOne, stop],
-  )
-
-  /** Read several lines in order (e.g. all MC options). */
-  const speakQueue = useCallback(
-    (parts: string[], lang: SpeakLang = 'zh-HK') => {
-      stop()
-      const cleaned = parts.map((p) => p.trim()).filter(Boolean)
+      const cleaned = chunks.filter((c) => c.text.trim())
       if (!cleaned.length) return
-      if (lang === 'zh-HK') setVoiceStatus(buildVoiceStatus('zh-HK'))
-      duckBgm(Math.min(16000, 2000 + cleaned.join('').length * 70))
-      queueRef.current = cleaned
-      queueLangRef.current = lang
+      setVoiceStatus(buildVoiceStatus())
+      duckBgm(Math.min(16000, 1800 + cleaned.reduce((n, c) => n + c.text.length, 0) * 80))
+      queueRef.current = cleaned.slice(1)
       playingQueue.current = true
-
       const next = () => {
         if (!playingQueue.current) return
         const piece = queueRef.current.shift()
@@ -203,11 +228,26 @@ export function useSpeech() {
           playingQueue.current = false
           return
         }
-        speakOne(piece, queueLangRef.current, next)
+        speakOne(piece.text, piece.lang, next)
       }
-      next()
+      speakOne(cleaned[0].text, cleaned[0].lang, next)
     },
     [speakOne, stop],
+  )
+
+  const speak = useCallback(
+    (text: string, lang: SpeakLang = 'zh-HK') => {
+      speakChunks(chunksForSpeech(text, lang))
+    },
+    [speakChunks],
+  )
+
+  const speakQueue = useCallback(
+    (parts: string[], lang: SpeakLang = 'zh-HK') => {
+      const chunks = parts.flatMap((p) => chunksForSpeech(p, lang))
+      speakChunks(chunks)
+    },
+    [speakChunks],
   )
 
   return { speak, speakQueue, stop, voiceStatus }
