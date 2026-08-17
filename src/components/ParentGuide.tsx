@@ -89,8 +89,7 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>點樣先有真正粵語朗讀？</h3>
           <p>
-            iPhone／iPad 用「中文（香港）」朗讀。請下載<strong>優質／增強</strong>語音包：設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文（香港）→ 優質或增強（下載後揀佢）。
-            優質聲處理口語（啲、咁、咗）同中英夾雜（例如 check 吓 email）最自然。完整英文自我介紹先會用英文聲。
+            iPhone／iPad 會<strong>指定用系統廣東話 Sin-Ji／善怡</strong>（唔係瀏覽器預設英文／普通話）。請下載<strong>優質／增強</strong>：設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文（香港）→ 優質或增強。練習頁會顯示「朗讀聲：…」，應見到 Sin-Ji、善怡，或帶 Premium／優質。
           </p>
         </article>
       </div>
