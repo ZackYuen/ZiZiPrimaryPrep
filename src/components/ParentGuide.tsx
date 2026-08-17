@@ -89,7 +89,7 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>點樣先有真正粵語朗讀？</h3>
           <p>
-            iPhone／iPad 優先用你喺系統揀嘅<strong>Siri 聲音 2</strong>廣東話（設定 → 輔助使用 → 朗讀內容 → 聲音 → 廣東話（香港）→ Siri → 聲音 2）。練習頁「朗讀聲」應顯示 Siri／聲音 2。Safari 列唔到 Siri 聲就唔會硬綁精簡版善怡，改用系統預設。
+            iPhone Safari <strong>用唔到 Siri 聲音 2</strong>（Apple 禁止網頁用 Siri／優質語音包，只得精簡版善怡）。所以朗讀改用 <strong>Google 高質粵語 Chirp3</strong>，口語同中英夾雜會自然過舊聲。練習頁「朗讀聲」應顯示 Google 粵語 Chirp3。
           </p>
         </article>
       </div>
