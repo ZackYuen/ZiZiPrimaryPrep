@@ -54,6 +54,10 @@ export type Activity = {
   sampleZh?: string
   sampleEn?: string
   tip?: string
+  /** Speaking feedback celebrates any covered idea instead of suggesting a fixed script. */
+  flexibleSpeak?: boolean
+  /** Top listen buttons play the natural model instead of reading the cue labels. */
+  listenToSample?: boolean
   choices?: Choice[]
   /** For math: accept answers like "13" or "13粒" */
   answer?: string
@@ -356,6 +360,8 @@ export const vocabCategories: VocabCategory[] = [
 
 const introZh = `老師好，我叫${CHILD.nameZh}，今年${CHILD.ageZh}歲，讀${CHILD.kindergarten}幼稚園。`
 const introEn = `Good morning teacher. My name is ${CHILD.fullNameEn}. I am ${CHILD.age} years old. I study in ${CHILD.kindergartenEn} Kindergarten.`
+const sethStoryEn =
+  'Hello, my name is Seth. I am five years old. I live with my mum and dad. We are a family of three. I like insects. Sometimes my dad catches them for me, and sometimes I catch them myself with a little bug net. I also like looking for geckos. I love drawing cartoon characters. My favourite colour is yellow because it makes me feel happy. Thank you.'
 
 export const days: DayPlan[] = [
   {
@@ -416,30 +422,53 @@ export const days: DayPlan[] = [
         kind: 'speak',
         level: 1,
         cue: 'English · Basic',
-        promptZh: 'Self-introduction (Basic)',
-        promptEn: 'Say your name, age and kindergarten.',
+        promptZh: '先講自己：名字、年齡、學校。',
+        promptEn: 'NAME → AGE → SCHOOL',
         sampleEn: introEn,
         sampleZh: introEn,
+        flexibleSpeak: true,
+        tip: '不用逐字背。只要自然講到名字、年齡和學校；順序不同也可以。',
       },
       {
         id: 'd1-en-like',
         kind: 'speak',
         level: 2,
         cue: 'English · Likes',
-        promptZh: '加入喜好與原因。',
-        promptEn: 'I like ____ because ____.',
-        sampleEn: 'I like blue because the sky is blue. I like drawing because it is fun.',
-        sampleZh: 'I like blue because the sky is blue. I like drawing because it is fun.',
+        promptZh: '揀兩樣喜好講，不用每次全部講。',
+        promptEn: 'INSECTS → GECKOS → DRAWING → YELLOW',
+        sampleEn:
+          'I like insects and looking for geckos. I love drawing cartoon characters. My favourite colour is yellow because it makes me feel happy.',
+        sampleZh:
+          'I like insects and looking for geckos. I love drawing cartoon characters. My favourite colour is yellow because it makes me feel happy.',
+        flexibleSpeak: true,
+        tip: '每次只揀兩樣喜好。家長可追問：What do you draw? Why do you like yellow?',
       },
       {
         id: 'd1-en-family',
         kind: 'speak',
         level: 2,
         cue: 'English · Family',
-        promptZh: '最喜歡與家人一起做什麼。',
-        promptEn: 'I like to ____ with my family.',
-        sampleEn: 'I like to go to the park with my family. We ride bicycles. It is fun.',
-        sampleZh: 'I like to go to the park with my family. We ride bicycles. It is fun.',
+        promptZh: '講家人，再講捉昆蟲的小故事。',
+        promptEn: 'FAMILY → DAD → LITTLE BUG NET',
+        sampleEn:
+          'I live with my mum and dad. We are a family of three. Sometimes my dad catches insects for me, and sometimes I catch them myself with a little bug net.',
+        sampleZh:
+          'I live with my mum and dad. We are a family of three. Sometimes my dad catches insects for me, and sometimes I catch them myself with a little bug net.',
+        flexibleSpeak: true,
+        tip: '不用照句背。可追問：Who catches the insects? What do you use?',
+      },
+      {
+        id: 'd1-en-story',
+        kind: 'speak',
+        level: 3,
+        cue: 'English · My Story',
+        promptZh: '看圖自由介紹：每次揀 3–4 個重點，次序可以不同。',
+        promptEn: 'ME → FAMILY → INSECTS → DRAWING → YELLOW → THANK YOU',
+        sampleEn: sethStoryEn,
+        sampleZh: sethStoryEn,
+        flexibleSpeak: true,
+        listenToSample: true,
+        tip: '這是示範，不是背誦稿。停一停想、換字、漏一項都可以；意思清楚和有眼神交流更重要。',
       },
       {
         id: 'd1-en-dream',
@@ -1521,7 +1550,7 @@ export const mockInterview: Activity[] = [
   'd1-zh-basic',
   'd1-zh-like',
   'd1-zh-dream',
-  'd1-en-basic',
+  'd1-en-story',
   'd3-share',
   'd4-emo2',
   'd5-job',

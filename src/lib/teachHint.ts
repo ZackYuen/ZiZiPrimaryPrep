@@ -27,6 +27,8 @@ export type HintVisualId =
   | 'clock'
   | 'coins'
   | 'like-blue'
+  | 'insects'
+  | 'seth-story'
   | 'talk'
   | 'sort'
   | 'reorder'
@@ -83,8 +85,9 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'd1-zh-family': 'family',
   'd1-zh-dream': 'teacher',
   'd1-en-basic': 'intro',
-  'd1-en-like': 'like-blue',
+  'd1-en-like': 'insects',
   'd1-en-family': 'family',
+  'd1-en-story': 'seth-story',
   'd1-en-dream': 'teacher',
   day2: 'talk',
   'd2-opp': 'move',
@@ -140,16 +143,20 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
     moreLine: '例如：我想做老師，因為可以教小朋友。多謝老師。',
   },
   'd1-en-basic': {
-    kidLine: '跟住講英文：My name is Seth.',
-    moreLine: '再講：I am 5 years old. I study in Lam Tin Ling Liang Kindergarten.',
+    kidLine: '唔使背全段。先望住老師講：My name is Seth.',
+    moreLine: '再揀一樣講：I am five years old，或者講學校。',
   },
   'd1-en-like': {
-    kidLine: '講 I like ____ because ____.',
-    moreLine: 'I like blue because the sky is blue.',
+    kidLine: '揀一幅圖講：I like insects.',
+    moreLine: '再加一件事：I also like drawing，或者 My favourite colour is yellow.',
   },
   'd1-en-family': {
-    kidLine: '講同家人去邊：I like to go to the park.',
-    moreLine: 'We ride bicycles. It is fun.',
+    kidLine: '先講屋企人：I live with my mum and dad.',
+    moreLine: '再講一件真事：Sometimes I catch insects with a little bug net.',
+  },
+  'd1-en-story': {
+    kidLine: '望一幅圖講一件事。唔記得原句，可以用自己嘅字。',
+    moreLine: '用 and、sometimes、also 接下一件事；講三四個重點就夠。',
   },
   'd1-en-dream': {
     kidLine: '講 I want to be a teacher. Thank you, teacher.',
