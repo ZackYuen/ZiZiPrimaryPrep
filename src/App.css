@@ -2363,6 +2363,35 @@
   min-height: 44px;
 }
 
+.kid-help__backdrop {
+  position: fixed;
+  z-index: 55;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: rgba(15, 34, 45, 0.58);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  animation: help-backdrop-in 0.18s ease both;
+}
+
+.kid-help__panel {
+  position: relative;
+  z-index: 60;
+}
+
+@keyframes help-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .kid-help__close {
   position: absolute;
   top: 0.45rem;
