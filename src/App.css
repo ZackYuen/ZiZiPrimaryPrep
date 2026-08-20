@@ -2320,3 +2320,529 @@
   font-weight: 800;
   padding: 0.2rem 0.55rem;
 }
+
+/* ---- Compact practice UI: one task, one toolbar, fixed navigation ---- */
+.session--practice,
+.session--vocab {
+  height: calc(100dvh - 3.75rem);
+  min-height: 0;
+  gap: 0.55rem;
+}
+
+.session--practice .session__layout {
+  min-height: 0;
+  gap: 0;
+}
+
+.session--practice .session__card {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.session--practice .session__footer,
+.session--vocab .session__footer {
+  flex: 0 0 auto;
+  padding: 0;
+}
+
+.session__tools {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+}
+
+.session__tools > .session__actions,
+.session__tools > .kid-help {
+  margin: 0;
+}
+
+.session__tools .pill-btn,
+.session__tools .kid-help__btn {
+  min-height: 44px;
+}
+
+.kid-help__close {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.55rem;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.speak-box--compact {
+  display: grid;
+  grid-template-columns: 3.1rem minmax(0, 1fr);
+  gap: 0.55rem;
+  margin-top: 0.55rem;
+}
+
+.speak-box--compact .listen-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.45rem;
+  padding: 0.55rem;
+}
+
+.speak-box--compact .listen-panel > .session__actions {
+  margin: 0;
+}
+
+.speak-box--compact .listen-panel > .primary-btn {
+  min-height: 44px;
+  height: 100%;
+}
+
+.speak-box--compact .listen-panel__compose,
+.speak-box--compact .listen-panel__tts,
+.speak-box--compact .listen-panel__feedback {
+  grid-column: 1 / -1;
+}
+
+.speak-box--compact .listen-panel__compose:not(.is-active),
+.speak-box--compact .listen-panel__tts:disabled {
+  display: none;
+}
+
+.speak-box--compact .listen-panel__compose {
+  padding: 0.35rem 0.55rem;
+}
+
+.speak-box--compact .listen-panel__input {
+  min-height: 2.8rem;
+  max-height: 5rem;
+  padding: 0.2rem 0;
+  font-size: 0.98rem;
+}
+
+.speak-box--compact .speak-box__parent-star {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.speak-box--compact > .session__actions {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: center;
+  margin: 0;
+}
+
+.speak-box--compact > .sample {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    padding: 0.65rem 0.65rem 0.8rem;
+  }
+
+  .session--practice,
+  .session--vocab {
+    height: calc(100dvh - 1.45rem);
+  }
+
+  .session__top {
+    flex-wrap: nowrap;
+    min-height: 42px;
+    gap: 0.45rem;
+  }
+
+  .session__progress {
+    gap: 0.12rem;
+    font-size: 0.78rem;
+  }
+
+  .session__title {
+    font-size: 0.9rem;
+  }
+
+  .session__track {
+    height: 7px;
+  }
+
+  .sound-toggle {
+    width: 2.65rem;
+    min-width: 2.65rem;
+    height: 2.65rem;
+    justify-content: center;
+    padding: 0;
+    overflow: hidden;
+    font-size: 0;
+  }
+
+  .sound-toggle__icon {
+    font-size: 1.1rem;
+  }
+
+  .session__card {
+    padding: 0.65rem 0.7rem 0.75rem;
+    border-radius: 22px;
+  }
+
+  .session__badges {
+    margin-bottom: 0.35rem;
+  }
+
+  .session__cue {
+    padding: 0.2rem 0.55rem;
+    font-size: 0.76rem;
+  }
+
+  .session__cue span {
+    opacity: 0.72;
+  }
+
+  .session__q {
+    font-size: clamp(1.08rem, 4.5vw, 1.35rem);
+    line-height: 1.25;
+  }
+
+  .session__q-en {
+    margin-top: 0.2rem;
+    font-size: 0.88rem;
+    line-height: 1.25;
+  }
+
+  .session__actions {
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+  }
+
+  .pill-btn {
+    min-height: 42px;
+    padding: 0.45rem 0.8rem;
+    font-size: 1rem;
+  }
+
+  .hint-pic-wrap {
+    margin-bottom: 0.35rem;
+  }
+
+  .hint-pic-wrap .hint-pic {
+    width: min(145px, 42vw);
+  }
+
+  .scene-art {
+    margin-bottom: 0.45rem;
+    border-radius: 16px;
+  }
+
+  .scene-art__img,
+  .scene-art__svg {
+    max-height: min(22vh, 150px);
+    object-fit: contain;
+  }
+
+  .analog-clock {
+    width: min(100%, 165px);
+  }
+
+  .coin-purse__bag {
+    min-height: 100px;
+  }
+
+  .june-cal {
+    max-width: 205px;
+    margin-top: 0.2rem;
+    margin-bottom: 0.1rem;
+    padding: 0.35rem;
+    margin-inline: auto;
+  }
+
+  .june-cal__title {
+    margin-bottom: 0.15rem;
+    font-size: 0.85rem;
+  }
+
+  .june-cal__grid {
+    gap: 0.12rem;
+  }
+
+  .june-cal__head,
+  .june-cal__cell {
+    padding-block: 0.12rem;
+    font-size: 0.7rem;
+  }
+
+  .math-dots {
+    margin: 0.15rem 0 0.35rem;
+    transform: scale(0.86);
+    transform-origin: center;
+  }
+
+  .kid-help__btn {
+    min-height: 42px;
+    padding: 0.35rem 0.7rem;
+    border-width: 2px;
+  }
+
+  .kid-help__panel {
+    position: fixed;
+    z-index: 60;
+    left: 0.65rem;
+    right: 0.65rem;
+    bottom: calc(4.25rem + env(safe-area-inset-bottom));
+    max-height: min(68dvh, 540px);
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.75rem;
+    box-shadow: 0 18px 60px rgba(27, 58, 75, 0.28);
+  }
+
+  .kid-help__panel .hint-pic {
+    width: min(170px, 48vw);
+  }
+
+  .kid-help__line {
+    padding-inline: 1.7rem;
+    font-size: 1rem;
+  }
+
+  .choice-list,
+  .math-box,
+  .sort-wrap,
+  .reorder-wrap,
+  .prompt-fields {
+    margin-top: 0.55rem;
+  }
+
+  .choice-list {
+    gap: 0.4rem;
+  }
+
+  .choice-row {
+    gap: 0.3rem;
+  }
+
+  .choice-btn {
+    min-height: 44px;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.94rem;
+    gap: 0.45rem;
+  }
+
+  .choice-btn__mark {
+    width: 1.65rem;
+    height: 1.65rem;
+  }
+
+  .choice-hear {
+    min-width: 2.8rem;
+    border-radius: 14px;
+  }
+
+  .math-box__label {
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+  }
+
+  .math-display {
+    min-height: 2.5rem;
+    margin-bottom: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    font-size: 1.35rem;
+  }
+
+  .numpad {
+    gap: 0.35rem;
+  }
+
+  .numpad__key {
+    min-height: 2.55rem;
+    border-radius: 12px;
+    font-size: 1.15rem;
+  }
+
+  .money-fields {
+    gap: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .money-field {
+    min-height: 2.7rem;
+    padding: 0.35rem 0.55rem;
+  }
+
+  .sort-buckets {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+  }
+
+  .sort-bucket {
+    min-height: 82px;
+    padding: 0.5rem;
+    border-radius: 15px;
+  }
+
+  .sort-bucket__title {
+    margin-bottom: 0.3rem;
+    font-size: 1.35rem;
+  }
+
+  .sort-box,
+  .sort-wrap {
+    gap: 0.45rem;
+    margin-top: 0.5rem;
+  }
+
+  .reorder__hint {
+    margin-bottom: 0.3rem;
+    font-size: 0.78rem;
+  }
+
+  .reorder__sentence {
+    min-height: 2.7rem;
+    padding: 0.45rem;
+  }
+
+  .reorder__pool {
+    min-height: 2.3rem;
+    padding: 0.4rem;
+  }
+
+  .chip {
+    min-height: 38px;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .check-row {
+    min-height: 42px;
+    padding: 0.4rem 0.55rem;
+  }
+
+  .math-feedback,
+  .sample__tip {
+    margin-top: 0.35rem;
+    padding: 0.4rem 0.55rem;
+    font-size: 0.85rem;
+  }
+
+  .session__footer .ghost-btn,
+  .session__footer .primary-btn {
+    min-height: 44px;
+  }
+
+  .session__footer .primary-btn {
+    font-size: 1.15rem;
+  }
+
+  .session--vocab .vocab-stage {
+    min-height: 0;
+    flex: 1;
+  }
+
+  .session--vocab .vocab-card {
+    min-height: 0;
+    padding: 0.7rem;
+    border-radius: 22px;
+  }
+
+  .session--vocab .vocab-card .hint-pic {
+    width: min(135px, 36vw);
+  }
+
+  .session--vocab .vocab-card__zh {
+    font-size: 1.8rem;
+  }
+
+  .session--vocab .vocab-card__en {
+    font-size: 1.1rem;
+  }
+
+  .session--vocab > .session__actions {
+    margin: 0;
+  }
+
+  .session--vocab .vocab-cats {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    gap: 0.35rem;
+    padding-bottom: 0.2rem;
+    scrollbar-width: none;
+  }
+
+  .session--vocab .vocab-cats::-webkit-scrollbar {
+    display: none;
+  }
+
+  .session--vocab .vocab-cats .chip {
+    flex: 0 0 auto;
+  }
+
+  .app-shell--home {
+    padding-top: 0.45rem;
+  }
+
+  .hero {
+    padding: 0.35rem 0.25rem 0.55rem;
+  }
+
+  .hero__brand {
+    font-size: 1.45rem;
+  }
+
+  .hero__mascot-wrap .mascot {
+    width: 88px !important;
+    height: 88px !important;
+  }
+
+  .hero__name {
+    font-size: 2.65rem;
+  }
+
+  .hero__figure,
+  .hero__tag {
+    margin-top: 0.18rem;
+    font-size: 0.85rem;
+  }
+
+  .hero__stars {
+    margin-top: 0.4rem;
+    padding: 0.3rem 0.7rem;
+  }
+
+  .home-main {
+    gap: 0.55rem;
+  }
+
+  .mock-cta,
+  .vocab-cta {
+    padding: 0.65rem 0.75rem;
+  }
+
+  .mock-cta__sub,
+  .vocab-cta__sub,
+  .module-card__sections {
+    display: none;
+  }
+
+  .module-grid {
+    gap: 0.5rem;
+  }
+
+  .module-card {
+    padding: 0.65rem 0.7rem;
+    gap: 0.55rem;
+    border-radius: 18px;
+  }
+
+  .module-card__icon--art {
+    width: 3rem;
+    height: 3rem;
+  }
+}

@@ -9,9 +9,7 @@ import {
   checkClock,
   checkMath,
   checkMoney,
-  levels,
   type Activity,
-  type ActivityKind,
   type DayId,
 } from '../data/content'
 import { looksEnglish, useSpeech } from '../hooks/useSpeech'
@@ -23,7 +21,6 @@ import { playSfx, unlockAudio } from '../hooks/useSfx'
 import { duckBgm, setBgmMood } from '../lib/bgm'
 import { SceneArt } from './SceneArt'
 import { Confetti } from './Confetti'
-import { Mascot } from './Mascot'
 import { SoundToggle } from './SoundToggle'
 import { AnalogClock } from './AnalogClock'
 import { CoinPurse } from './CoinPurse'
@@ -44,17 +41,6 @@ type Props = {
   onMarkDone: (itemId: string, moduleKey: DayId | 'mock' | 'vocab') => void
   onBack: () => void
   celebrate?: boolean
-}
-
-const METHOD_LABEL: Record<ActivityKind, string> = {
-  speak: '▶',
-  choice: '○',
-  math: '123',
-  reorder: '↔',
-  prompt: '✓',
-  sort: '＋－',
-  clock: '◎',
-  money: '$',
 }
 
 const MATH_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '/'] as const
@@ -119,7 +105,6 @@ export function PracticeSession({
   const isStoryFocus = item.id === 'd1-en-story'
   const isLast = index >= items.length - 1
   const done = completed[item.id]
-  const levelMeta = levels.find((l) => l.level === item.level)
   const solvedChoice = picked !== null && !!item.choices?.[picked]?.correct
 
   const sortCorrect = useMemo(() => {
@@ -415,7 +400,10 @@ export function PracticeSession({
   }
 
   return (
-    <section className="session" style={{ '--accent': accent } as CSSProperties}>
+    <section
+      className={`session session--practice session--kind-${item.kind}`}
+      style={{ '--accent': accent } as CSSProperties}
+    >
       <Confetti show={showConfetti} onDone={() => setShowConfetti(false)} />
 
       <header className="session__top">
@@ -445,21 +433,12 @@ export function PracticeSession({
       </header>
 
       <div className={`session__layout ${isStoryFocus ? 'session__layout--story' : ''}`}>
-        {!isStoryFocus && (
-          <div className="session__buddy" aria-hidden>
-            <Mascot mood={mascotMood} size={120} />
-          </div>
-        )}
-
         <div className={`session__card ${isStoryFocus ? 'session__card--story' : ''}`} key={item.id}>
           <div className="session__badges">
-            <p className={`session__method session__method--${item.kind}`}>{METHOD_LABEL[item.kind]}</p>
             {(item.section || item.cue) && (
-              <p className="session__cue">{item.section || item.cue}</p>
-            )}
-            {levelMeta && (
-              <p className="session__level" style={{ background: levelMeta.color }}>
-                Lv.{item.level} {levelMeta.name}
+              <p className="session__cue">
+                {item.section || item.cue}
+                <span> · Lv.{item.level}</span>
               </p>
             )}
           </div>
@@ -470,9 +449,10 @@ export function PracticeSession({
               <HintPicture visual={teach.visual} />
             </div>
           )}
-          {item.kind === 'math' && teach.math && <MathDots model={teach.math} />}
+          {item.kind === 'math' && teach.math && item.calendarDay == null && (
+            <MathDots model={teach.math} />
+          )}
           {item.clock && <AnalogClock hour={item.clock.hour} minute={item.clock.minute} />}
-          {item.clock && <p className="kid-help__caption">短針＝點鐘　長針＝分鐘</p>}
           {item.coins && item.purseOwner && <CoinPurse owner={item.purseOwner} coins={item.coins} />}
           {item.calendarDay != null && <JuneCalendar highlightDay={item.calendarDay} />}
 
@@ -502,88 +482,69 @@ export function PracticeSession({
               <h2 className="session__q">{item.promptZh}</h2>
               {item.promptEn && <p className="session__q-en">{item.promptEn}</p>}
 
-              <div className="session__actions">
-                <button
-                  type="button"
-                  className="pill-btn"
-                  onClick={() => {
-                    unlockAudio()
-                    playSfx('tap')
-                    if (item.promptEn) {
-                      const englishText =
-                        item.listenToSample && item.sampleEn ? item.sampleEn : item.promptEn
-                      speakQueue(
-                        [item.promptZh, englishText],
-                        looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK',
-                      )
-                    } else {
-                      speak(item.promptZh, looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK')
-                    }
-                  }}
-                  aria-label="聽題目"
-                >
-                  {KID.listen}
-                </button>
-                {item.promptEn && (
+              <div className="session__tools">
+                <div className="session__actions">
                   <button
                     type="button"
-                    className="pill-btn pill-btn--soft"
+                    className="pill-btn"
                     onClick={() => {
                       unlockAudio()
                       playSfx('tap')
-                      speak(
-                        item.listenToSample && item.sampleEn ? item.sampleEn : item.promptEn!,
-                        'en-US',
-                      )
+                      if (item.promptEn) {
+                        const englishText =
+                          item.listenToSample && item.sampleEn ? item.sampleEn : item.promptEn
+                        speakQueue(
+                          [item.promptZh, englishText],
+                          looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK',
+                        )
+                      } else {
+                        speak(item.promptZh, looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK')
+                      }
                     }}
-                    aria-label="Hear English"
+                    aria-label="聽題目"
                   >
-                    {KID.listenEn}
+                    {KID.listen} 聽題
                   </button>
-                )}
+                </div>
+                <KidHelp
+                  hint={teach}
+                  open={helpOpen}
+                  step={helpStep}
+                  hideArt={
+                    !item.scene &&
+                    !item.clock &&
+                    !item.coins &&
+                    item.calendarDay == null &&
+                    !(item.kind === 'math' && teach.math)
+                  }
+                  onToggle={() => {
+                    unlockAudio()
+                    playSfx('flip')
+                    const next = !helpOpen
+                    setHelpOpen(next)
+                    if (next) {
+                      setHelped(true)
+                      speak(helpStep >= 2 ? teach.moreLine : teach.kidLine, 'zh-HK')
+                    }
+                  }}
+                  onMore={() => {
+                    playSfx('tap')
+                    setHelpStep(2)
+                    setHelped(true)
+                    speak(teach.moreLine, 'zh-HK')
+                  }}
+                  onSpeak={(text) => {
+                    unlockAudio()
+                    playSfx('tap')
+                    speak(text, 'zh-HK')
+                  }}
+                />
               </div>
             </>
           )}
 
-          {!isStoryFocus && (
-            <KidHelp
-              hint={teach}
-              open={helpOpen}
-              step={helpStep}
-              hideArt={
-                !item.scene &&
-                !item.clock &&
-                !item.coins &&
-                item.calendarDay == null &&
-                !(item.kind === 'math' && teach.math)
-              }
-              onToggle={() => {
-                unlockAudio()
-                playSfx('flip')
-                const next = !helpOpen
-                setHelpOpen(next)
-                if (next) {
-                  setHelped(true)
-                  speak(helpStep >= 2 ? teach.moreLine : teach.kidLine, 'zh-HK')
-                }
-              }}
-              onMore={() => {
-                playSfx('tap')
-                setHelpStep(2)
-                setHelped(true)
-                speak(teach.moreLine, 'zh-HK')
-              }}
-              onSpeak={(text) => {
-                unlockAudio()
-                playSfx('tap')
-                speak(text, 'zh-HK')
-              }}
-            />
-          )}
-
           {item.kind === 'speak' && (
-            <div className={`speak-box ${isStoryFocus ? 'speak-box--story' : ''}`}>
-              {!isStoryFocus && <p className="speak-box__guide">● → ■ → ▶ → ★</p>}
+            <div className={`speak-box ${isStoryFocus ? 'speak-box--story' : 'speak-box--compact'}`}>
 
               <div
                 className={`listen-panel ${listening || composeActive || listenBusy ? 'is-listening' : ''} ${
@@ -824,25 +785,6 @@ export function PracticeSession({
 
           {item.kind === 'choice' && item.choices && (
             <div className="choice-list">
-              <p className="reorder__hint">▶ 聽 · 再撳揀</p>
-              <div className="session__actions">
-                <button
-                  type="button"
-                  className="pill-btn"
-                  onClick={() => {
-                    unlockAudio()
-                    playSfx('tap')
-                    const lang = item.choices!.every((c) => looksEnglish(c.text)) ? 'en-US' : 'zh-HK'
-                    const lines = item.choices!.map(
-                      (c, i) => `${String.fromCharCode(65 + i)}. ${c.text}`,
-                    )
-                    speakQueue(lines, lang)
-                  }}
-                  aria-label="讀晒選項"
-                >
-                  {KID.listenAll}
-                </button>
-              </div>
               {item.choices.map((c, i) => {
                 const selected = picked === i
                 const triedWrong = wrongPicks.includes(i)
@@ -1230,20 +1172,6 @@ export function PracticeSession({
                   {reorderCorrect ? '句子正確！好叻！' : '繼續拖一拖順序吧'}
                 </p>
               )}
-              {reorderCorrect && !done && (
-                <button
-                  type="button"
-                  className="primary-btn"
-                  style={{ marginTop: '0.75rem' }}
-                  onClick={() => {
-                    playSfx('tap')
-                    awardAndMaybeNext(false)
-                  }}
-                  aria-label="收下星星"
-                >
-                  {KID.starOk}
-                </button>
-              )}
             </div>
           )}
 
@@ -1268,7 +1196,7 @@ export function PracticeSession({
 
           {item.kind !== 'speak' &&
             (item.sampleZh || item.sampleEn || item.tip) &&
-            (showSample || item.kind === 'prompt') && (
+            showSample && (
               <div className="session__coach">
                 <div className="sample">
                   {item.sampleZh && <p className="sample__zh">{item.sampleZh}</p>}

@@ -4,7 +4,6 @@ import { useSpeech } from '../hooks/useSpeech'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
 import { ensureBgm, setBgmMood, startBgm } from '../lib/bgm'
 import { KID } from '../lib/kidLabels'
-import { Mascot } from './Mascot'
 import { SoundToggle } from './SoundToggle'
 import { HintPicture } from './HintPicture'
 import { vocabVisual } from '../lib/teachHint'
@@ -60,7 +59,7 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
   }
 
   return (
-    <section className="session">
+    <section className="session session--vocab">
       <Confetti show={burst} onDone={() => setBurst(false)} />
       <header className="session__top">
         <button
@@ -85,7 +84,6 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
       </header>
 
       <div className="vocab-stage">
-        <Mascot mood={flipped ? 'cheer' : 'wave'} size={100} className="vocab-stage__mascot" />
         <button
           type="button"
           className={`vocab-card ${flipped ? 'is-flipped' : ''}`}
@@ -116,7 +114,7 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
             speak(item.zh, 'zh-HK')
           }}
         >
-          {KID.listen}
+          {KID.listen} 中
         </button>
         <button
           type="button"
