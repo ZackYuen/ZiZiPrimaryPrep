@@ -1,4 +1,4 @@
-import { prepareSpokenText, type SpeakLang as TtsLang } from './speakText'
+import { prepareSpokenText, toPlainSpoken, toSsml, type SpeakLang as TtsLang } from './speakText'
 
 export type { TtsLang }
 
@@ -33,17 +33,19 @@ function b64ToBytes(b64: string): Uint8Array {
 }
 
 async function synthesizeOnce(opts: {
-  text: string
+  text?: string
+  ssml?: string
   languageCode: string
   voiceName: string
   apiKey: string
   signal?: AbortSignal
 }): Promise<Uint8Array> {
+  const input = opts.ssml ? { ssml: opts.ssml } : { text: opts.text }
   const res = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${opts.apiKey}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      input: { text: opts.text },
+      input,
       voice: { languageCode: opts.languageCode, name: opts.voiceName },
       audioConfig: {
         audioEncoding: 'MP3',
@@ -79,20 +81,27 @@ export async function synthesizeGoogleTts(
 
   const languageCode = lang === 'en-US' ? 'en-US' : 'yue-HK'
   const voices = lang === 'en-US' ? EN_VOICES : YUE_VOICES
+  const ssml = toSsml(prepared)
+  const plain = toPlainSpoken(prepared, lang).slice(0, 4000)
+  const inputs: Array<{ ssml?: string; text?: string }> = []
+  if (ssml) inputs.push({ ssml })
+  inputs.push({ text: plain })
   let lastErr = 'Google TTS 失敗'
   for (const voiceName of voices) {
-    try {
-      const bytes = await synthesizeOnce({
-        text: prepared.slice(0, 4000),
-        languageCode,
-        voiceName,
-        apiKey: key,
-        signal,
-      })
-      remember(ck, bytes)
-      return bytes
-    } catch (err) {
-      lastErr = err instanceof Error ? err.message : lastErr
+    for (const input of inputs) {
+      try {
+        const bytes = await synthesizeOnce({
+          ...input,
+          languageCode,
+          voiceName,
+          apiKey: key,
+          signal,
+        })
+        remember(ck, bytes)
+        return bytes
+      } catch (err) {
+        lastErr = err instanceof Error ? err.message : lastErr
+      }
     }
   }
   throw new Error(lastErr)

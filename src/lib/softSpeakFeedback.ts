@@ -60,11 +60,11 @@ function extractZhKeys(sample: string): string[] {
   return [...new Set(merged)].slice(0, 8)
 }
 
-function extractEnKeys(sample: string): string[] {
+function extractEnKeys(sample: string, limit = 8): string[] {
   const words = (sample.toLowerCase().match(/[a-z']+/g) ?? []).filter(
     (w) => w.length >= 3 && !EN_STOP.has(w),
   )
-  return [...new Set(words)].slice(0, 8)
+  return [...new Set(words)].slice(0, limit)
 }
 
 /** Gentle keyword overlap — never used as a hard pass/fail gate. */
@@ -72,11 +72,14 @@ export function softSpeakFeedback(
   transcript: string,
   sample: string | undefined,
   lang: 'zh' | 'en',
+  flexible = false,
 ): SoftSpeakFeedback | null {
   const heard = transcript.trim()
   if (!heard || !sample?.trim()) return null
 
-  const keys = lang === 'en' ? extractEnKeys(sample) : extractZhKeys(sample)
+  // Flexible stories may start at any picture, so match ideas from the whole model—not
+  // just the first sentence. Missing ideas are intentionally not shown as errors.
+  const keys = lang === 'en' ? extractEnKeys(sample, flexible ? 32 : 8) : extractZhKeys(sample)
   if (keys.length === 0) return null
 
   const normHeard = lang === 'en' ? heard.toLowerCase() : heard
@@ -88,6 +91,14 @@ export function softSpeakFeedback(
       matched,
       missing,
       message: '電話未必聽得準童聲——唔緊要，請爸爸媽媽判斷。',
+    }
+  }
+
+  if (flexible) {
+    return {
+      matched,
+      missing: [],
+      message: `聽到：${matched.slice(0, 4).join('、')}。講到自己嘅重點，好自然～`,
     }
   }
 

@@ -229,6 +229,58 @@ function draw(visual: HintVisualId) {
           <LabelText x={130} y={188} text="藍色 · 畫畫" />
         </>
       )
+    case 'insects':
+      return (
+        <>
+          {person(62, 126, { scale: 0.72, wave: true })}
+          <g transform="translate(126 45)">
+            <ellipse cx="0" cy="8" rx="13" ry="9" fill="#F5C84C" stroke="#1B3A4B" strokeWidth="2" />
+            <ellipse cx="26" cy="8" rx="13" ry="9" fill="#FF9B7A" stroke="#1B3A4B" strokeWidth="2" />
+            <rect x="11" y="2" width="5" height="22" rx="3" fill="#1B3A4B" />
+            <path d="M10 3 L4 -5 M17 3 L23 -5" stroke="#1B3A4B" strokeWidth="2" />
+          </g>
+          <g transform="translate(154 82) rotate(-18)">
+            <ellipse cx="28" cy="20" rx="30" ry="24" fill="#fff" fillOpacity="0.65" stroke="#1B3A4B" strokeWidth="4" />
+            <path d="M9 6 L47 34 M2 20 L54 20 M9 34 L47 6" stroke="#7EC8E3" strokeWidth="2" />
+            <path d="M4 38 L-18 82" stroke="#8A5A2B" strokeWidth="7" strokeLinecap="round" />
+          </g>
+          <circle cx="218" cy="64" r="12" fill="#6BCB8B" />
+          <circle cx="211" cy="60" r="2" fill="#1B3A4B" />
+          <circle cx="225" cy="60" r="2" fill="#1B3A4B" />
+          <LabelText x={130} y={188} text="昆蟲 · 小網" />
+        </>
+      )
+    case 'seth-story':
+      return (
+        <>
+          <path d="M48 96 H212" stroke="#1B3A4B" strokeWidth="4" strokeDasharray="6 7" />
+          <g transform="translate(38 58)">
+            {person(0, 28, { scale: 0.36, wave: true, badge: 'Seth' })}
+          </g>
+          <g transform="translate(82 58)">
+            {person(-10, 28, { scale: 0.28, body: '#5EB5D8' })}
+            {person(8, 28, { scale: 0.32 })}
+            {person(26, 28, { scale: 0.28, body: '#FF9B7A' })}
+          </g>
+          <g transform="translate(136 67)">
+            <ellipse cx="-8" cy="0" rx="10" ry="7" fill="#F5C84C" stroke="#1B3A4B" strokeWidth="2" />
+            <ellipse cx="10" cy="0" rx="10" ry="7" fill="#FF9B7A" stroke="#1B3A4B" strokeWidth="2" />
+            <rect x="-1" y="-5" width="4" height="16" rx="2" fill="#1B3A4B" />
+          </g>
+          <g transform="translate(176 48)">
+            <rect width="34" height="40" rx="5" fill="#fff" stroke="#1B3A4B" strokeWidth="3" />
+            <circle cx="17" cy="15" r="8" fill="#F5C84C" />
+            <path d="M8 32 Q17 22 27 31" fill="none" stroke="#1B6B8A" strokeWidth="3" />
+          </g>
+          <circle cx="222" cy="68" r="18" fill="#F5C84C" stroke="#D4A24C" strokeWidth="3" />
+          <text x="38" y="128" textAnchor="middle" fontSize="12" fontWeight="800" fill="#1B3A4B">ME</text>
+          <text x="97" y="128" textAnchor="middle" fontSize="12" fontWeight="800" fill="#1B3A4B">FAMILY</text>
+          <text x="144" y="128" textAnchor="middle" fontSize="12" fontWeight="800" fill="#1B3A4B">BUGS</text>
+          <text x="193" y="128" textAnchor="middle" fontSize="12" fontWeight="800" fill="#1B3A4B">DRAW</text>
+          <text x="222" y="151" textAnchor="middle" fontSize="12" fontWeight="800" fill="#1B3A4B">YELLOW</text>
+          <LabelText x={130} y={188} text="揀三幅，自然講" />
+        </>
+      )
     case 'talk':
       return (
         <>

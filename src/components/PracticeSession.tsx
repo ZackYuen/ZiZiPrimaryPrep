@@ -253,7 +253,12 @@ export function PracticeSession({
       listenLang === 'en-US'
         ? item.sampleEn || item.sampleZh
         : item.sampleZh || item.sampleEn
-    return softSpeakFeedback(heard, sample, listenLang === 'en-US' ? 'en' : 'zh')
+    return softSpeakFeedback(
+      heard,
+      sample,
+      listenLang === 'en-US' ? 'en' : 'zh',
+      item.flexibleSpeak,
+    )
   }, [item, spokenText, listenLang])
 
   useEffect(() => {
@@ -478,7 +483,16 @@ export function PracticeSession({
               onClick={() => {
                 unlockAudio()
                 playSfx('tap')
-                speak(item.promptZh, looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK')
+                if (item.promptEn) {
+                  const englishText =
+                    item.listenToSample && item.sampleEn ? item.sampleEn : item.promptEn
+                  speakQueue(
+                    [item.promptZh, englishText],
+                    looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK',
+                  )
+                } else {
+                  speak(item.promptZh, looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK')
+                }
               }}
               aria-label="聽題目"
             >
@@ -491,7 +505,10 @@ export function PracticeSession({
                 onClick={() => {
                   unlockAudio()
                   playSfx('tap')
-                  speak(item.promptEn!, 'en-US')
+                  speak(
+                    item.listenToSample && item.sampleEn ? item.sampleEn : item.promptEn!,
+                    'en-US',
+                  )
                 }}
                 aria-label="Hear English"
               >
@@ -592,6 +609,12 @@ export function PracticeSession({
                           '多謝老師',
                           '我鍾意',
                           '因為',
+                          'insects',
+                          'geckos',
+                          'little bug net',
+                          'cartoon characters',
+                          'favourite colour',
+                          'yellow',
                         ])
                         startListening(listenLang, { phrases })
                       } else {
