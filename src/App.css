@@ -2555,7 +2555,25 @@
 
   .june-cal {
     max-width: 205px;
+    margin-top: 0.2rem;
+    margin-bottom: 0.1rem;
+    padding: 0.35rem;
     margin-inline: auto;
+  }
+
+  .june-cal__title {
+    margin-bottom: 0.15rem;
+    font-size: 0.85rem;
+  }
+
+  .june-cal__grid {
+    gap: 0.12rem;
+  }
+
+  .june-cal__head,
+  .june-cal__cell {
+    padding-block: 0.12rem;
+    font-size: 0.7rem;
   }
 
   .math-dots {
