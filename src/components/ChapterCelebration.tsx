@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Confetti } from './Confetti'
 import { Mascot } from './Mascot'
 
@@ -12,11 +12,17 @@ const DURATION_MS = 3000
 
 /** Full-screen finale reserved for finishing a whole chapter/module. */
 export function ChapterCelebration({ show, title, onDone }: Props) {
+  const onDoneRef = useRef(onDone)
+
+  useEffect(() => {
+    onDoneRef.current = onDone
+  }, [onDone])
+
   useEffect(() => {
     if (!show) return
-    const timer = window.setTimeout(onDone, DURATION_MS)
+    const timer = window.setTimeout(() => onDoneRef.current(), DURATION_MS)
     return () => window.clearTimeout(timer)
-  }, [show, onDone])
+  }, [show])
 
   if (!show) return null
 
