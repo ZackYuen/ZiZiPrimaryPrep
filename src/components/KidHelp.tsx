@@ -27,29 +27,37 @@ export function KidHelp({ hint, open, step, hideArt, onToggle, onMore, onSpeak }
         <span className="kid-help__btn-label">幫我</span>
       </button>
       {open && (
-        <div className="kid-help__panel">
-          <button type="button" className="kid-help__close" onClick={onToggle} aria-label="收起提示">
-            ×
-          </button>
-          {!hideArt && <HintPicture visual={hint.visual} size={240} />}
-          {hint.math && <MathDots model={hint.math} />}
-          <p className="kid-help__line">{line}</p>
-          <div className="session__actions">
-            <button
-              type="button"
-              className="pill-btn"
-              onClick={() => onSpeak(line)}
-              aria-label="聽提示"
-            >
-              {KID.listen}
+        <>
+          <button
+            type="button"
+            className="kid-help__backdrop"
+            onClick={onToggle}
+            aria-label="收起提示"
+          />
+          <div className="kid-help__panel" role="dialog" aria-modal="true" aria-label="幫我提示">
+            <button type="button" className="kid-help__close" onClick={onToggle} aria-label="收起提示">
+              ×
             </button>
-            {step < 2 && (
-              <button type="button" className="pill-btn pill-btn--soft" onClick={onMore} aria-label="再提示">
-                {KID.help}{KID.help}
+            {!hideArt && <HintPicture visual={hint.visual} size={240} />}
+            {hint.math && <MathDots model={hint.math} />}
+            <p className="kid-help__line">{line}</p>
+            <div className="session__actions">
+              <button
+                type="button"
+                className="pill-btn"
+                onClick={() => onSpeak(line)}
+                aria-label="聽提示"
+              >
+                {KID.listen}
               </button>
-            )}
+              {step < 2 && (
+                <button type="button" className="pill-btn pill-btn--soft" onClick={onMore} aria-label="再提示">
+                  {KID.help}{KID.help}
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   )
