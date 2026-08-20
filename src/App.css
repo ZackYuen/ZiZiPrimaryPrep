@@ -2068,6 +2068,227 @@
   animation: confetti-fall 1.3s ease-in forwards;
 }
 
+.confetti--grand {
+  z-index: 102;
+}
+
+.confetti--grand .confetti__piece {
+  top: -28px;
+  animation-duration: 2.65s;
+  box-shadow: 0 2px 0 rgba(27, 58, 75, 0.12);
+}
+
+.chapter-finale {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 1rem;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.96) 0 12%, transparent 42%),
+    linear-gradient(145deg, #7ec8e3 0%, #ffe08a 46%, #ff9b7a 100%);
+  animation: chapter-finale-in 0.28s ease-out both;
+}
+
+.chapter-finale__rays {
+  position: absolute;
+  width: min(160vw, 950px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0.55;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 0.88) 0deg 9deg,
+    transparent 9deg 20deg
+  );
+  animation: chapter-rays 7s linear infinite;
+}
+
+.chapter-finale__card {
+  position: relative;
+  z-index: 103;
+  width: min(92vw, 430px);
+  padding: 1.15rem 1rem 1.3rem;
+  border: 5px solid #fff;
+  border-radius: 38px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 22px 0 rgba(138, 106, 18, 0.16),
+    0 28px 70px rgba(27, 58, 75, 0.28);
+  text-align: center;
+  animation: chapter-card-pop 0.75s cubic-bezier(0.2, 1.55, 0.45, 1) both;
+}
+
+.chapter-finale__kicker {
+  margin: 0;
+  color: #c45c26;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 6vw, 2rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  animation: chapter-kicker 0.65s ease 0.55s both;
+}
+
+.chapter-finale__mascot {
+  display: block;
+  width: min(46vw, 190px);
+  height: auto;
+  margin: -0.15rem auto -0.35rem;
+  filter: drop-shadow(0 12px 0 rgba(27, 58, 75, 0.1));
+  animation: chapter-mascot-jump 0.75s ease 0.35s both;
+}
+
+.chapter-finale__card h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 10vw, 3.2rem);
+  line-height: 1.05;
+  text-shadow: 0 5px 0 rgba(245, 200, 76, 0.4);
+}
+
+.chapter-finale__card > p:last-of-type {
+  margin: 0.5rem 0 0;
+  color: var(--ink-soft);
+  font-size: clamp(1rem, 4vw, 1.25rem);
+  font-weight: 800;
+}
+
+.chapter-finale__trophy {
+  position: absolute;
+  right: -0.55rem;
+  bottom: -0.7rem;
+  display: grid;
+  place-items: center;
+  width: 4.2rem;
+  height: 4.2rem;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  background: #f5c84c;
+  color: #8a6a12;
+  font-size: 2.5rem;
+  box-shadow: 0 8px 0 rgba(138, 106, 18, 0.24);
+  animation: chapter-trophy 0.7s cubic-bezier(0.2, 1.7, 0.4, 1) 1.05s both;
+}
+
+.chapter-finale__stars {
+  position: absolute;
+  z-index: 104;
+  inset: 0;
+  pointer-events: none;
+}
+
+.chapter-finale__stars span {
+  position: absolute;
+  color: #fff;
+  font-size: clamp(2.6rem, 12vw, 5.4rem);
+  text-shadow: 0 7px 0 rgba(138, 106, 18, 0.2);
+  animation: chapter-star-pop 0.65s cubic-bezier(0.2, 1.8, 0.4, 1) both;
+}
+
+.chapter-finale__stars span:nth-child(1) {
+  top: 10%;
+  left: 8%;
+  transform: rotate(-18deg);
+  animation-delay: 0.5s;
+}
+
+.chapter-finale__stars span:nth-child(2) {
+  top: 8%;
+  right: 8%;
+  transform: rotate(20deg);
+  animation-delay: 0.72s;
+}
+
+.chapter-finale__stars span:nth-child(3) {
+  left: 12%;
+  bottom: 9%;
+  transform: rotate(12deg);
+  animation-delay: 0.94s;
+}
+
+@keyframes chapter-finale-in {
+  from {
+    opacity: 0;
+    filter: saturate(0.6);
+  }
+  to {
+    opacity: 1;
+    filter: saturate(1);
+  }
+}
+
+@keyframes chapter-rays {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes chapter-card-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.25) rotate(-8deg);
+  }
+  72% {
+    opacity: 1;
+    transform: scale(1.08) rotate(2deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes chapter-mascot-jump {
+  from {
+    opacity: 0;
+    transform: translateY(90px) scale(0.65) rotate(-10deg);
+  }
+  62% {
+    opacity: 1;
+    transform: translateY(-18px) scale(1.1) rotate(6deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0);
+  }
+}
+
+@keyframes chapter-kicker {
+  from {
+    opacity: 0;
+    transform: scale(2.2) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes chapter-trophy {
+  from {
+    opacity: 0;
+    scale: 0;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes chapter-star-pop {
+  from {
+    opacity: 0;
+    scale: 0;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
 @keyframes confetti-fall {
   0% {
     transform: translateY(0) rotate(0deg);
