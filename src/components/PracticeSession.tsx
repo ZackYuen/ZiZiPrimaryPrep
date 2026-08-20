@@ -21,6 +21,7 @@ import { playSfx, unlockAudio } from '../hooks/useSfx'
 import { duckBgm, setBgmMood } from '../lib/bgm'
 import { SceneArt } from './SceneArt'
 import { Confetti } from './Confetti'
+import { ChapterCelebration } from './ChapterCelebration'
 import { SoundToggle } from './SoundToggle'
 import { AnalogClock } from './AnalogClock'
 import { CoinPurse } from './CoinPurse'
@@ -62,6 +63,7 @@ export function PracticeSession({
   const [showSample, setShowSample] = useState(false)
   const [justStar, setJustStar] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [chapterComplete, setChapterComplete] = useState(false)
   const [picked, setPicked] = useState<number | null>(null)
   const [wrongPicks, setWrongPicks] = useState<number[]>([])
   const [wrongAttempts, setWrongAttempts] = useState(0)
@@ -130,6 +132,10 @@ export function PracticeSession({
       duckBgm(4000)
       return
     }
+    if (chapterComplete) {
+      setBgmMood('celebrate')
+      return
+    }
     if (justStar || (celebrate && isLast && done)) {
       setBgmMood(celebrate && isLast ? 'celebrate' : 'cheer')
       return
@@ -143,7 +149,7 @@ export function PracticeSession({
       return
     }
     setBgmMood('practice')
-  }, [listening, listenBusy, justStar, celebrate, isLast, done, mascotMood])
+  }, [listening, listenBusy, chapterComplete, justStar, celebrate, isLast, done, mascotMood])
 
   const resetInteraction = (_activity: Activity) => {
     setShowSample(false)
@@ -194,9 +200,9 @@ export function PracticeSession({
   useEffect(() => {
     if (justStar) {
       playSfx('star')
-      setShowConfetti(true)
+      if (!isLast) setShowConfetti(true)
     }
-  }, [justStar])
+  }, [justStar, isLast])
 
   const reorderCorrect = useMemo(() => {
     if (item.kind !== 'reorder' || !item.correctOrder) return false
@@ -256,11 +262,14 @@ export function PracticeSession({
   const goNext = () => {
     stop()
     stopListening()
-    playSfx('whoosh')
     if (isLast) {
-      if (celebrate) playSfx('celebrate')
-      onBack()
-    } else setIndex((i) => i + 1)
+      setBgmMood('celebrate')
+      playSfx('finale')
+      setChapterComplete(true)
+      return
+    }
+    playSfx('whoosh')
+    setIndex((i) => i + 1)
   }
 
   const awardAndMaybeNext = (autoNext = false) => {
@@ -405,6 +414,14 @@ export function PracticeSession({
       style={{ '--accent': accent } as CSSProperties}
     >
       <Confetti show={showConfetti} onDone={() => setShowConfetti(false)} />
+      <ChapterCelebration
+        show={chapterComplete}
+        title={title}
+        onDone={() => {
+          setChapterComplete(false)
+          onBack()
+        }}
+      />
 
       <header className="session__top">
         <button
