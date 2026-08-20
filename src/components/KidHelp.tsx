@@ -28,6 +28,9 @@ export function KidHelp({ hint, open, step, hideArt, onToggle, onMore, onSpeak }
       </button>
       {open && (
         <div className="kid-help__panel">
+          <button type="button" className="kid-help__close" onClick={onToggle} aria-label="收起提示">
+            ×
+          </button>
           {!hideArt && <HintPicture visual={hint.visual} size={240} />}
           {hint.math && <MathDots model={hint.math} />}
           <p className="kid-help__line">{line}</p>
