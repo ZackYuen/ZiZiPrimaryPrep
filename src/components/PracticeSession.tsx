@@ -449,7 +449,9 @@ export function PracticeSession({
               <HintPicture visual={teach.visual} />
             </div>
           )}
-          {item.kind === 'math' && teach.math && <MathDots model={teach.math} />}
+          {item.kind === 'math' && teach.math && item.calendarDay == null && (
+            <MathDots model={teach.math} />
+          )}
           {item.clock && <AnalogClock hour={item.clock.hour} minute={item.clock.minute} />}
           {item.coins && item.purseOwner && <CoinPurse owner={item.purseOwner} coins={item.coins} />}
           {item.calendarDay != null && <JuneCalendar highlightDay={item.calendarDay} />}
