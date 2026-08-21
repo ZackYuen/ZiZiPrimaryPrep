@@ -1,10 +1,15 @@
 import { prepareSpokenText, toPlainSpoken, toSsml, type SpeakLang as TtsLang } from './speakText'
+import { getVoiceSettings } from './voiceSettings'
 
 export type { TtsLang }
 
-export function isGoogleTtsConfigured(): boolean {
+export function hasGoogleTtsKey(): boolean {
   const key = import.meta.env.VITE_GOOGLE_SPEECH_API_KEY as string | undefined
   return Boolean(key && key.trim())
+}
+
+export function isGoogleTtsConfigured(): boolean {
+  return getVoiceSettings().provider === 'google' && hasGoogleTtsKey()
 }
 
 const YUE_VOICES = ['yue-HK-Chirp3-HD-Kore', 'yue-HK-Standard-A']
@@ -13,8 +18,8 @@ const EN_VOICES = ['en-US-Chirp3-HD-Kore', 'en-US-Neural2-C', 'en-US-Standard-C'
 const cache = new Map<string, Uint8Array>()
 const CACHE_MAX = 40
 
-function cacheKey(text: string, lang: TtsLang): string {
-  return `${lang}:${text}`
+function cacheKey(text: string, lang: TtsLang, voiceName: string, rate: number): string {
+  return `${lang}:${voiceName}:${rate}:${text}`
 }
 
 function remember(key: string, bytes: Uint8Array) {
@@ -37,6 +42,7 @@ async function synthesizeOnce(opts: {
   ssml?: string
   languageCode: string
   voiceName: string
+  speakingRate: number
   apiKey: string
   signal?: AbortSignal
 }): Promise<Uint8Array> {
@@ -49,7 +55,7 @@ async function synthesizeOnce(opts: {
       voice: { languageCode: opts.languageCode, name: opts.voiceName },
       audioConfig: {
         audioEncoding: 'MP3',
-        speakingRate: opts.languageCode.startsWith('yue') ? 0.95 : 0.96,
+        speakingRate: opts.speakingRate,
       },
     }),
     signal: opts.signal,
@@ -75,12 +81,16 @@ export async function synthesizeGoogleTts(
   const key = (import.meta.env.VITE_GOOGLE_SPEECH_API_KEY as string | undefined)?.trim()
   if (!key) throw new Error('未設定 Google TTS')
 
-  const ck = cacheKey(prepared, lang)
+  const settings = getVoiceSettings()
+  const selectedVoice = lang === 'en-US' ? settings.enVoice : settings.yueVoice
+  const speakingRate = settings.rate
+  const ck = cacheKey(prepared, lang, selectedVoice, speakingRate)
   const hit = cache.get(ck)
   if (hit) return hit
 
   const languageCode = lang === 'en-US' ? 'en-US' : 'yue-HK'
-  const voices = lang === 'en-US' ? EN_VOICES : YUE_VOICES
+  const fallbackVoices = lang === 'en-US' ? EN_VOICES : YUE_VOICES
+  const voices = [selectedVoice, ...fallbackVoices.filter((voice) => voice !== selectedVoice)]
   const ssml = toSsml(prepared)
   const plain = toPlainSpoken(prepared, lang).slice(0, 4000)
   const inputs: Array<{ ssml?: string; text?: string }> = []
@@ -94,6 +104,7 @@ export async function synthesizeGoogleTts(
           ...input,
           languageCode,
           voiceName,
+          speakingRate,
           apiKey: key,
           signal,
         })
