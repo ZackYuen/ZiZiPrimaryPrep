@@ -1192,6 +1192,112 @@
   font-size: 1.02rem;
 }
 
+.voice-settings {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 3px solid rgba(27, 107, 138, 0.18);
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(232, 246, 251, 0.94));
+  box-shadow: 0 10px 28px rgba(27, 58, 75, 0.1);
+}
+
+.voice-settings__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.voice-settings__heading h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+}
+
+.voice-settings__heading p {
+  margin: 0.2rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.voice-settings__badge {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--sky-deep, #1b6b8a);
+  color: #fff;
+  font-weight: 900;
+}
+
+.voice-settings__field {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 0.35fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.voice-settings__field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0.55rem 2.2rem 0.55rem 0.7rem;
+  border: 2px solid rgba(27, 58, 75, 0.14);
+  border-radius: 14px;
+  background-color: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+}
+
+.voice-settings__notice,
+.voice-settings__warning {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 14px;
+  font-size: 0.88rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.voice-settings__notice {
+  background: rgba(245, 200, 76, 0.2);
+  color: #76580f;
+}
+
+.voice-settings__warning {
+  background: rgba(255, 122, 89, 0.14);
+  color: #8f3f29;
+}
+
+.voice-settings__tests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.voice-settings__tests .pill-btn {
+  flex: 1 1 9rem;
+  min-height: 46px;
+}
+
+.voice-settings__reset {
+  flex: 1 1 100%;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .parent__list {
   display: flex;
   flex-direction: column;

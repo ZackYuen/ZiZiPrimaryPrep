@@ -1,4 +1,5 @@
 import { coreAbilities, levels, parentQuotes, parentTips } from '../data/content'
+import { VoiceSettingsPanel } from './VoiceSettingsPanel'
 
 type Props = {
   stars: number
@@ -20,6 +21,8 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
       <p className="parent__lead">
         內容來自《名校模擬面試》第一週字詞表與 Day 1–6。目標不是全部做對，而是建立勇氣、表達與不放棄。
       </p>
+
+      <VoiceSettingsPanel />
 
       <h3 className="parent__h3">三個核心能力</h3>
       <div className="parent__list">
