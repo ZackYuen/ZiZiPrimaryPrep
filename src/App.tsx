@@ -3,10 +3,12 @@ import { DayCard } from './components/DayCard'
 import { PracticeSession } from './components/PracticeSession'
 import { ParentGuide } from './components/ParentGuide'
 import { VocabSession } from './components/VocabSession'
+import { StoryInterviewSession } from './components/StoryInterviewSession'
 import { Mascot } from './components/Mascot'
 import { SoundToggle } from './components/SoundToggle'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { CHILD, days, getDay, mockInterview, type DayId } from './data/content'
+import { storyInterviews } from './data/storyInterview'
 import { useProgress } from './hooks/useProgress'
 import { useBackgroundMusic } from './hooks/useBackgroundMusic'
 import { playSfx, unlockAudio } from './hooks/useSfx'
@@ -18,6 +20,7 @@ type View =
   | { name: 'day'; id: DayId }
   | { name: 'mock' }
   | { name: 'vocab' }
+  | { name: 'story' }
   | { name: 'parent' }
 
 function dayNumber(id: DayId): number {
@@ -34,6 +37,8 @@ export default function App() {
       ? 'day'
       : view.name === 'mock'
         ? 'mock'
+        : view.name === 'story'
+          ? 'mock'
         : view.name === 'vocab'
           ? 'vocab'
           : view.name === 'parent'
@@ -93,6 +98,17 @@ export default function App() {
     return shell(
       false,
       <VocabSession
+        completed={progress.completed}
+        onMarkDone={markDone}
+        onBack={() => go({ name: 'home' })}
+      />,
+    )
+  }
+
+  if (view.name === 'story') {
+    return shell(
+      false,
+      <StoryInterviewSession
         completed={progress.completed}
         onMarkDone={markDone}
         onBack={() => go({ name: 'home' })}
@@ -198,6 +214,19 @@ export default function App() {
           <span>
             <span className="vocab-cta__label">A 字詞</span>
             <span className="vocab-cta__sub">時間 · 人物 · 動作 · 地點（中英）</span>
+          </span>
+        </button>
+
+        <button type="button" className="story-cta" onClick={() => go({ name: 'story' })}>
+          <span className="story-cta__badge" aria-hidden>
+            <i>1</i><i>2</i><i>3</i>
+          </span>
+          <span className="story-cta__text">
+            <span className="story-cta__label">▣ 看圖講故事</span>
+            <span className="story-cta__sub">1 分鐘逐張掃 · 收圖後講故事＋作結尾</span>
+          </span>
+          <span className="story-cta__progress">
+            {storyInterviews.filter((story) => progress.completed[story.id]).length}/{storyInterviews.length} ★
           </span>
         </button>
 

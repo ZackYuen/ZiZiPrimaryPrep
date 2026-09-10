@@ -3,7 +3,7 @@ import type { DayId } from '../data/content'
 
 const STORAGE_KEY = 'zizi-prep-progress-v2'
 
-export type ModuleKey = DayId | 'mock' | 'vocab'
+export type ModuleKey = DayId | 'mock' | 'vocab' | 'story'
 
 export type ProgressState = {
   stars: number
