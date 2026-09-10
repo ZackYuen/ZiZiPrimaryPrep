@@ -14,9 +14,10 @@ import type { ModuleKey } from '../hooks/useProgress'
 import { useSpeech } from '../hooks/useSpeech'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
 import { setBgmMood } from '../lib/bgm'
+import { storyFrameSrc } from '../lib/storyFrameSrc'
 import { Confetti } from './Confetti'
 import { SoundToggle } from './SoundToggle'
-import { StoryFrameArt, storyFrameSrc } from './StoryFrameArt'
+import { StoryFrameArt } from './StoryFrameArt'
 
 type Props = {
   completed: Record<string, boolean>
