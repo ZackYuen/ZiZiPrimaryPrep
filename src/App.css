@@ -633,7 +633,7 @@
 /* ---- One-minute iPad story interview ---- */
 .story-interview {
   display: flex;
-  min-height: calc(100dvh - 2.5rem);
+  min-height: calc(100dvh - 3.75rem);
   flex-direction: column;
   gap: 0.85rem;
   animation: rise-in 0.4s ease both;

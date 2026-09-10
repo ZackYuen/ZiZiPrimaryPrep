@@ -42,7 +42,6 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
   useEffect(() => {
     if (phase !== 'study' || !story) return
     const deadline = Date.now() + STORY_BROWSE_SECONDS * 1000
-    setSecondsLeft(STORY_BROWSE_SECONDS)
     const timer = window.setInterval(() => {
       const next = Math.max(0, Math.ceil((deadline - Date.now()) / 1000))
       setSecondsLeft(next)
@@ -62,6 +61,7 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
     playSfx('tap')
     setStory(next)
     setFrameIndex(0)
+    setSecondsLeft(STORY_BROWSE_SECONDS)
     setJustStar(false)
     setPhase('study')
   }
@@ -134,7 +134,7 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
                 key={item.id}
                 onClick={() => chooseStory(item)}
               >
-                <StoryFrameArt scene={item.frames[0].scene} alt="" />
+                <StoryFrameArt scene={item.frames[0].scene} alt={item.frames[0].alt} />
                 <span className="story-choice__body">
                   <strong>故事 {index + 1} · {item.shortTitle}</strong>
                   <span>{completed[item.id] ? '★ 已完成 · 再玩' : '60 秒 · 開始'}</span>
