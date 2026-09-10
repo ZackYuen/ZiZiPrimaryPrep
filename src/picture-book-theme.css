@@ -118,6 +118,7 @@ body {
 .pill-btn--soft,
 .ghost-btn {
   background: rgba(255, 253, 247, 0.9);
+  color: var(--ink);
 }
 
 .day-glyph {
@@ -135,6 +136,11 @@ body {
 
 .hint-pic {
   filter: saturate(0.74) sepia(0.06);
+}
+
+.hint-pic--picture-book {
+  object-fit: cover;
+  filter: saturate(0.88) sepia(0.03) contrast(0.98);
 }
 
 .scene-art__img {

@@ -6,14 +6,62 @@ type Props = {
   className?: string
 }
 
+const PICTURE_BOOK_HINTS: Partial<Record<HintVisualId, string>> = {
+  me: 'hint-intro.jpg',
+  intro: 'hint-intro.jpg',
+  family: 'hint-family.jpg',
+  school: 'hint-school.jpg',
+  teacher: 'hint-teacher.jpg',
+  park: 'hint-run-park.jpg',
+  run: 'hint-run-park.jpg',
+  move: 'hint-run-park.jpg',
+  eat: 'hint-eat.jpg',
+  drink: 'hint-drink.jpg',
+  sleep: 'hint-sleep.jpg',
+  book: 'hint-study.jpg',
+  write: 'hint-study.jpg',
+  share: 'hint-share.jpg',
+  vase: 'hint-vase.jpg',
+  happy: 'hint-happy.jpg',
+  sad: 'hint-sad.jpg',
+  angry: 'hint-angry.jpg',
+  feelings: 'hint-feelings.jpg',
+  zoo: 'hint-zoo.jpg',
+  job: 'hint-police.jpg',
+  policeman: 'hint-police.jpg',
+  uniform: 'hint-police.jpg',
+  football: 'hint-football.jpg',
+  'like-blue': 'hint-like-blue.jpg',
+  insects: 'hint-insects.jpg',
+  'seth-story': 'hint-seth-story.jpg',
+  talk: 'hint-talk.jpg',
+  story: 'hint-story-sequence.jpg',
+}
+
 /**
  * Concrete picture clues a 5-year-old can recognise (people, school, toys),
  * never abstract letter tiles.
  */
 export function HintPicture({ visual, size = 260, className = '' }: Props) {
+  const picture = PICTURE_BOOK_HINTS[visual]
+
+  if (picture) {
+    return (
+      <img
+        className={`hint-pic hint-pic--picture-book ${className}`}
+        src={`${import.meta.env.BASE_URL}hints/${picture}`}
+        width={size}
+        height={Math.round(size * 0.75)}
+        alt=""
+        aria-hidden
+        draggable={false}
+      />
+    )
+  }
+
   return (
     <svg
-      className={`hint-pic ${className}`}
+      className={`hint-pic hint-pic--diagram ${className}`}
       width={size}
       height={Math.round(size * 0.78)}
       viewBox="0 0 260 200"
