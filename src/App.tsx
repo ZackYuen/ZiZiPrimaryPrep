@@ -14,6 +14,7 @@ import { useBackgroundMusic } from './hooks/useBackgroundMusic'
 import { playSfx, unlockAudio } from './hooks/useSfx'
 import { ensureBgm, setBgmMood, startBgm } from './lib/bgm'
 import './App.css'
+import './picture-book-theme.css'
 
 type View =
   | { name: 'home' }
