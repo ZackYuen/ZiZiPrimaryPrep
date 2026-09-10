@@ -49,7 +49,7 @@ export function HintPicture({ visual, size = 260, className = '' }: Props) {
     return (
       <img
         className={`hint-pic hint-pic--picture-book ${className}`}
-        src={`/hints/${picture}`}
+        src={`${import.meta.env.BASE_URL}hints/${picture}`}
         width={size}
         height={Math.round(size * 0.75)}
         alt=""
