@@ -137,6 +137,11 @@ body {
   filter: saturate(0.74) sepia(0.06);
 }
 
+.hint-pic--picture-book {
+  object-fit: cover;
+  filter: saturate(0.88) sepia(0.03) contrast(0.98);
+}
+
 .scene-art__img {
   filter: saturate(0.78) sepia(0.06) contrast(0.96);
 }
