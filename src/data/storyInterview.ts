@@ -1,16 +1,6 @@
-export type StoryScene =
-  | 'park-teddy'
-  | 'chase-butterfly'
-  | 'rain-leave'
-  | 'home-missing'
-  | 'indoor-ball'
-  | 'plant-hit'
-  | 'broken-pot'
-  | 'teacher-arrives'
-
 export type StoryFrame = {
   id: string
-  scene: StoryScene
+  image: string
   alt: string
 }
 
@@ -21,6 +11,7 @@ export type StoryInterview = {
   accent: string
   frames: StoryFrame[]
   memoryPrompt: string
+  endingQuestion: string
 }
 
 export const STORY_BROWSE_SECONDS = 60
@@ -28,30 +19,32 @@ export const STORY_BROWSE_SECONDS = 60
 export const storyInterviews: StoryInterview[] = [
   {
     id: 'ipad-story-teddy',
-    title: '公園裡的啤啤熊',
-    shortTitle: '啤啤熊',
+    title: '落雨了，啤啤熊呢？',
+    shortTitle: '雨天的啤啤熊',
     accent: '#1B6B8A',
     memoryPrompt:
-      '圖片收起咗。請由頭講返個故事：首先發生咩事？跟住點樣？最後碩孜發現咗咩？再幫故事作一個新結尾。',
+      '圖片收起咗。唔使背句子，跟住你記得嘅畫面慢慢講：碩孜帶咗邊個去公園？見到蝴蝶後做咗咩？落雨時漏低咗咩？返到屋企先發現咩？最後，如果你係碩孜，你會點做？',
+    endingQuestion: '如果你係碩孜，會點樣搵返啤啤熊？',
     frames: [
-      { id: 'teddy-1', scene: 'park-teddy', alt: '小朋友帶著啤啤熊去公園' },
-      { id: 'teddy-2', scene: 'chase-butterfly', alt: '小朋友放下啤啤熊去追蝴蝶' },
-      { id: 'teddy-3', scene: 'rain-leave', alt: '突然下雨，小朋友急忙離開公園' },
-      { id: 'teddy-4', scene: 'home-missing', alt: '回到家後，小朋友發現啤啤熊不見了' },
+      { id: 'teddy-1', image: 'teddy-1.jpg', alt: '碩孜帶住心愛嘅啤啤熊去公園' },
+      { id: 'teddy-2', image: 'teddy-2.jpg', alt: '碩孜將啤啤熊放喺長櫈上，走去追蝴蝶' },
+      { id: 'teddy-3', image: 'teddy-3.jpg', alt: '突然落大雨，碩孜急忙離開，啤啤熊仍然留喺長櫈' },
+      { id: 'teddy-4', image: 'teddy-4.jpg', alt: '返到屋企，碩孜先發現啤啤熊唔見咗' },
     ],
   },
   {
     id: 'ipad-story-plant',
-    title: '課室裡的小意外',
-    shortTitle: '小意外',
+    title: '飛走了的皮球',
+    shortTitle: '課室小意外',
     accent: '#B85C45',
     memoryPrompt:
-      '圖片收起咗。請由頭講返個故事：首先兩個小朋友做緊咩？跟住發生咩事？老師返嚟見到咩？再幫故事作一個新結尾。',
+      '圖片收起咗。唔使背句子，跟住你記得嘅畫面慢慢講：碩孜同美美做緊咩？個波飛咗去邊？花盆變成點？老師返嚟見到咩？最後，如果你係佢哋，你會點做？',
+    endingQuestion: '老師入嚟之後，兩個小朋友會點做？',
     frames: [
-      { id: 'plant-1', scene: 'indoor-ball', alt: '兩個小朋友在課室裡玩球' },
-      { id: 'plant-2', scene: 'plant-hit', alt: '皮球飛向窗邊的盆栽' },
-      { id: 'plant-3', scene: 'broken-pot', alt: '花盆跌在地上打破了' },
-      { id: 'plant-4', scene: 'teacher-arrives', alt: '老師回到課室看見打破的花盆' },
+      { id: 'plant-1', image: 'plant-1.jpg', alt: '碩孜同美美喺課室玩皮球' },
+      { id: 'plant-2', image: 'plant-2.jpg', alt: '皮球突然飛向窗邊嘅盆栽' },
+      { id: 'plant-3', image: 'plant-3.jpg', alt: '花盆跌落地打爛咗，兩個小朋友好擔心' },
+      { id: 'plant-4', image: 'plant-4.jpg', alt: '老師返到課室，見到打爛咗嘅花盆' },
     ],
   },
 ]
