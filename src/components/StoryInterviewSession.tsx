@@ -16,7 +16,7 @@ import { playSfx, unlockAudio } from '../hooks/useSfx'
 import { setBgmMood } from '../lib/bgm'
 import { Confetti } from './Confetti'
 import { SoundToggle } from './SoundToggle'
-import { StoryFrameArt } from './StoryFrameArt'
+import { StoryFrameArt, storyFrameSrc } from './StoryFrameArt'
 
 type Props = {
   completed: Record<string, boolean>
@@ -59,6 +59,10 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
   const chooseStory = (next: StoryInterview) => {
     unlockAudio()
     playSfx('tap')
+    next.frames.forEach((frame) => {
+      const image = new Image()
+      image.src = storyFrameSrc(frame.image)
+    })
     setStory(next)
     setFrameIndex(0)
     setSecondsLeft(STORY_BROWSE_SECONDS)
@@ -134,7 +138,7 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
                 key={item.id}
                 onClick={() => chooseStory(item)}
               >
-                <StoryFrameArt scene={item.frames[0].scene} alt={item.frames[0].alt} />
+                <StoryFrameArt image={item.frames[0].image} alt={item.frames[0].alt} />
                 <span className="story-choice__body">
                   <strong>故事 {index + 1} · {item.shortTitle}</strong>
                   <span>{completed[item.id] ? '★ 已完成 · 再玩' : '60 秒 · 開始'}</span>
@@ -163,7 +167,7 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
             <p className="story-viewer__counter">第 {frameIndex + 1} 張／共 {story.frames.length} 張</p>
             <StoryFrameArt
               key={story.frames[frameIndex].id}
-              scene={story.frames[frameIndex].scene}
+              image={story.frames[frameIndex].image}
               alt={story.frames[frameIndex].alt}
             />
             <div className="story-viewer__dots" aria-hidden>
@@ -215,7 +219,7 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
             <h2>講返成個故事</h2>
             <ol>
               <li>由第一張開始，講清楚先後次序。</li>
-              <li><strong>最後自己作一個新結尾！</strong></li>
+              <li><strong>{story.endingQuestion}</strong></li>
             </ol>
             <button
               type="button"
