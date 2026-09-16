@@ -20,6 +20,13 @@ export type HintVisualId =
   | 'angry'
   | 'feelings'
   | 'gift'
+  | 'lost-toy'
+  | 'grab'
+  | 'firefighter'
+  | 'bike'
+  | 'doctor'
+  | 'cook'
+  | 'daily'
   | 'zoo'
   | 'job'
   | 'policeman'
@@ -73,14 +80,13 @@ const SCENE_VISUAL: Partial<Record<SceneId, HintVisualId>> = {
 
 const ID_VISUAL: Record<string, HintVisualId> = {
   'd1-v': 'talk',
-  'd2-v': 'run',
-  'd3-v': 'talk',
+  'd2-v': 'daily',
+  'd3-v': 'bike',
   'd3-share': 'share',
   'd4-vocab': 'feelings',
   'd5-fam': 'family',
   'd5-story1': 'share',
   'd5-story2': 'vase',
-  'd6-dad': 'family',
   'd1-zh-basic': 'intro',
   'd1-zh-like': 'like-blue',
   'd1-zh-family': 'family',
@@ -98,24 +104,27 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'd3-r2': 'reorder',
   'd3-r3': 'reorder',
   'd3-r4': 'reorder',
-  'd3-en-q': 'share',
+  'd3-en-q': 'bike',
   day4: 'feelings',
   'd4-emo1': 'gift',
-  'd4-emo1b': 'sad',
+  'd4-emo1b': 'lost-toy',
   'd4-emo2': 'happy',
-  'd4-solve': 'share',
+  'd4-solve': 'grab',
   'd4-sort': 'sort',
   'd4-syn': 'happy',
   'd4-ben': 'zoo',
   'd4-leo': 'happy',
-  'd4-lily': 'feelings',
+  'd4-lily': 'angry',
   'd4-sam': 'feelings',
   'd4-week': 'weekend',
   day5: 'family',
   'd5-job': 'job',
-  'd5-hobby': 'happy',
-  'd6-ming': 'story',
-  'd6-ming2': 'talk',
+  'd5-hobby': 'cook',
+  'd5-purse-most': 'coins',
+  'd5-purse-least': 'coins',
+  'd6-dad': 'firefighter',
+  'd6-ming': 'bike',
+  'd6-ming2': 'bike',
   'd6-en1': 'policeman',
   'd6-en2': 'uniform',
   'd6-en3': 'football',
@@ -189,7 +198,7 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
   },
   'd4-emo1b': {
     kidLine: '唔見最鍾意嘅玩具會點？多數係傷心。',
-    moreLine: '開心／興奮係笑；傷心係喊。',
+    moreLine: '搵唔到心愛嘅嘢，會喊、會唔開心。',
   },
   'd4-emo2': {
     kidLine: '講：今日我好____，因為____。',
@@ -280,13 +289,17 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (ID_VISUAL[item.id]) return ID_VISUAL[item.id]
   if (item.scene && SCENE_VISUAL[item.scene]) return SCENE_VISUAL[item.scene]!
   if (item.kind === 'clock' || item.clock) return 'clock'
-  if (item.kind === 'money' || item.coins) return 'coins'
+  if (item.kind === 'money' || item.coins || /錢包|硬幣|幾多元/.test(`${item.promptZh}`)) return 'coins'
   if (item.kind === 'sort') return 'sort'
   if (item.kind === 'reorder') return 'reorder'
   if (item.kind === 'prompt') return 'move'
   if (item.calendarDay) return 'weekend'
   const p = `${item.promptZh} ${item.promptEn || ''} ${item.cue || ''}`
   if (/policeman|police|警察/.test(p)) return 'policeman'
+  if (/firefighter|消防/.test(p)) return 'firefighter'
+  if (/doctor|醫生|護士|醫院/.test(p)) return 'doctor'
+  if (/cycle|bicycle|單車|騎車/.test(p)) return 'bike'
+  if (/cook|煮嘢|煮/.test(p)) return 'cook'
   if (/uniform|制服/.test(p)) return 'uniform'
   if (/football|zoo|elephant|monkey|動物/.test(p)) return /football|park/.test(p) ? 'football' : 'zoo'
   if (/self-introduction|Say your name|我叫袁|我叫碩/.test(p)) return 'intro'
@@ -294,10 +307,11 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (/school|kindergarten|老師|幼稚園|課室/.test(p)) return 'school'
   if (/family|家人|爸爸|媽媽/.test(p)) return 'family'
   if (/park|公園|跑步/.test(p)) return 'park'
-  if (/share|分享|輪流/.test(p)) return 'share'
+  if (/share|分享|輪流/.test(p) && !/搶/.test(p)) return 'share'
   if (/禮物|gift|present/.test(p)) return 'gift'
-  if (/sad|傷心|哭|唔見.*玩具/.test(p)) return 'sad'
-  if (/angry|嬲|憤怒|搶/.test(p)) return 'angry'
+  if (/唔見.*玩具|lost.*toy/.test(p)) return 'lost-toy'
+  if (/sad|傷心|哭/.test(p)) return 'sad'
+  if (/angry|嬲|憤怒|搶/.test(p)) return 'grab'
   if (/happy|開心|興奮/.test(p)) return 'happy'
   if (/job|工作|老師/.test(p)) return 'job'
   if (item.kind === 'math') {
@@ -311,18 +325,37 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
 
 export function vocabVisual(catId: string, zh: string): HintVisualId {
   if (catId === 'family') return 'family'
-  if (catId === 'jobs') return 'job'
+  if (catId === 'jobs') {
+    if (/老師/.test(zh)) return 'teacher'
+    if (/同學/.test(zh)) return 'school'
+    if (/醫生|護士/.test(zh)) return 'doctor'
+    if (/消防/.test(zh)) return 'firefighter'
+    if (/警察/.test(zh)) return 'policeman'
+    if (/廚師/.test(zh)) return 'cook'
+    return 'job'
+  }
   if (catId === 'actions') {
     if (/吃/.test(zh)) return 'eat'
     if (/喝/.test(zh)) return 'drink'
     if (/跑|踏/.test(zh)) return 'run'
-    if (/哭/.test(zh)) return 'sad'
-    if (/說話|叫|唱/.test(zh)) return 'talk'
-    return 'move'
+    if (/跳|舞蹈/.test(zh)) return 'happy'
+    if (/單車/.test(zh)) return 'bike'
+    if (/哭|跌倒/.test(zh)) return 'sad'
+    if (/打|拉|推/.test(zh)) return 'grab'
+    if (/抱/.test(zh)) return 'family'
+    if (/說話|叫|唱|拍手/.test(zh)) return 'talk'
+    return 'daily'
   }
   if (catId === 'places') {
-    if (/學|校|園/.test(zh)) return 'school'
-    return 'park'
+    if (/家/.test(zh)) return 'family'
+    if (/公園/.test(zh)) return 'park'
+    if (/學|校|教室/.test(zh)) return 'school'
+    if (/消防/.test(zh)) return 'firefighter'
+    if (/醫院/.test(zh)) return 'doctor'
+    if (/餐廳/.test(zh)) return 'eat'
+    if (/圖書館/.test(zh)) return 'book'
+    if (/超市|市場/.test(zh)) return 'coins'
+    return 'talk'
   }
   if (/吃|食|飯/.test(zh)) return 'eat'
   if (catId === 'times-of-day') {
