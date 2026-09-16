@@ -19,6 +19,7 @@ export type HintVisualId =
   | 'sad'
   | 'angry'
   | 'feelings'
+  | 'gift'
   | 'zoo'
   | 'job'
   | 'policeman'
@@ -99,14 +100,14 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'd3-r4': 'reorder',
   'd3-en-q': 'share',
   day4: 'feelings',
-  'd4-emo1': 'sad',
-  'd4-emo1b': 'angry',
+  'd4-emo1': 'gift',
+  'd4-emo1b': 'sad',
   'd4-emo2': 'happy',
   'd4-solve': 'share',
   'd4-sort': 'sort',
   'd4-syn': 'happy',
   'd4-ben': 'zoo',
-  'd4-leo': 'sad',
+  'd4-leo': 'happy',
   'd4-lily': 'feelings',
   'd4-sam': 'feelings',
   'd4-week': 'weekend',
@@ -183,7 +184,11 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
     moreLine: 'I share my toys with my friends.',
   },
   'd4-emo1': {
-    kidLine: '唔見玩具會點？多數係傷心。',
+    kidLine: '收到禮物會點？多數係開心。',
+    moreLine: '開心會笑；傷心先會喊。',
+  },
+  'd4-emo1b': {
+    kidLine: '唔見最鍾意嘅玩具會點？多數係傷心。',
     moreLine: '開心／興奮係笑；傷心係喊。',
   },
   'd4-emo2': {
@@ -290,7 +295,8 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (/family|家人|爸爸|媽媽/.test(p)) return 'family'
   if (/park|公園|跑步/.test(p)) return 'park'
   if (/share|分享|輪流/.test(p)) return 'share'
-  if (/sad|傷心|哭/.test(p)) return 'sad'
+  if (/禮物|gift|present/.test(p)) return 'gift'
+  if (/sad|傷心|哭|唔見.*玩具/.test(p)) return 'sad'
   if (/angry|嬲|憤怒|搶/.test(p)) return 'angry'
   if (/happy|開心|興奮/.test(p)) return 'happy'
   if (/job|工作|老師/.test(p)) return 'job'

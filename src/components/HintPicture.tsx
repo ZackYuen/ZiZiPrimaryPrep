@@ -26,6 +26,7 @@ const PICTURE_BOOK_HINTS: Partial<Record<HintVisualId, string>> = {
   sad: 'hint-sad.jpg',
   angry: 'hint-angry.jpg',
   feelings: 'hint-feelings.jpg',
+  gift: 'hint-gift.jpg',
   zoo: 'hint-zoo.jpg',
   job: 'hint-police.jpg',
   policeman: 'hint-police.jpg',
