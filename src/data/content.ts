@@ -81,6 +81,14 @@ export type Activity = {
   moneyJiao?: string
   /** Highlight a June date on the mini calendar (1–30) */
   calendarDay?: number
+  /** Hide the usual hint picture (e.g. memory recall). */
+  hideArt?: boolean
+  /** Extra picture under public/, shown instead of the mapped hint. */
+  hintImage?: string
+  /** Labelled picture strip, e.g. A–D story cards. */
+  pictureStrip?: { src: string; label: string }[]
+  /** Show hintImage / pictureStrip for this many seconds, then hide. */
+  lookSeconds?: number
 }
 
 export type DayId = 'day1' | 'day2' | 'day3' | 'day4' | 'day5' | 'day6'

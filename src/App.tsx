@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { DayCard } from './components/DayCard'
+import { SchoolCard } from './components/SchoolCard'
 import { PracticeSession } from './components/PracticeSession'
 import { ParentGuide } from './components/ParentGuide'
 import { VocabSession } from './components/VocabSession'
@@ -8,6 +9,7 @@ import { Mascot } from './components/Mascot'
 import { SoundToggle } from './components/SoundToggle'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { CHILD, days, getDay, mockInterview, type DayId } from './data/content'
+import { getSchool, schoolPlans, type SchoolId } from './data/schoolWeek'
 import { storyInterviews } from './data/storyInterview'
 import { useProgress } from './hooks/useProgress'
 import { useBackgroundMusic } from './hooks/useBackgroundMusic'
@@ -19,6 +21,7 @@ import './picture-book-theme.css'
 type View =
   | { name: 'home' }
   | { name: 'day'; id: DayId }
+  | { name: 'school'; id: SchoolId }
   | { name: 'mock' }
   | { name: 'vocab' }
   | { name: 'story' }
@@ -34,7 +37,7 @@ export default function App() {
   const { progress, markDone, reset } = useProgress()
 
   const bgmPlace =
-    view.name === 'day'
+    view.name === 'day' || view.name === 'school'
       ? 'day'
       : view.name === 'mock'
         ? 'mock'
@@ -129,6 +132,33 @@ export default function App() {
         onMarkDone={markDone}
         onBack={() => go({ name: 'home' })}
         celebrate
+      />,
+    )
+  }
+
+  if (view.name === 'school') {
+    const school = getSchool(view.id)
+    if (!school) {
+      return shell(
+        false,
+        <>
+          <button type="button" className="ghost-btn" onClick={() => go({ name: 'home' })}>
+            ← 返回
+          </button>
+          <p>找不到這所學校的練習。</p>
+        </>,
+      )
+    }
+    return shell(
+      false,
+      <PracticeSession
+        title={school.title}
+        accent={school.accent}
+        items={school.activities}
+        moduleKey={school.id}
+        completed={progress.completed}
+        onMarkDone={markDone}
+        onBack={() => go({ name: 'home' })}
       />,
     )
   }
@@ -230,6 +260,21 @@ export default function App() {
             {storyInterviews.filter((story) => progress.completed[story.id]).length}/{storyInterviews.length} ★
           </span>
         </button>
+
+        <h2 className="section-label">學校專項</h2>
+        <p className="section-lead">本週四校：聽故事 · 揀圖 · 心算 · 記憶</p>
+        <div className="module-grid">
+          {schoolPlans.map((school, i) => (
+            <SchoolCard
+              key={school.id}
+              school={school}
+              doneCount={school.activities.filter((a) => progress.completed[a.id]).length}
+              total={school.activities.length}
+              delay={80 + i * 50}
+              onOpen={() => go({ name: 'school', id: school.id })}
+            />
+          ))}
+        </div>
 
         <h2 className="section-label">Day</h2>
         <div className="module-grid">

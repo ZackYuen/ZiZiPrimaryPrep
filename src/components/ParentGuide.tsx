@@ -19,7 +19,7 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
 
       <h2 className="parent__title">家長指引</h2>
       <p className="parent__lead">
-        內容來自《名校模擬面試》第一週字詞表與 Day 1–6。目標不是全部做對，而是建立勇氣、表達與不放棄。
+        內容來自《名校模擬面試》第一週字詞表、Day 1–6，以及本週《K3 學校專項每週練習》（蔡繼有、聖保羅書院小學、王錦輝、播道）。目標不是全部做對，而是建立勇氣、表達與不放棄。
       </p>
 
       <VoiceSettingsPanel />
@@ -111,6 +111,10 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <h3>個人化</h3>
         <p>
           已設定為 <strong>袁碩孜（Seth Yuen）</strong>、藍田靈糧幼稚園。喜好／志願答案仍可按碩孜真實情況改寫。
+        </p>
+        <p>
+          主頁「學校專項」跟本週四校練習：聽故事、揀圖、心算、砌橋／七巧板、記憶 20
+          秒後作答。節日同地方題無標準答案，講到原因就算。
         </p>
         <p>PDF 原稿在倉庫根目錄。Level 4 唔係必須完成——敢嘗試已經值得讚！</p>
       </div>

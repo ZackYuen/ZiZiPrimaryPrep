@@ -10,8 +10,8 @@ import {
   checkMath,
   checkMoney,
   type Activity,
-  type DayId,
 } from '../data/content'
+import type { ModuleKey } from '../hooks/useProgress'
 import { looksEnglish, useSpeech } from '../hooks/useSpeech'
 import { useSpeechRecognition, type ListenLang } from '../hooks/useSpeechRecognition'
 import { softSpeakFeedback } from '../lib/softSpeakFeedback'
@@ -36,9 +36,9 @@ type Props = {
   title: string
   accent: string
   items: Activity[]
-  moduleKey: DayId | 'mock' | 'vocab'
+  moduleKey: ModuleKey
   completed: Record<string, boolean>
-  onMarkDone: (itemId: string, moduleKey: DayId | 'mock' | 'vocab') => void
+  onMarkDone: (itemId: string, moduleKey: ModuleKey) => void
   onBack: () => void
   celebrate?: boolean
 }
@@ -46,6 +46,11 @@ type Props = {
 const MATH_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '/'] as const
 const CLOCK_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', ':', '0', '00'] as const
 const MONEY_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '✓'] as const
+
+function mediaSrc(path: string) {
+  const base = import.meta.env.BASE_URL || '/'
+  return `${base}${path.replace(/^\//, '')}`
+}
 
 
 export function PracticeSession({
@@ -102,6 +107,8 @@ export function PracticeSession({
   const dictationRef = useRef<HTMLTextAreaElement | null>(null)
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const advancingRef = useRef(false)
+  const [artHidden, setArtHidden] = useState(false)
+  const [lookLeft, setLookLeft] = useState<number | null>(null)
 
   const item = items[index]
   const isStoryFocus = item.id === 'd1-en-story'
@@ -178,6 +185,8 @@ export function PracticeSession({
       clearTimeout(advanceTimerRef.current)
       advanceTimerRef.current = null
     }
+    setArtHidden(!!_activity.hideArt)
+    setLookLeft(_activity.lookSeconds ?? null)
     if (_activity.kind === 'reorder' && _activity.fragments) {
       const shuffled = [..._activity.fragments].sort(() => Math.random() - 0.5)
       setPool(shuffled)
@@ -197,6 +206,24 @@ export function PracticeSession({
     resetInteraction(item)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item.id])
+
+  useEffect(() => {
+    if (!item.lookSeconds || item.hideArt) return
+    setArtHidden(false)
+    setLookLeft(item.lookSeconds)
+    const started = Date.now()
+    const id = window.setInterval(() => {
+      const left = item.lookSeconds! - Math.floor((Date.now() - started) / 1000)
+      if (left <= 0) {
+        setLookLeft(0)
+        setArtHidden(true)
+        window.clearInterval(id)
+      } else {
+        setLookLeft(left)
+      }
+    }, 250)
+    return () => window.clearInterval(id)
+  }, [item.id, item.lookSeconds, item.hideArt])
 
   useEffect(() => {
     if (justStar) {
@@ -287,7 +314,7 @@ export function PracticeSession({
   useEffect(() => {
     if (reorderCorrect && !done && !advancingRef.current) {
       playSfx('correct')
-      setCoachMsg('句子正確！好叻！')
+      setCoachMsg(item.pictureStrip ? '次序啱啦！好叻！' : '句子正確！好叻！')
       awardAndMaybeNext(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -471,12 +498,47 @@ export function PracticeSession({
           </div>
 
           {item.scene && <SceneArt scene={item.scene} alt={item.promptZh} />}
-          {!isStoryFocus && !item.scene && !item.clock && !item.coins && item.calendarDay == null && !(item.kind === 'math' && teach.math) && (
+          {!artHidden && !item.hideArt && item.pictureStrip && item.pictureStrip.length > 0 && (
+            <div className={`picture-strip picture-strip--${item.pictureStrip.length}`}>
+              {item.pictureStrip.map((pic) => (
+                <figure key={pic.src} className="picture-strip__item">
+                  <img src={mediaSrc(pic.src)} alt="" width={240} height={180} />
+                  <figcaption>{pic.label}</figcaption>
+                </figure>
+              ))}
+            </div>
+          )}
+          {!artHidden && !item.hideArt && item.hintImage && (
+            <div className="hint-pic-wrap">
+              <img
+                className="hint-pic hint-pic--picture-book"
+                src={mediaSrc(item.hintImage)}
+                alt=""
+                width={260}
+                height={195}
+              />
+            </div>
+          )}
+          {item.lookSeconds != null && lookLeft != null && (
+            <p className={`look-timer ${artHidden ? 'look-timer--done' : ''}`} aria-live="polite">
+              {artHidden ? '時間到，圖收起咗' : `仲有 ${lookLeft} 秒`}
+            </p>
+          )}
+          {!isStoryFocus &&
+            !item.scene &&
+            !item.clock &&
+            !item.coins &&
+            item.calendarDay == null &&
+            !(item.kind === 'math' && teach.math && !item.hintImage && !item.pictureStrip) &&
+            !item.hintImage &&
+            !item.pictureStrip &&
+            !item.hideArt &&
+            !artHidden && (
             <div className="hint-pic-wrap">
               <HintPicture visual={teach.visual} />
             </div>
           )}
-          {item.kind === 'math' && teach.math && item.calendarDay == null && (
+          {item.kind === 'math' && teach.math && item.calendarDay == null && !item.hintImage && (
             <MathDots model={teach.math} />
           )}
           {item.clock && <AnalogClock hour={item.clock.hour} minute={item.clock.minute} />}
@@ -538,11 +600,13 @@ export function PracticeSession({
                   open={helpOpen}
                   step={helpStep}
                   hideArt={
-                    !item.scene &&
-                    !item.clock &&
-                    !item.coins &&
-                    item.calendarDay == null &&
-                    !(item.kind === 'math' && teach.math)
+                    (!item.scene &&
+                      !item.clock &&
+                      !item.coins &&
+                      item.calendarDay == null &&
+                      !(item.kind === 'math' && teach.math && !item.hintImage)) ||
+                    (!!item.hintImage && !artHidden && !item.hideArt) ||
+                    (!!item.pictureStrip && !artHidden && !item.hideArt)
                   }
                   onToggle={() => {
                     unlockAudio()
@@ -1189,7 +1253,11 @@ export function PracticeSession({
               />
               {order.length > 0 && (
                 <p className={`math-feedback ${reorderCorrect ? 'is-ok' : ''}`}>
-                  {reorderCorrect ? '句子正確！好叻！' : '繼續拖一拖順序吧'}
+                  {reorderCorrect
+                    ? item.pictureStrip
+                      ? '次序啱啦！好叻！'
+                      : '句子正確！好叻！'
+                    : '繼續拖一拖順序吧'}
                 </p>
               )}
             </div>

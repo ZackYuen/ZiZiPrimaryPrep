@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { DayId } from '../data/content'
+import type { SchoolId } from '../data/schoolWeek'
 
 const STORAGE_KEY = 'zizi-prep-progress-v2'
 
-export type ModuleKey = DayId | 'mock' | 'vocab' | 'story'
+export type ModuleKey = DayId | 'mock' | 'vocab' | 'story' | SchoolId
 
 export type ProgressState = {
   stars: number
