@@ -637,6 +637,12 @@ def main():
         stay_ok = path == "留現址-統一派位+自行分配" and rankable
         dss_stay_ok = path == "直資私立可通勤" and eligible
         dp_ok = eligible and has_p1 and funding in ("官立", "資助")
+        # 已可留月華街入讀 → 唔使搬，搬屋總分留空，避免同留現址列混淆
+        move_ok = rankable and path in (
+            "自行分配可申請(校網外)",
+            "直資私立但通勤遠",
+            "需搬屋",
+        )
 
         link_text = link["dragon"] or link["linked"] or "無"
         if link["dragon"] and link["linked"]:
@@ -647,6 +653,17 @@ def main():
             source_note = "直資/私立不經官津派位"
         elif not has_p1:
             source_note = "教育局/概覽顯示本年度無小一"
+
+        if stay_ok:
+            score_use = "留現址請只睇「留現址總分」；已在校網48，無搬屋總分"
+        elif dss_stay_ok:
+            score_use = "留現址通勤請只睇「現址直資總分」；唔使搬，無搬屋總分"
+        elif dp_ok and move_ok:
+            score_use = "唔搬申請睇「自行分配總分」；要入該網先讀到先睇「搬屋總分」"
+        elif move_ok:
+            score_use = "要搬近學校／入該網先讀到，請睇「搬屋總分」"
+        else:
+            score_use = ""
 
         rows.append({
             "男生排名": 0,
@@ -659,12 +676,13 @@ def main():
             "性別收生": gender,
             "男生適讀": "是" if eligible else "否(女校)",
             "現址入學途徑": path,
+            "分數用途": score_use,
             "暫停小一": "是" if path == "暫停小一" else "否",
             "區域": district,
             "校網": net_display,
             "類別": funding,
             "加權總分": weighted_total(scores_std, "standard") if rankable else "",
-            "搬屋總分": weighted_total(scores_rel, "relocate") if rankable else "",
+            "搬屋總分": weighted_total(scores_rel, "relocate") if move_ok else "",
             "留現址總分": weighted_total(scores_stay, "stay") if stay_ok else "",
             "自行分配總分": weighted_total(scores_dp, "dp") if dp_ok else "",
             "現址直資總分": weighted_total(scores_stay, "stay") if dss_stay_ok else "",
@@ -706,11 +724,12 @@ def main():
             "_stay_ok": stay_ok,
             "_dss_stay_ok": dss_stay_ok,
             "_dp_ok": dp_ok,
+            "_move_ok": move_ok,
             "_rankable": rankable,
         })
 
     rank_subset(rows, "加權總分", "男生排名", lambda r: r["_rankable"])
-    rank_subset(rows, "搬屋總分", "男生搬屋排名", lambda r: r["_rankable"])
+    rank_subset(rows, "搬屋總分", "男生搬屋排名", lambda r: r["_move_ok"])
     rank_subset(rows, "留現址總分", "男生留現址排名", lambda r: r["_stay_ok"])
     rank_subset(rows, "自行分配總分", "男生自行分配排名", lambda r: r["_dp_ok"])
     rank_subset(rows, "現址直資總分", "男生現址直資排名", lambda r: r["_dss_stay_ok"])
@@ -729,6 +748,7 @@ def main():
         r.pop("_stay_ok", None)
         r.pop("_dss_stay_ok", None)
         r.pop("_dp_ok", None)
+        r.pop("_move_ok", None)
         r.pop("_rankable", None)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
