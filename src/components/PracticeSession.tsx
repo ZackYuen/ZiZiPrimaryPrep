@@ -100,6 +100,8 @@ export function PracticeSession({
   const [spokenText, setSpokenText] = useState('')
   const [composeActive, setComposeActive] = useState(false)
   const dictationRef = useRef<HTMLTextAreaElement | null>(null)
+  const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const advancingRef = useRef(false)
 
   const item = items[index]
   const isStoryFocus = item.id === 'd1-en-story'
@@ -171,6 +173,11 @@ export function PracticeSession({
     setHelpOpen(false)
     setHelpStep(1)
     setHelped(false)
+    advancingRef.current = false
+    if (advanceTimerRef.current != null) {
+      clearTimeout(advanceTimerRef.current)
+      advanceTimerRef.current = null
+    }
     if (_activity.kind === 'reorder' && _activity.fragments) {
       const shuffled = [..._activity.fragments].sort(() => Math.random() - 0.5)
       setPool(shuffled)
@@ -247,13 +254,12 @@ export function PracticeSession({
     )
   }, [item, spokenText, listenLang])
 
-  useEffect(() => {
-    if (reorderCorrect && !done) {
-      playSfx('correct')
-    }
-  }, [reorderCorrect, done])
-
   const goNext = () => {
+    advancingRef.current = false
+    if (advanceTimerRef.current != null) {
+      clearTimeout(advanceTimerRef.current)
+      advanceTimerRef.current = null
+    }
     stop()
     stopListening()
     playSfx('whoosh')
@@ -268,10 +274,30 @@ export function PracticeSession({
       onMarkDone(item.id, moduleKey)
       setJustStar(true)
     }
-    if (autoNext || celebrate || isLast) {
-      setTimeout(goNext, done ? 0 : 550)
-    }
+    if (!(autoNext || celebrate || isLast)) return
+    if (advancingRef.current) return
+    advancingRef.current = true
+    if (advanceTimerRef.current != null) clearTimeout(advanceTimerRef.current)
+    advanceTimerRef.current = setTimeout(() => {
+      advanceTimerRef.current = null
+      goNext()
+    }, done ? 0 : 800)
   }
+
+  useEffect(() => {
+    if (reorderCorrect && !done && !advancingRef.current) {
+      playSfx('correct')
+      setCoachMsg('句子正確！好叻！')
+      awardAndMaybeNext(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reorderCorrect, done, item.id])
+
+  useEffect(() => {
+    return () => {
+      if (advanceTimerRef.current != null) clearTimeout(advanceTimerRef.current)
+    }
+  }, [])
 
   const isSolved = (): boolean => {
     if (item.kind === 'choice') return solvedChoice
@@ -318,10 +344,7 @@ export function PracticeSession({
     setMathResult('ok')
     setCoachMsg('答對啦！好努力！')
     playSfx('correct')
-    if (!done) {
-      onMarkDone(item.id, moduleKey)
-      setJustStar(true)
-    }
+    awardAndMaybeNext(true)
   }
 
   const submitMath = () => {
@@ -388,6 +411,10 @@ export function PracticeSession({
   const handlePrimary = () => {
     unlockAudio()
     playSfx('tap')
+    if (advancingRef.current) {
+      goNext()
+      return
+    }
     if (!done && !canProceed()) {
       setHelped(true)
       setHelpOpen(true)
@@ -712,8 +739,7 @@ export function PracticeSession({
                     setComposeActive(false)
                     dictationRef.current?.blur()
                     playSfx('correct')
-                    onMarkDone(item.id, moduleKey)
-                    setJustStar(true)
+                    awardAndMaybeNext(true)
                   }}
                   aria-label="爸爸媽媽確認完成"
                 >
@@ -814,10 +840,7 @@ export function PracticeSession({
                           setPicked(i)
                           setCoachMsg('答對啦！你好努力！')
                           playSfx('correct')
-                          if (!done) {
-                            onMarkDone(item.id, moduleKey)
-                            setJustStar(true)
-                          }
+                          awardAndMaybeNext(true)
                         } else {
                           playSfx('wrong')
                           setWrongPicks((prev) => (prev.includes(i) ? prev : [...prev, i]))
@@ -1116,10 +1139,7 @@ export function PracticeSession({
                     if (sortCorrect) {
                       playSfx('correct')
                       setCoachMsg('全部分對啦！好叻！')
-                      if (!done) {
-                        onMarkDone(item.id, moduleKey)
-                        setJustStar(true)
-                      }
+                      awardAndMaybeNext(true)
                     } else {
                       playSfx('wrong')
                       registerWrong(item.tip)
@@ -1185,7 +1205,12 @@ export function PracticeSession({
                     checked={!!checkedFields[f]}
                     onChange={(e) => {
                       playSfx(e.target.checked ? 'tap' : 'flip')
-                      setCheckedFields((prev) => ({ ...prev, [f]: e.target.checked }))
+                      const next = { ...checkedFields, [f]: e.target.checked }
+                      setCheckedFields(next)
+                      const fields = item.fields ?? ['我已經試過']
+                      if (e.target.checked && fields.every((name) => next[name])) {
+                        awardAndMaybeNext(true)
+                      }
                     }}
                   />
                   <span>{f}</span>

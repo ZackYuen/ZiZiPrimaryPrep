@@ -68,7 +68,7 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>唔會一次錯就揭曉</h3>
           <p>
-            選擇題／數學：答錯會出圖同淺提示，唔會即刻揭曉答案。再錯可以撳「?」睇答案。答啱先有星星；睇完提示都可以去下一題。
+            選擇題／數學：答錯會出圖同淺提示，唔會即刻揭曉答案。再錯可以撳「?」睇答案。答啱會自動去下一題；睇完提示都可以撳箭咀跳過。
           </p>
         </article>
         <article className="parent__item">
