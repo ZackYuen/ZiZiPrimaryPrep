@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate scored report for all HK primary schools (502) with housing cost model."""
+"""Generate scored report for all HK primary schools (502) — Zizi (boy) family profile."""
 
 import csv
 import json
@@ -11,11 +11,17 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 BASE = "https://schoolfit.hk/api/schools"
 OUT = "/workspace/docs/hk-primary-school-scores-2026.csv"
 
-# Lam Tin / 藍田 (校網48) baseline — 麗港城/康田苑/啟田大廈 2025-26 市場參考
-LAMTIN_RENT_MONTH_500 = 18500   # HKD/mo, ~500 sqft practical
-LAMTIN_PRICE_500 = 5.25         # HKD million, ~500 sqft practical
-LAMTIN_RENT_PSF = 37
-LAMTIN_PRICE_PSF = 10500
+# 碩孜 Zizi — 現居觀塘月華街（校網48）
+HOME_LABEL = "觀塘月華街"
+HOME_SQFT = 633
+HOME_RENT = 17000
+HOME_PARKING = 2250
+HOME_TOTAL_MONTHLY = HOME_RENT + HOME_PARKING  # 19250
+HOME_RENT_PSF = round(HOME_RENT / HOME_SQFT, 2)  # ~26.86
+HOME_PRICE_PSF = 6900  # 月華大廈/遠景大廈區 2025-26 成交參考
+HOME_PRICE_TOTAL_M = round(HOME_SQFT * HOME_PRICE_PSF / 1_000_000, 2)  # ~4.37
+HOME_SCHOOL_NET = "48"
+STUDENT = "男生"
 
 # District housing midpoints (2025-26 market refs: 28Hse EPI, WeProperty, Centaline aggregates)
 # rent_psf: HKD/sqft/month; price_psf: HKD/sqft sale
@@ -28,7 +34,7 @@ DISTRICT_HOUSING = {
     "油尖旺區": {"rent_psf": 52, "price_psf": 17000, "note": "尖沙咀/佐敦"},
     "深水埗區": {"rent_psf": 33, "price_psf": 9500,  "note": "西九龍"},
     "黃大仙區": {"rent_psf": 35, "price_psf": 10000, "note": "黃大仙/鑽石山"},
-    "觀塘區":   {"rent_psf": 37, "price_psf": 10500, "note": "藍田/油塘/觀塘"},
+    "觀塘區":   {"rent_psf": 27, "price_psf": 7500,  "note": "觀塘/月華街/藍田/油塘"},
     "西貢區":   {"rent_psf": 38, "price_psf": 12000, "note": "將軍澳/西貢"},
     "沙田區":   {"rent_psf": 36, "price_psf": 11500, "note": "沙田/馬鞍山"},
     "大埔區":   {"rent_psf": 32, "price_psf": 10000, "note": "大埔/粉嶺"},
@@ -39,6 +45,16 @@ DISTRICT_HOUSING = {
     "元朗區":   {"rent_psf": 29, "price_psf": 8800,  "note": "元朗/天水圍"},
     "離島區":   {"rent_psf": 32, "price_psf": 11000, "note": "東涌/長洲等"},
 }
+
+# Monthly car-park rent estimate by district (HKD)
+PARKING_MONTHLY = {
+    "中西區": 2800, "灣仔區": 2600, "香港東區": 2400, "香港南區": 2500,
+    "九龍城區": 2400, "油尖旺區": 2700, "深水埗區": 2200, "黃大仙區": 2250,
+    "觀塘區": 2250, "西貢區": 2100, "沙田區": 2000, "大埔區": 1900,
+    "北區": 1800, "葵青區": 1900, "荃灣區": 2000, "屯門區": 1800,
+    "元朗區": 1800, "離島區": 2000,
+}
+DEFAULT_PARKING = 2000
 
 ELITE_SEC = [
     "聖保羅", "皇仁", "喇沙", "拔萃", "英華", "男拔", "女拔", "協恩", "真光",
@@ -58,7 +74,8 @@ NET_EASE = {
     "12": 3.5, "14": 3.5, "11": 5.0, "18": 4.5,
 }
 
-PRACTICAL_SQFT = 500
+def boy_eligible(gender: str) -> bool:
+    return gender != "女校"
 
 
 def fetch_json(url: str, retries=3):
@@ -75,17 +92,25 @@ def fetch_json(url: str, retries=3):
 
 def housing_metrics(district: str) -> dict:
     h = DISTRICT_HOUSING.get(district, {"rent_psf": 35, "price_psf": 11000, "note": "估算"})
-    rent_mo = round(h["rent_psf"] * PRACTICAL_SQFT)
-    price_m = round(h["price_psf"] * PRACTICAL_SQFT / 1_000_000, 2)
-    rent_vs = round((rent_mo - LAMTIN_RENT_MONTH_500) / LAMTIN_RENT_MONTH_500 * 100, 1)
-    price_vs = round((price_m - LAMTIN_PRICE_500) / LAMTIN_PRICE_500 * 100, 1)
+    parking = PARKING_MONTHLY.get(district, DEFAULT_PARKING)
+    rent_mo = round(h["rent_psf"] * HOME_SQFT)
+    price_m = round(h["price_psf"] * HOME_SQFT / 1_000_000, 2)
+    total_mo = rent_mo + parking
+    rent_vs = round((rent_mo - HOME_RENT) / HOME_RENT * 100, 1)
+    parking_vs = round((parking - HOME_PARKING) / HOME_PARKING * 100, 1)
+    total_vs = round((total_mo - HOME_TOTAL_MONTHLY) / HOME_TOTAL_MONTHLY * 100, 1)
+    price_vs = round((price_m - HOME_PRICE_TOTAL_M) / HOME_PRICE_TOTAL_M * 100, 1)
     return {
         "rent_psf": h["rent_psf"],
         "price_psf": h["price_psf"],
         "rent_month": rent_mo,
+        "parking_month": parking,
+        "total_monthly": total_mo,
         "price_million": price_m,
-        "rent_vs_lamtin_pct": rent_vs,
-        "price_vs_lamtin_pct": price_vs,
+        "rent_vs_home_pct": rent_vs,
+        "parking_vs_home_pct": parking_vs,
+        "total_vs_home_pct": total_vs,
+        "price_vs_home_pct": price_vs,
         "note": h.get("note", ""),
     }
 
@@ -98,14 +123,33 @@ def score_from_range(value: float, low: float, high: float) -> float:
     return round(max(1.0, min(10.0, 10.0 - ratio * 9.0)), 1)
 
 
-def score_housing(district: str) -> dict:
+def score_housing(district: str, school_net: str = "") -> dict:
     m = housing_metrics(district)
-    rents = [d["rent_psf"] * PRACTICAL_SQFT for d in DISTRICT_HOUSING.values()]
-    prices = [d["price_psf"] * PRACTICAL_SQFT for d in DISTRICT_HOUSING.values()]
+    totals = []
+    rents = []
+    prices = []
+    for d_name, d in DISTRICT_HOUSING.items():
+        p = PARKING_MONTHLY.get(d_name, DEFAULT_PARKING)
+        rents.append(d["rent_psf"] * HOME_SQFT)
+        prices.append(d["price_psf"] * HOME_SQFT)
+        totals.append(d["rent_psf"] * HOME_SQFT + p)
     rent_s = score_from_range(m["rent_month"], min(rents), max(rents))
     buy_s = score_from_range(m["price_million"] * 1_000_000, min(prices), max(prices))
-    combined = round(rent_s * 0.5 + buy_s * 0.5, 1)
-    return {**m, "rent_score": rent_s, "buy_score": buy_s, "housing_score": combined}
+    total_s = score_from_range(m["total_monthly"], min(totals), max(totals))
+    # Rent 40% + buy 35% + total incl. parking 25%
+    combined = round(rent_s * 0.40 + buy_s * 0.35 + total_s * 0.25, 1)
+    if school_net == HOME_SCHOOL_NET:
+        stay_s = 10.0
+    else:
+        stay_s = round(max(3.0, combined), 1)
+    return {
+        **m,
+        "rent_score": rent_s,
+        "buy_score": buy_s,
+        "total_score": total_s,
+        "housing_score": combined,
+        "stay_housing_score": stay_s,
+    }
 
 
 def parse_area(facts: list) -> float | None:
@@ -251,12 +295,30 @@ def weighted_total(scores: dict, mode: str = "standard") -> float:
             "area": 0.08, "dragon": 0.08, "s1": 0.12, "negative": 0.07,
             "housing": 0.30, "active": 0.20, "ease": 0.15,
         }
+    elif mode == "stay":
+        w = {
+            "area": 0.10, "dragon": 0.08, "s1": 0.12, "negative": 0.10,
+            "housing": 0.22, "active": 0.22, "ease": 0.16,
+        }
+        scores = {**scores, "housing": scores.get("stay_housing", scores["housing"])}
     else:
         w = {
             "area": 0.10, "dragon": 0.08, "s1": 0.12, "negative": 0.10,
             "housing": 0.18, "active": 0.22, "ease": 0.20,
         }
     return round(sum(scores[k] * w[k] for k in w), 2)
+
+
+def move_hint(total_vs: float, rent_vs: float, school_net: str) -> str:
+    if school_net == HOME_SCHOOL_NET:
+        return "留現址(校網48)"
+    if total_vs <= -8:
+        return "搬屋更省"
+    if total_vs >= 12:
+        return "搬屋更貴"
+    if abs(total_vs) <= 5:
+        return "同現址水平"
+    return "視租買取向"
 
 
 def fetch_all_list():
@@ -309,11 +371,14 @@ def main():
         primary = d.get("stageProfile", {}).get("primary", {}) or s.get("stageProfile", {}).get("primary", {})
         hket = primary.get("hketReference", {}) or {}
         district = s.get("district", d.get("district", ""))
+        gender = d.get("gender", s.get("gender", "男女校"))
+        school_net = primary.get("schoolNet", "")
+        eligible = boy_eligible(gender)
 
         sqm = parse_area(facts)
         link = parse_linkage(facts)
         p1 = parse_p1(hket.get("p1PlaceSummary", ""))
-        house = score_housing(district)
+        house = score_housing(district, school_net)
 
         scores = {
             "area": score_area(sqm),
@@ -321,46 +386,51 @@ def main():
             "s1": score_s1(link, score_dragon(link)),
             "negative": score_negative(d.get("reviewSignals")),
             "housing": house["housing_score"],
+            "stay_housing": house["stay_housing_score"],
             "active": score_active(facts, {**primary, "hketReference": hket}, score_area(sqm)),
-            "ease": score_ease(p1, primary.get("schoolNet", ""), s.get("fundingType", "")),
+            "ease": score_ease(p1, school_net, s.get("fundingType", "")),
         }
+        if gender == "男校":
+            scores["active"] = round(min(10.0, scores["active"] + 0.3), 1)
         scores["competition"] = score_competition(scores["ease"])
 
         link_text = link["dragon"] or link["linked"] or "無"
         if link["dragon"] and link["linked"]:
             link_text = f"龍:{link['dragon']} | 聯:{link['linked']}"
 
-        vs_rent = house["rent_vs_lamtin_pct"]
-        vs_price = house["price_vs_lamtin_pct"]
-        if vs_rent <= -5 and vs_price <= -5:
-            move_hint = "搬屋更省"
-        elif vs_rent >= 10 or vs_price >= 15:
-            move_hint = "搬屋更貴"
-        elif abs(vs_rent) <= 5 and abs(vs_price) <= 5:
-            move_hint = "同藍田水平"
-        else:
-            move_hint = "視租買取向"
+        hint = move_hint(house["total_vs_home_pct"], house["rent_vs_home_pct"], school_net)
 
         rows.append({
-            "排名": 0,
-            "搬屋排名": 0,
+            "男生排名": 0,
+            "男生搬屋排名": 0,
+            "男生留現址排名": 0,
             "學校": s["nameZh"],
             "英文名": s["nameEn"],
+            "性別收生": gender,
+            "男生適讀": "是" if eligible else "否(女校)",
             "區域": district,
-            "校網": primary.get("schoolNet", ""),
+            "校網": school_net,
             "類別": s.get("fundingType", ""),
-            "加權總分": weighted_total(scores, "standard"),
-            "搬屋總分": weighted_total(scores, "relocate"),
-            "住屋成本分": scores["housing"],
+            "加權總分": weighted_total(scores, "standard") if eligible else "",
+            "搬屋總分": weighted_total(scores, "relocate") if eligible else "",
+            "留現址總分": weighted_total(scores, "stay") if eligible else "",
+            "住屋成本分": house["housing_score"],
+            "留現址住屋分": house["stay_housing_score"],
             "租金評分": house["rent_score"],
             "樓價評分": house["buy_score"],
+            "總住屋評分": house["total_score"],
             "參考呎租": house["rent_psf"],
             "參考呎價": house["price_psf"],
-            "估計月租500呎": house["rent_month"],
-            "估計樓價500呎萬": house["price_million"],
-            "較藍田租金差%": vs_rent,
-            "較藍田樓價差%": vs_price,
-            "搬屋提示": move_hint,
+            "估計月租633呎": house["rent_month"],
+            "估計車位月租": house["parking_month"],
+            "估計住屋總月費": house["total_monthly"],
+            "估計樓價633呎萬": house["price_million"],
+            "較現址租金差%": house["rent_vs_home_pct"],
+            "較現址車位差%": house["parking_vs_home_pct"],
+            "較現址總月費差%": house["total_vs_home_pct"],
+            "較現址樓價差%": house["price_vs_home_pct"],
+            "搬屋提示": hint,
+            "現址基準": f"{HOME_LABEL} {HOME_SQFT}呎 租${HOME_RENT}+位${HOME_PARKING}",
             "校園面積分": scores["area"],
             "佔地平方米": sqm or "",
             "龍校分": scores["dragon"],
@@ -378,14 +448,24 @@ def main():
             "資料來源": d.get("sourceUrl", s.get("sourceUrl", "")),
         })
 
-    rows.sort(key=lambda r: (-r["加權總分"], r["學校"]))
-    for i, r in enumerate(rows, 1):
-        r["排名"] = i
+    def rank_boys(rows_in: list, key: str, field: str):
+        boys = [r for r in rows_in if r["男生適讀"] == "是" and r.get(key)]
+        boys.sort(key=lambda r: (-float(r[key]), r["學校"]))
+        rank_map = {r["學校"]: i for i, r in enumerate(boys, 1)}
+        for r in rows_in:
+            r[field] = rank_map.get(r["學校"], "")
 
-    rows_reloc = sorted(rows, key=lambda r: (-r["搬屋總分"], r["學校"]))
-    rank_map = {r["學校"]: i for i, r in enumerate(rows_reloc, 1)}
-    for r in rows:
-        r["搬屋排名"] = rank_map[r["學校"]]
+    rank_boys(rows, "加權總分", "男生排名")
+    rank_boys(rows, "搬屋總分", "男生搬屋排名")
+    rank_boys(rows, "留現址總分", "男生留現址排名")
+
+    # Sort CSV: boys first by 男生搬屋排名, then girls schools at end
+    def sort_key(r):
+        if r["男生適讀"] != "是" or not r.get("男生搬屋排名"):
+            return (1, 9999, r["學校"])
+        return (0, int(r["男生搬屋排名"]), r["學校"])
+
+    rows.sort(key=sort_key)
 
     fieldnames = list(rows[0].keys())
     with open(OUT, "w", newline="", encoding="utf-8-sig") as f:
@@ -393,9 +473,12 @@ def main():
         w.writeheader()
         w.writerows(rows)
 
-    print(f"Wrote {len(rows)} rows to {OUT}")
-    top_reloc = sorted(rows, key=lambda r: -r["搬屋總分"])[:5]
-    print("搬屋總分 TOP5:", ", ".join(f"{r['學校']}({r['搬屋總分']})" for r in top_reloc))
+    boys = [r for r in rows if r["男生適讀"] == "是"]
+    print(f"Wrote {len(rows)} rows ({len(boys)} boys-eligible) to {OUT}")
+    top_stay = sorted(boys, key=lambda r: -float(r["留現址總分"]))[:5]
+    top_reloc = sorted(boys, key=lambda r: -float(r["搬屋總分"]))[:5]
+    print("留現址 TOP5:", ", ".join(f"{r['學校']}({r['留現址總分']})" for r in top_stay))
+    print("搬屋 TOP5:", ", ".join(f"{r['學校']}({r['搬屋總分']})" for r in top_reloc))
 
 
 if __name__ == "__main__":
