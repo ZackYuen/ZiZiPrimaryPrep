@@ -123,7 +123,11 @@ export function StoryOrderBoard({ frames, slots, pool, locked, showWrong, onChan
   ) => {
     if (locked) return
     e.preventDefault()
-    e.currentTarget.setPointerCapture(e.pointerId)
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch {
+      /* ignore */
+    }
     ghostOnRef.current = false
     setGhostOn(false)
     originRef.current = { x: e.clientX, y: e.clientY }
@@ -256,13 +260,15 @@ export function StoryOrderBoard({ frames, slots, pool, locked, showWrong, onChan
         )
       : null
 
-  const hint = canPointer
-    ? selected
-      ? '已揀一張圖 → 拖去或撳四格'
-      : '拖圖去四格，排先後次序'
-    : selected
-      ? '已揀一張圖 → 再撳要放嘅格'
-      : '先撳圖，再撳四格'
+  const hint = locked
+    ? '次序啱喇，跟住圖講故事'
+    : canPointer
+      ? selected
+        ? '已揀一張圖 → 拖去或撳四格'
+        : '拖圖去四格，排先後次序'
+      : selected
+        ? '已揀一張圖 → 再撳要放嘅格'
+        : '先撳圖，再撳四格'
 
   return (
     <div className={`story-order ${drag ? 'is-dragging' : ''}`}>
@@ -334,7 +340,7 @@ export function StoryOrderBoard({ frames, slots, pool, locked, showWrong, onChan
         ref={poolRef}
         className={`story-order__pool ${overPool ? 'is-drop-target' : ''} ${locked ? 'is-hidden' : ''}`}
         aria-label="未排嘅圖"
-        hidden={locked}
+        hidden={locked || pool.length === 0}
       >
         {pool.map((frameId, index) => {
           const frame = frameById(frames, frameId)

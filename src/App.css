@@ -928,6 +928,18 @@
   .story-order__slots {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+
+  .story-order__empty {
+    min-height: 6.4rem;
+  }
+
+  .story-order__tile .story-frame-art {
+    height: 6.2rem;
+  }
+
+  .story-order__slot .story-order__tile .story-frame-art {
+    height: 7.2rem;
+  }
 }
 
 .story-recall__prompt {
