@@ -28,37 +28,31 @@ HOME_PRICE_TOTAL_M = round(HOME_SQFT * HOME_PRICE_PSF / 1_000_000, 2)  # 4.37
 HOME_SCHOOL_NET = "48"
 HOME_DISTRICT = "觀塘區"
 
-# District housing midpoints for RELOCATE comparisons (not used for 觀塘現址).
-# rent_psf: HKD/sqft/month; price_psf: HKD/sqft sale. 2025-26 mass-market blend.
-DISTRICT_HOUSING = {
-    "中西區":   {"rent_psf": 62, "price_psf": 22000, "note": "港島核心"},
-    "灣仔區":   {"rent_psf": 57, "price_psf": 20000, "note": "港島核心"},
-    "香港東區": {"rent_psf": 42, "price_psf": 14000, "note": "港島東"},
-    "香港南區": {"rent_psf": 45, "price_psf": 15000, "note": "港島南"},
-    "九龍城區": {"rent_psf": 40, "price_psf": 13000, "note": "九龍城/土瓜灣"},
-    "油尖旺區": {"rent_psf": 52, "price_psf": 17000, "note": "尖沙咀/佐敦"},
-    "深水埗區": {"rent_psf": 33, "price_psf": 9500,  "note": "西九龍"},
-    "黃大仙區": {"rent_psf": 35, "price_psf": 10000, "note": "黃大仙/鑽石山"},
-    "觀塘區":   {"rent_psf": HOME_RENT_PSF, "price_psf": HOME_PRICE_PSF, "note": "現址月華街基準"},
-    "西貢區":   {"rent_psf": 38, "price_psf": 12000, "note": "將軍澳/西貢"},
-    "沙田區":   {"rent_psf": 36, "price_psf": 11500, "note": "沙田/馬鞍山"},
-    "大埔區":   {"rent_psf": 32, "price_psf": 10000, "note": "大埔/粉嶺"},
-    "北區":     {"rent_psf": 30, "price_psf": 9000,  "note": "上水/粉嶺北"},
-    "葵青區":   {"rent_psf": 31, "price_psf": 9500,  "note": "葵涌/青衣"},
-    "荃灣區":   {"rent_psf": 34, "price_psf": 10500, "note": "荃灣"},
-    "屯門區":   {"rent_psf": 28, "price_psf": 8500,  "note": "屯門"},
-    "元朗區":   {"rent_psf": 29, "price_psf": 8800,  "note": "元朗/天水圍"},
-    "離島區":   {"rent_psf": 32, "price_psf": 11000, "note": "東涌/長洲等"},
+# 搬屋用：2026 私人大型屋苑中位（實用呎），唔包括唐樓／居屋未補價／山頂豪宅。
+# 官方錨：差估署《香港物業報告》每月補編 2026 Q2 私人住宅 B 類（40–69.9㎡≈430–750呎）
+# 平均租金 港島 $431/㎡≈$40/呎、九龍 $403/㎡≈$37/呎、新界 $293/㎡≈$27/呎（÷10.764）。
+# 差估署只有三大區，無18區；分區數字改用 2026 中原／美聯／28Hse 屋苑成交中位上調（校網熱點會貴過全區平均）。
+PRIVATE_HOUSING = {
+    "中西區":   {"rent_psf": 55, "price_psf": 24000, "parking": 4500, "note": "半山/西營盤私人", "src": "差估署港島B類~$40；半山私人呎租常見$50-65、呎價$22-28k；車位中環/半山叫價$4.5-6k"},
+    "灣仔區":   {"rent_psf": 52, "price_psf": 22000, "parking": 4000, "note": "跑馬地/灣仔私人", "src": "差估署港島B類~$40；跑馬地/灣仔私人中位高過東區"},
+    "香港東區": {"rent_psf": 42, "price_psf": 15500, "parking": 2800, "note": "太古/鰂魚涌", "src": "太古城2026中原成交約$15.5-16.9k"},
+    "香港南區": {"rent_psf": 42, "price_psf": 16000, "parking": 2800, "note": "薄扶林/鴨脷洲私人", "src": "差估署港島B類~$40，南區私人略高於東區舊樓"},
+    "九龍城區": {"rent_psf": 50, "price_psf": 17000, "parking": 3200, "note": "九龍塘/何文田（喇沙圈）", "src": "又一居2026成交約$16-18k、呎租$52-64；土瓜灣更平、畢架山$24k+。車位約$3-4k"},
+    "油尖旺區": {"rent_psf": 48, "price_psf": 18000, "parking": 3500, "note": "佐敦/油麻地私人", "src": "差估署九龍B類~$37；尖沙咀/佐敦私人高過全九龍平均"},
+    "深水埗區": {"rent_psf": 36, "price_psf": 12000, "parking": 2600, "note": "美孚/長沙灣私人", "src": "差估署九龍B類~$37；美孚/長沙灣私人中位約$11-14k"},
+    "黃大仙區": {"rent_psf": 36, "price_psf": 11500, "parking": 2500, "note": "鑽石山私人", "src": "差估署九龍B類~$37；鑽石山私人略低於九龍塘"},
+    "觀塘區":   {"rent_psf": 35, "price_psf": 12000, "parking": 2800, "note": "麗港城級私人（非月華舊樓）", "src": "麗港城2026成交約$11-13k、呎租約$34-36；凱滙叫價$18-20k。現址月華大廈成交$6.5-6.9k、租$17k/633呎。車位28Hse觀塘住宅約$2.6-3.3k"},
+    "西貢區":   {"rent_psf": 42, "price_psf": 13500, "parking": 2500, "note": "將軍澳私人", "src": "日出康城2026中原約$14k；將軍澳租盤實用呎租常見$47-50"},
+    "沙田區":   {"rent_psf": 38, "price_psf": 13000, "parking": 2300, "note": "沙田/馬鞍山私人", "src": "差估署新界B類~$27；沙田第一城2026約$15k，區內中位略低"},
+    "大埔區":   {"rent_psf": 32, "price_psf": 11000, "parking": 2200, "note": "大埔私人", "src": "差估署新界B類~$27，大埔私人略高於屯門"},
+    "北區":     {"rent_psf": 30, "price_psf": 10000, "parking": 2000, "note": "上水/粉嶺私人", "src": "差估署新界B類~$27"},
+    "葵青區":   {"rent_psf": 32, "price_psf": 11000, "parking": 2200, "note": "葵涌/青衣私人", "src": "差估署新界B類~$27"},
+    "荃灣區":   {"rent_psf": 34, "price_psf": 11500, "parking": 2300, "note": "荃灣私人", "src": "差估署新界B類~$27"},
+    "屯門區":   {"rent_psf": 28, "price_psf": 9500,  "parking": 2000, "note": "屯門私人", "src": "差估署新界B類~$27"},
+    "元朗區":   {"rent_psf": 28, "price_psf": 9800,  "parking": 2000, "note": "元朗/天水圍私人", "src": "差估署新界B類~$27"},
+    "離島區":   {"rent_psf": 34, "price_psf": 11500, "parking": 3000, "note": "東涌私人", "src": "東涌屋苑2025-26呎租約$31-39；東環車位叫租見$4k，取$3k中位"},
 }
-
-PARKING_MONTHLY = {
-    "中西區": 2800, "灣仔區": 2600, "香港東區": 2400, "香港南區": 2500,
-    "九龍城區": 2400, "油尖旺區": 2700, "深水埗區": 2200, "黃大仙區": 2250,
-    "觀塘區": HOME_PARKING, "西貢區": 2100, "沙田區": 2000, "大埔區": 1900,
-    "北區": 1800, "葵青區": 1900, "荃灣區": 2000, "屯門區": 1800,
-    "元朗區": 1800, "離島區": 2000,
-}
-DEFAULT_PARKING = 2000
+DEFAULT_PRIVATE = {"rent_psf": 35, "price_psf": 11000, "parking": 2200, "note": "估算", "src": "缺區資料，用九龍/新界中位"}
 
 # Longer names first. No bare 保良局 / 東華三院 / 可譽 / 真光.
 ELITE_SEC = [
@@ -229,35 +223,43 @@ def lookup_p1(index: dict, name_zh: str, name_en: str) -> dict | None:
     return None
 
 
-def housing_metrics(district: str) -> dict:
-    if district == HOME_DISTRICT:
-        rent_mo = HOME_RENT
-        parking = HOME_PARKING
-        price_m = HOME_PRICE_TOTAL_M
-        rent_psf = HOME_RENT_PSF
-        price_psf = HOME_PRICE_PSF
-        note = "現址月華街（633呎 $17000+$2250）"
-    else:
-        h = DISTRICT_HOUSING.get(district, {"rent_psf": 35, "price_psf": 11000, "note": "估算"})
-        parking = PARKING_MONTHLY.get(district, DEFAULT_PARKING)
-        rent_mo = round(h["rent_psf"] * HOME_SQFT)
-        price_m = round(h["price_psf"] * HOME_SQFT / 1_000_000, 2)
-        rent_psf = h["rent_psf"]
-        price_psf = h["price_psf"]
-        note = h.get("note", "")
+def private_cost(district: str) -> dict:
+    h = PRIVATE_HOUSING.get(district, DEFAULT_PRIVATE)
+    rent_mo = round(h["rent_psf"] * HOME_SQFT)
+    parking = h["parking"]
+    price_m = round(h["price_psf"] * HOME_SQFT / 1_000_000, 2)
     total_mo = rent_mo + parking
     return {
-        "rent_psf": rent_psf,
-        "price_psf": price_psf,
+        "rent_psf": h["rent_psf"],
+        "price_psf": h["price_psf"],
         "rent_month": rent_mo,
         "parking_month": parking,
         "total_monthly": total_mo,
         "price_million": price_m,
+        "note": h.get("note", ""),
+        "src": h.get("src", ""),
+    }
+
+
+def home_cost() -> dict:
+    return {
+        "rent_psf": HOME_RENT_PSF,
+        "price_psf": HOME_PRICE_PSF,
+        "rent_month": HOME_RENT,
+        "parking_month": HOME_PARKING,
+        "total_monthly": HOME_TOTAL_MONTHLY,
+        "price_million": HOME_PRICE_TOTAL_M,
+        "note": "現址月華舊樓實際（非觀塘私人屋苑）",
+        "src": "家庭現租$17000+車位$2250；月華大廈2025-26美聯/28Hse成交約$6,515-$6,907/呎",
+    }
+
+
+def vs_home(rent_mo, parking, total_mo, price_m) -> dict:
+    return {
         "rent_vs_home_pct": round((rent_mo - HOME_RENT) / HOME_RENT * 100, 1),
         "parking_vs_home_pct": round((parking - HOME_PARKING) / HOME_PARKING * 100, 1),
         "total_vs_home_pct": round((total_mo - HOME_TOTAL_MONTHLY) / HOME_TOTAL_MONTHLY * 100, 1),
         "price_vs_home_pct": round((price_m - HOME_PRICE_TOTAL_M) / HOME_PRICE_TOTAL_M * 100, 1),
-        "note": note,
     }
 
 
@@ -268,27 +270,40 @@ def score_from_range(value: float, low: float, high: float) -> float:
     return round(max(1.0, min(10.0, 10.0 - ratio * 9.0)), 1)
 
 
-def score_housing(district: str) -> dict:
-    m = housing_metrics(district)
-    totals, rents, prices = [], [], []
-    for d_name, d in DISTRICT_HOUSING.items():
-        p = PARKING_MONTHLY.get(d_name, DEFAULT_PARKING)
-        rent = HOME_RENT if d_name == HOME_DISTRICT else d["rent_psf"] * HOME_SQFT
-        price = HOME_PRICE_TOTAL_M * 1_000_000 if d_name == HOME_DISTRICT else d["price_psf"] * HOME_SQFT
-        rents.append(rent)
-        prices.append(price)
-        totals.append(rent + p)
-    rent_s = score_from_range(m["rent_month"], min(rents), max(rents))
-    buy_s = score_from_range(m["price_million"] * 1_000_000, min(prices), max(prices))
-    total_s = score_from_range(m["total_monthly"], min(totals), max(totals))
+def score_housing(district: str, use_home_display: bool) -> dict:
+    priv = private_cost(district)
+    shown = home_cost() if use_home_display else priv
+    rents, prices, totals = [], [], []
+    for d_name in PRIVATE_HOUSING:
+        p = private_cost(d_name)
+        rents.append(p["rent_month"])
+        prices.append(p["price_million"] * 1_000_000)
+        totals.append(p["total_monthly"])
+    # 搬屋住屋分用「該區私人中位」；留現址顯示現址實際但不入搬屋排名
+    score_base = priv
+    rent_s = score_from_range(score_base["rent_month"], min(rents), max(rents))
+    buy_s = score_from_range(score_base["price_million"] * 1_000_000, min(prices), max(prices))
+    total_s = score_from_range(score_base["total_monthly"], min(totals), max(totals))
     combined = round(rent_s * 0.40 + buy_s * 0.35 + total_s * 0.25, 1)
+    vs = vs_home(shown["rent_month"], shown["parking_month"], shown["total_monthly"], shown["price_million"])
+    vs_priv = vs_home(priv["rent_month"], priv["parking_month"], priv["total_monthly"], priv["price_million"])
     return {
-        **m,
+        **shown,
+        **vs,
         "rent_score": rent_s,
         "buy_score": buy_s,
         "total_score": total_s,
         "housing_score": combined,
-        "stay_housing_score": 10.0,  # 留現址住屋不變
+        "stay_housing_score": 10.0,
+        "口径": shown["note"],
+        "priv_rent_psf": priv["rent_psf"],
+        "priv_price_psf": priv["price_psf"],
+        "priv_rent_month": priv["rent_month"],
+        "priv_parking": priv["parking_month"],
+        "priv_total": priv["total_monthly"],
+        "priv_price_m": priv["price_million"],
+        "priv_vs_home_pct": vs_priv["total_vs_home_pct"],
+        "priv_src": priv["src"],
     }
 
 
@@ -603,9 +618,10 @@ def main():
             p1 = {"total": 0, "self": 0, "central": 0, "classes": 0}
 
         path = stay_path(funding, school_net, district, has_p1)
+        stay_display = path in ("留現址-統一派位+自行分配", "直資私立可通勤") and district == HOME_DISTRICT
         sqm = parse_area(facts)
         link = parse_linkage(facts)
-        house = score_housing(district)
+        house = score_housing(district, stay_display)
         commute = score_commute(name_zh, district)
         dragon = score_dragon(link)
         area_s = score_area(sqm)
@@ -688,6 +704,8 @@ def main():
             "現址直資總分": weighted_total(scores_stay, "stay") if dss_stay_ok else "",
             "住屋成本分": house["housing_score"],
             "留現址住屋分": 10.0,
+            "住屋口徑": house["口径"],
+            "住屋資料來源": house["src"] if stay_display else house["priv_src"],
             "現址通勤分": commute,
             "租金評分": house["rent_score"],
             "樓價評分": house["buy_score"],
@@ -698,10 +716,17 @@ def main():
             "估計車位月租": house["parking_month"],
             "估計住屋總月費": house["total_monthly"],
             "估計樓價633呎萬": house["price_million"],
+            "該區私人呎租": house["priv_rent_psf"],
+            "該區私人呎價": house["priv_price_psf"],
+            "該區私人月租633呎": house["priv_rent_month"],
+            "該區私人車位月租": house["priv_parking"],
+            "該區私人總月費": house["priv_total"],
+            "該區私人樓價633呎萬": house["priv_price_m"],
             "較現址租金差%": house["rent_vs_home_pct"],
             "較現址車位差%": house["parking_vs_home_pct"],
             "較現址總月費差%": house["total_vs_home_pct"],
             "較現址樓價差%": house["price_vs_home_pct"],
+            "較現址私人屋苑總月費差%": house["priv_vs_home_pct"],
             "搬屋提示": move_hint(house["total_vs_home_pct"], school_net, path),
             "現址基準": f"{HOME_LABEL} {HOME_SQFT}呎 租${HOME_RENT}+位${HOME_PARKING}",
             "校園面積分": area_s,
