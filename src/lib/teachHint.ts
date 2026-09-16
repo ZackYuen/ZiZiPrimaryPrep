@@ -24,14 +24,32 @@ export type HintVisualId =
   | 'grab'
   | 'firefighter'
   | 'bike'
+  | 'bike-fall'
   | 'doctor'
+  | 'nurse'
   | 'cook'
   | 'daily'
+  | 'play-fun'
+  | 'balloon'
+  | 'pencil-case'
+  | 'birthday'
+  | 'family-hobbies'
   | 'zoo'
   | 'job'
   | 'policeman'
+  | 'police-help'
   | 'uniform'
   | 'football'
+  | 'driver'
+  | 'postman'
+  | 'actor'
+  | 'writer'
+  | 'lawyer'
+  | 'toilet'
+  | 'mtr'
+  | 'bus-stop'
+  | 'sweep'
+  | 'sing'
   | 'clock'
   | 'coins'
   | 'like-blue'
@@ -81,7 +99,7 @@ const SCENE_VISUAL: Partial<Record<SceneId, HintVisualId>> = {
 const ID_VISUAL: Record<string, HintVisualId> = {
   'd1-v': 'talk',
   'd2-v': 'daily',
-  'd3-v': 'bike',
+  'd3-v': 'play-fun',
   'd3-share': 'share',
   'd4-vocab': 'feelings',
   'd5-fam': 'family',
@@ -105,30 +123,34 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'd3-r3': 'reorder',
   'd3-r4': 'reorder',
   'd3-en-q': 'bike',
+  'd3-m1a': 'mix',
+  'd3-m3b': 'mix',
   day4: 'feelings',
   'd4-emo1': 'gift',
   'd4-emo1b': 'lost-toy',
-  'd4-emo2': 'happy',
+  'd4-emo2': 'gift',
   'd4-solve': 'grab',
   'd4-sort': 'sort',
   'd4-syn': 'happy',
   'd4-ben': 'zoo',
-  'd4-leo': 'happy',
-  'd4-lily': 'angry',
-  'd4-sam': 'feelings',
+  'd4-leo': 'balloon',
+  'd4-lily': 'pencil-case',
+  'd4-sam': 'birthday',
   'd4-week': 'weekend',
   day5: 'family',
   'd5-job': 'job',
-  'd5-hobby': 'cook',
+  'd5-hobby': 'family-hobbies',
   'd5-purse-most': 'coins',
   'd5-purse-least': 'coins',
   'd6-dad': 'firefighter',
-  'd6-ming': 'bike',
-  'd6-ming2': 'bike',
+  'd6-ming': 'bike-fall',
+  'd6-ming2': 'bike-fall',
   'd6-en1': 'policeman',
   'd6-en2': 'uniform',
   'd6-en3': 'football',
-  'd6-en4': 'policeman',
+  'd6-en4': 'police-help',
+  'd6-r2': 'mix',
+  'd6-r3a': 'mix',
 }
 
 const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
@@ -215,6 +237,18 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
   'd4-ben': {
     kidLine: 'Ben 去邊？圖係動物園。',
     moreLine: 'He is going to the zoo.',
+  },
+  'd4-leo': {
+    kidLine: 'Leo 想要紅氣球，但收到藍氣球，之後送給 Tim。',
+    moreLine: '最後佢覺得Proud，因為肯分享。',
+  },
+  'd4-lily': {
+    kidLine: 'Lily 嬲因為弟弟整爛筆盒，佢深呼吸數到十。',
+    moreLine: '嬲嘅時候可以深呼吸，等自己冷靜。',
+  },
+  'd4-sam': {
+    kidLine: '跟住生日故事講心情：蛋糕、藍裇、遙控車、落雨、室內賽道。',
+    moreLine: '有興奮、失望、擔心、開心。',
   },
   'd5-job': {
     kidLine: '講爸爸／媽媽做咩工作。',
@@ -307,6 +341,9 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (/school|kindergarten|老師|幼稚園|課室/.test(p)) return 'school'
   if (/family|家人|爸爸|媽媽/.test(p)) return 'family'
   if (/park|公園|跑步/.test(p)) return 'park'
+  if (/balloon|氣球/.test(p)) return 'balloon'
+  if (/pencil case|筆盒|筆袋/.test(p)) return 'pencil-case'
+  if (/遙控車|藍裇|生日故事/.test(p)) return 'birthday'
   if (/share|分享|輪流/.test(p) && !/搶/.test(p)) return 'share'
   if (/禮物|gift|present/.test(p)) return 'gift'
   if (/唔見.*玩具|lost.*toy/.test(p)) return 'lost-toy'
@@ -319,6 +356,7 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
     if (math?.op === '+') return 'plus'
     return 'mix'
   }
+  if (/誰比較多|哪班比較多|多多少|比較多/.test(p)) return 'mix'
   if (item.kind === 'speak') return 'talk'
   return 'story'
 }
@@ -328,22 +366,31 @@ export function vocabVisual(catId: string, zh: string): HintVisualId {
   if (catId === 'jobs') {
     if (/老師/.test(zh)) return 'teacher'
     if (/同學/.test(zh)) return 'school'
-    if (/醫生|護士/.test(zh)) return 'doctor'
+    if (/護士/.test(zh)) return 'nurse'
+    if (/醫生/.test(zh)) return 'doctor'
     if (/消防/.test(zh)) return 'firefighter'
     if (/警察/.test(zh)) return 'policeman'
     if (/廚師/.test(zh)) return 'cook'
+    if (/司機/.test(zh)) return 'driver'
+    if (/郵差/.test(zh)) return 'postman'
+    if (/演員/.test(zh)) return 'actor'
+    if (/作家/.test(zh)) return 'writer'
+    if (/律師/.test(zh)) return 'lawyer'
     return 'job'
   }
   if (catId === 'actions') {
     if (/吃/.test(zh)) return 'eat'
     if (/喝/.test(zh)) return 'drink'
     if (/跑|踏/.test(zh)) return 'run'
-    if (/跳|舞蹈/.test(zh)) return 'happy'
+    if (/舞蹈/.test(zh)) return 'play-fun'
+    if (/跳/.test(zh)) return 'happy'
     if (/單車/.test(zh)) return 'bike'
     if (/哭|跌倒/.test(zh)) return 'sad'
     if (/打|拉|推/.test(zh)) return 'grab'
     if (/抱/.test(zh)) return 'family'
-    if (/說話|叫|唱|拍手/.test(zh)) return 'talk'
+    if (/唱/.test(zh)) return 'sing'
+    if (/掃/.test(zh)) return 'sweep'
+    if (/說話|叫|拍手/.test(zh)) return 'talk'
     return 'daily'
   }
   if (catId === 'places') {
@@ -355,6 +402,9 @@ export function vocabVisual(catId: string, zh: string): HintVisualId {
     if (/餐廳/.test(zh)) return 'eat'
     if (/圖書館/.test(zh)) return 'book'
     if (/超市|市場/.test(zh)) return 'coins'
+    if (/洗手|廁/.test(zh)) return 'toilet'
+    if (/地鐵/.test(zh)) return 'mtr'
+    if (/巴士/.test(zh)) return 'bus-stop'
     return 'talk'
   }
   if (/吃|食|飯/.test(zh)) return 'eat'
