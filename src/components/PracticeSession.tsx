@@ -31,6 +31,10 @@ import { HintPicture } from './HintPicture'
 import { MathDots } from './MathDots'
 import { KidHelp } from './KidHelp'
 import { resolveTeachHint } from '../lib/teachHint'
+import { TangramBoard } from './TangramBoard'
+import { SimonGame } from './SimonGame'
+import { BuildBoard } from './BuildBoard'
+import { MemoryMatch } from './MemoryMatch'
 
 type Props = {
   title: string
@@ -109,6 +113,7 @@ export function PracticeSession({
   const advancingRef = useRef(false)
   const [artHidden, setArtHidden] = useState(false)
   const [lookLeft, setLookLeft] = useState<number | null>(null)
+  const [gameSolved, setGameSolved] = useState(false)
 
   const item = items[index]
   const isStoryFocus = item.id === 'd1-en-story'
@@ -127,7 +132,7 @@ export function PracticeSession({
   }, [item, sortPlacement])
 
   const mascotMood =
-    justStar || mathResult === 'ok' || solvedChoice || (sortChecked && sortCorrect)
+    justStar || mathResult === 'ok' || solvedChoice || (sortChecked && sortCorrect) || gameSolved
       ? 'cheer'
       : mathResult === 'no' || wrongAttempts > 0 || (sortChecked && !sortCorrect)
         ? 'think'
@@ -187,6 +192,7 @@ export function PracticeSession({
     }
     setArtHidden(!!_activity.hideArt)
     setLookLeft(_activity.lookSeconds ?? null)
+    setGameSolved(false)
     if (_activity.kind === 'reorder' && _activity.fragments) {
       const shuffled = [..._activity.fragments].sort(() => Math.random() - 0.5)
       setPool(shuffled)
@@ -311,6 +317,20 @@ export function PracticeSession({
     }, done ? 0 : 800)
   }
 
+  const noteGameWrong = () => {
+    setHelped(true)
+    setWrongAttempts((n) => n + 1)
+    setCoachMsg('再試一次！')
+  }
+
+  const solveGame = () => {
+    if (gameSolved) return
+    setGameSolved(true)
+    setCoachMsg('完成啦！好叻！')
+    playSfx('correct')
+    awardAndMaybeNext(true)
+  }
+
   useEffect(() => {
     if (reorderCorrect && !done && !advancingRef.current) {
       playSfx('correct')
@@ -337,6 +357,14 @@ export function PracticeSession({
       if (!item.fields?.length) return true
       return item.fields.every((f) => checkedFields[f])
     }
+    if (
+      item.kind === 'tangram' ||
+      item.kind === 'simon' ||
+      item.kind === 'build' ||
+      item.kind === 'memory'
+    ) {
+      return gameSolved
+    }
     // speak: star when parent/kid taps「我講完啦」(marks done)
     return done
   }
@@ -348,6 +376,14 @@ export function PracticeSession({
     if (isSolved() || revealAnswer || helped) return true
     if (item.kind === 'speak') return showSample || !!spokenText.trim()
     if (item.kind === 'prompt') return isSolved()
+    if (
+      item.kind === 'tangram' ||
+      item.kind === 'simon' ||
+      item.kind === 'build' ||
+      item.kind === 'memory'
+    ) {
+      return isSolved()
+    }
     return false
   }
 
@@ -501,12 +537,61 @@ export function PracticeSession({
           {item.scene && <SceneArt scene={item.scene} alt={item.promptZh} />}
           {!artHidden && !item.hideArt && item.pictureStrip && item.pictureStrip.length > 0 && (
             <div className={`picture-strip picture-strip--${item.pictureStrip.length}`}>
-              {item.pictureStrip.map((pic) => (
-                <figure key={pic.src} className="picture-strip__item">
-                  <img src={mediaSrc(pic.src)} alt="" width={240} height={180} />
-                  <figcaption>{pic.label}</figcaption>
-                </figure>
-              ))}
+              {item.pictureStrip.map((pic, picIndex) => {
+                const choice = item.kind === 'choice' ? item.choices?.[picIndex] : undefined
+                const selected = picked === picIndex
+                const triedWrong = wrongPicks.includes(picIndex)
+                const showCorrect = (solvedChoice || revealAnswer) && !!choice?.correct
+                const lockedChoice = solvedChoice || revealAnswer
+                const clickable = !!choice && item.kind === 'choice'
+                const body = (
+                  <>
+                    <img src={mediaSrc(pic.src)} alt="" width={240} height={180} />
+                    <span className="picture-strip__caption">{pic.label}</span>
+                  </>
+                )
+                if (!clickable) {
+                  return (
+                    <figure key={pic.src} className="picture-strip__item">
+                      <img src={mediaSrc(pic.src)} alt="" width={240} height={180} />
+                      <figcaption>{pic.label}</figcaption>
+                    </figure>
+                  )
+                }
+                return (
+                  <button
+                    key={pic.src}
+                    type="button"
+                    className={[
+                      'picture-strip__item',
+                      'picture-strip__item--choice',
+                      selected && choice.correct ? 'is-selected' : '',
+                      showCorrect ? 'is-correct' : '',
+                      triedWrong && !choice.correct ? 'is-wrong' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    disabled={lockedChoice || triedWrong}
+                    onClick={() => {
+                      unlockAudio()
+                      if (lockedChoice || triedWrong) return
+                      if (choice.correct) {
+                        setPicked(picIndex)
+                        setCoachMsg('答對啦！你好努力！')
+                        playSfx('correct')
+                        awardAndMaybeNext(true)
+                      } else {
+                        playSfx('wrong')
+                        setWrongPicks((prev) => (prev.includes(picIndex) ? prev : [...prev, picIndex]))
+                        registerWrong()
+                        setPicked(null)
+                      }
+                    }}
+                  >
+                    {body}
+                  </button>
+                )
+              })}
             </div>
           )}
           {!artHidden && !item.hideArt && item.hintImage && (
@@ -534,7 +619,11 @@ export function PracticeSession({
             !item.hintImage &&
             !item.pictureStrip &&
             !item.hideArt &&
-            !artHidden && (
+            !artHidden &&
+            item.kind !== 'tangram' &&
+            item.kind !== 'simon' &&
+            item.kind !== 'build' &&
+            item.kind !== 'memory' && (
             <div className="hint-pic-wrap">
               <HintPicture visual={teach.visual} />
             </div>
@@ -876,7 +965,16 @@ export function PracticeSession({
             </div>
           )}
 
-          {item.kind === 'choice' && item.choices && (
+          {item.kind === 'choice' &&
+            item.choices &&
+            item.pictureStrip &&
+            item.pictureStrip.length === item.choices.length && (
+            <div className="choice-list choice-list--pictures">
+              {coachMsg && <p className={`math-feedback ${solvedChoice ? 'is-ok' : 'is-no'}`}>{coachMsg}</p>}
+            </div>
+          )}
+
+          {item.kind === 'choice' && item.choices && !(item.pictureStrip && item.pictureStrip.length === item.choices.length) && (
             <div className="choice-list">
               {item.choices.map((c, i) => {
                 const selected = picked === i
@@ -1264,6 +1362,73 @@ export function PracticeSession({
                 </p>
               )}
             </div>
+          )}
+
+          {item.kind === 'tangram' && item.tangram && (
+            <TangramBoard
+              mode={item.tangram.mode}
+              shape={item.tangram.shape}
+              locked={gameSolved}
+              reveal={revealAnswer}
+              onSolved={solveGame}
+              onWrong={noteGameWrong}
+            />
+          )}
+
+          {item.kind === 'simon' && item.simon && (
+            <SimonGame
+              config={item.simon}
+              locked={gameSolved}
+              reveal={revealAnswer}
+              onSolved={solveGame}
+              onWrong={noteGameWrong}
+              onSpeak={(text, lang) => speak(text, lang)}
+            />
+          )}
+
+          {item.kind === 'build' && item.build && (
+            <BuildBoard
+              scene={item.build.scene}
+              locked={gameSolved}
+              reveal={revealAnswer}
+              onSolved={solveGame}
+              onWrong={noteGameWrong}
+            />
+          )}
+
+          {item.kind === 'memory' && item.memory && (
+            <MemoryMatch
+              config={item.memory}
+              locked={gameSolved}
+              reveal={revealAnswer}
+              onSolved={solveGame}
+              onWrong={noteGameWrong}
+            />
+          )}
+
+          {(item.kind === 'tangram' ||
+            item.kind === 'simon' ||
+            item.kind === 'build' ||
+            item.kind === 'memory') && (
+            <>
+              {coachMsg && (
+                <p className={`math-feedback ${gameSolved ? 'is-ok' : 'is-no'}`}>{coachMsg}</p>
+              )}
+              {!gameSolved && !revealAnswer && wrongAttempts >= 1 && (
+                <button
+                  type="button"
+                  className="pill-btn pill-btn--soft"
+                  onClick={() => {
+                    playSfx('flip')
+                    setRevealAnswer(true)
+                    setCoachMsg('睇睇點玩，下次自己試！')
+                  }}
+                  aria-label="睇睇答案"
+                >
+                  {KID.peek}
+                </button>
+              )}
+            </>
           )}
 
           {item.kind === 'prompt' && (

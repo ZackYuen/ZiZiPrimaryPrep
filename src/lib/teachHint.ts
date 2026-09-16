@@ -216,10 +216,6 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'evg-lunch-4': 'sweep',
   'evg-read-zh': 'eat',
   'evg-mem-look': 'zoo',
-  'evg-mem-1': 'zoo',
-  'evg-mem-2': 'zoo',
-  'evg-mem-3': 'zoo',
-  'evg-mem-4': 'eat',
   'evg-guess': 'zoo',
   'evg-animal-day': 'zoo',
   'evg-bridge-talk': 'share',
@@ -332,8 +328,52 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
     moreLine: '可以講一齊去邊、一齊食咩。',
   },
   'cky-simon': {
-    kidLine: '聽到 Simon says 先郁。冇聽到就企定。',
-    moreLine: '例如拍手兩下、轉一圈：冇 Simon says 就唔好郁。',
+    kidLine: '聽到 Simon says 先撳「做」。冇聽到就撳「企定」。',
+    moreLine: '拍手兩下、轉一圈：冇 Simon says 就企定。',
+  },
+  'cky-simon-chain': {
+    kidLine: '跟次序：先摸鼻，再拍手，最後指門。',
+    moreLine: '鼻 → 拍手 → 門。',
+  },
+  'cky-party-draw': {
+    kidLine: '拖壽星、朋友、蛋糕、禮物同有趣嘢去派對。',
+    moreLine: '六樣都放好就得。',
+  },
+  'spcc-bridge-look': {
+    kidLine: '拖橋面、護欄同三角形支柱去河上面。',
+    moreLine: '兩邊都要有護欄同支柱。',
+  },
+  'spcc-bridge-shape': {
+    kidLine: '撳兩塊黃色三角形支柱。',
+    moreLine: '三角形支柱令橋企得穩。',
+  },
+  'spcc-bridge-blocks': {
+    kidLine: '先撳支柱，再橋面，最後護欄。',
+    moreLine: '橋要先企得穩，先至可以行。',
+  },
+  'wkf-tan-play': {
+    kidLine: '拖色塊去上面同一個形狀，砌大三角形。',
+    moreLine: '對住顏色同形狀放。',
+  },
+  'wkf-tan-7': {
+    kidLine: '撳晒七塊先至得。',
+    moreLine: '兩大、一中、兩細、一方、一斜，合共七塊。',
+  },
+  'wkf-tan-tri': {
+    kidLine: '只撳三角形。正方形同斜塊唔好撳。',
+    moreLine: '有五塊三角形。',
+  },
+  'wkf-tan-sq': {
+    kidLine: '撳兩塊最細嘅三角形。',
+    moreLine: '兩塊細三角形合埋就係正方形。',
+  },
+  'wkf-tan-boat': {
+    kidLine: '拖色塊去船形空位。',
+    moreLine: '上面係帆，下面係船身。',
+  },
+  'evg-mem-look': {
+    kidLine: '翻兩張，配對動物同佢攞住嘅嘢。',
+    moreLine: '企鵝有藍波，大象有綠傘，兔子有紅蘿蔔。',
   },
   'cky-amy-3': {
     kidLine: 'Ben 着雨衣，唔係因為天花板漏水。',
@@ -359,26 +399,6 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
     kidLine: '英文拖去中文：name 係名字。',
     moreLine: 'egg 雞蛋、broccoli 西蘭花、ear 耳朵。',
   },
-  'evg-mem-look': {
-    kidLine: '慢慢睇六格：邊隻動物、攞住咩。',
-    moreLine: '企鵝有藍波，大象有綠傘，兔子喺左上。',
-  },
-  'evg-mem-1': {
-    kidLine: '諗返六格圖：邊隻動物旁邊有波？',
-    moreLine: '企鵝企喺雪地，旁邊係藍色波。',
-  },
-  'evg-mem-2': {
-    kidLine: '諗返：大象長鼻子旁邊有咩？',
-    moreLine: '大象攞住一把綠色雨傘。',
-  },
-  'evg-mem-3': {
-    kidLine: '諗返：白兔喺邊一格？',
-    moreLine: '兔子喺左上角，旁邊有紅蘿蔔。',
-  },
-  'evg-mem-4': {
-    kidLine: '邊兩樣可以食？帽子同波唔食得。',
-    moreLine: '紅蘿蔔同香蕉係食物。',
-  },
 }
 
 function defaultKidLine(kind: ActivityKind): { kidLine: string; moreLine: string } {
@@ -399,6 +419,14 @@ function defaultKidLine(kind: ActivityKind): { kidLine: string; moreLine: string
       return { kidLine: '拖去 ＋ 或者 －。', moreLine: '笑面去 ＋，喊面去 －。' }
     case 'prompt':
       return { kidLine: '睇圖，同爸爸媽媽一齊做。', moreLine: '做完就撳 ✓。' }
+    case 'tangram':
+      return { kidLine: '拖色塊去同一個形狀。', moreLine: '兩塊細三角形可以砌成正方形。' }
+    case 'simon':
+      return { kidLine: '聽到 Simon says 先撳「做」。冇聽到就撳「企定」。', moreLine: '拍手、轉圈如果冇 Simon says，唔好郁。' }
+    case 'build':
+      return { kidLine: '拖零件去圖上嘅空位。', moreLine: '橋要先砌三角形支柱先穩。' }
+    case 'memory':
+      return { kidLine: '翻兩張，搵同一對。', moreLine: '企鵝配藍波，大象配綠傘。' }
     default:
       return { kidLine: '睇圖再試。', moreLine: '試完唔識可以再撳 ?' }
   }
@@ -448,6 +476,10 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (item.kind === 'sort') return 'sort'
   if (item.kind === 'reorder') return 'reorder'
   if (item.kind === 'prompt') return 'move'
+  if (item.kind === 'tangram') return 'mix'
+  if (item.kind === 'simon') return 'play-fun'
+  if (item.kind === 'build') return 'move'
+  if (item.kind === 'memory') return 'zoo'
   if (item.calendarDay) return 'weekend'
   const p = `${item.promptZh} ${item.promptEn || ''} ${item.cue || ''}`
   if (/policeman|police|警察/.test(p)) return 'policeman'

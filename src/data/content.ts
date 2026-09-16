@@ -14,6 +14,56 @@ export type ActivityKind =
   | 'sort'
   | 'clock'
   | 'money'
+  | 'tangram'
+  | 'simon'
+  | 'build'
+  | 'memory'
+
+export type TangramMode = 'assemble' | 'pair' | 'count' | 'count-tri'
+export type TangramShape = 'triangle' | 'boat'
+
+export type TangramGame = {
+  mode: TangramMode
+  shape?: TangramShape
+}
+
+export type SimonAction = 'head' | 'clap' | 'foot' | 'turn' | 'blue' | 'sit' | 'nose' | 'door'
+
+export type SimonRound = {
+  phrase: string
+  simon: boolean
+  action: SimonAction
+}
+
+export type SimonGame = {
+  mode: 'listen' | 'chain'
+  rounds?: SimonRound[]
+  chain?: SimonAction[]
+}
+
+export type BuildScene = 'party' | 'bridge' | 'bridge-order' | 'bridge-shape'
+
+export type BuildGame = {
+  scene: BuildScene
+}
+
+export type MemoryFace =
+  | 'penguin'
+  | 'elephant'
+  | 'rabbit'
+  | 'lion'
+  | 'panda'
+  | 'monkey'
+  | 'ball'
+  | 'umbrella'
+  | 'carrot'
+  | 'hat'
+  | 'bamboo'
+  | 'banana'
+
+export type MemoryGame = {
+  pairs: { id: string; a: MemoryFace; b: MemoryFace }[]
+}
 
 export type SortItem = {
   text: string
@@ -89,6 +139,10 @@ export type Activity = {
   pictureStrip?: { src: string; label: string }[]
   /** Show hintImage / pictureStrip for this many seconds, then hide. */
   lookSeconds?: number
+  tangram?: TangramGame
+  simon?: SimonGame
+  build?: BuildGame
+  memory?: MemoryGame
 }
 
 export type DayId = 'day1' | 'day2' | 'day3' | 'day4' | 'day5' | 'day6'
