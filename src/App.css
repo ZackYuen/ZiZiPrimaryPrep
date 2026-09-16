@@ -3541,3 +3541,416 @@
     height: 3rem;
   }
 }
+
+/* ---- Parent school report ---- */
+.app-shell--report {
+  width: min(920px, 100%);
+  overflow: visible;
+}
+
+.sr-entry {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  width: 100%;
+  margin: 0.25rem 0 0.5rem;
+  padding: 0.95rem 1rem;
+  border: 3px solid rgba(217, 120, 96, 0.35);
+  border-radius: 22px;
+  background: linear-gradient(145deg, #fff7ef, #ffe4d6);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 8px 0 rgba(176, 86, 62, 0.08);
+}
+
+.sr-entry__date {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  background: #c45c3e;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.sr-entry__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.sr-entry__text strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.sr-entry__text em {
+  font-style: normal;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+}
+
+.school-report {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding-bottom: 2rem;
+}
+
+.school-report__top {
+  align-items: center;
+}
+
+.school-report__kicker {
+  flex: 1;
+  margin: 0;
+  font-weight: 800;
+  color: #8a6a12;
+}
+
+.sr-print,
+.sr-filter {
+  min-height: 40px;
+  padding: 0.35rem 0.8rem;
+  border: 2px solid rgba(27, 58, 75, 0.14);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sr-deadline {
+  padding: 1rem 1.1rem;
+  border-radius: 22px;
+  background: #c45c3e;
+  color: #fffdf7;
+}
+
+.sr-deadline p {
+  margin: 0.4rem 0 0;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.sr-checklist,
+.sr-strategy,
+.sr-card {
+  padding: 1rem 1.1rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(27, 58, 75, 0.08);
+}
+
+.sr-checklist h3,
+.sr-strategy h3 {
+  font-family: var(--font-display);
+  margin: 0 0 0.45rem;
+}
+
+.sr-checklist ol {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+.sr-checklist li + li {
+  margin-top: 0.35rem;
+}
+
+.sr-strategies {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sr-strategy__badge {
+  display: inline-block;
+  margin: 0 0 0.3rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #efe1c5;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.sr-strategy__dp {
+  margin: 0 0 0.4rem;
+}
+
+.sr-strategy p,
+.sr-strategy__backup {
+  color: var(--ink-soft);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.sr-strategy__backup {
+  margin-top: 0.45rem;
+  font-size: 0.9rem;
+}
+
+.sr-weights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sr-weights li {
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 2px solid rgba(27, 58, 75, 0.08);
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.sr-fine {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.sr-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.sr-filter--on {
+  background: #1b3a4b;
+  color: #fff;
+  border-color: #1b3a4b;
+}
+
+.sr-table-wrap {
+  overflow-x: auto;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 2px solid rgba(27, 58, 75, 0.08);
+}
+
+.sr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.sr-table th,
+.sr-table td {
+  padding: 0.55rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(27, 58, 75, 0.08);
+}
+
+.sr-table th {
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+}
+
+.sr-row {
+  cursor: pointer;
+}
+
+.sr-row--open,
+.sr-row:hover {
+  background: rgba(169, 213, 223, 0.22);
+}
+
+.sr-muted {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.sr-chip {
+  display: inline-block;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.sr-chip--dp-first {
+  background: #c45c3e;
+  color: #fff;
+}
+
+.sr-chip--dp-if-linked {
+  background: #e9bd55;
+  color: #3d2f08;
+}
+
+.sr-chip--ca-backup {
+  background: #d7ecf1;
+  color: #1b3a4b;
+}
+
+.sr-chip--skip-dp {
+  background: #eee7da;
+  color: #5c5346;
+}
+
+.sr-chip--dss-optional {
+  background: #dfeada;
+  color: #2d4a33;
+}
+
+.sr-cards {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.sr-card {
+  padding: 0;
+}
+
+.sr-card__head {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.sr-card__rank {
+  flex: 0 0 2rem;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+}
+
+.sr-card__title {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.sr-card__title em {
+  font-style: normal;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+.sr-card__total {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: #c45c3e;
+}
+
+.sr-card__body {
+  padding: 0 1rem 1rem;
+}
+
+.sr-card__why {
+  margin: 0 0 0.6rem;
+  line-height: 1.5;
+}
+
+.sr-bars {
+  list-style: none;
+  margin: 0.75rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.sr-bars li {
+  display: grid;
+  grid-template-columns: 6.4rem 1fr 1.6rem;
+  gap: 0.4rem;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.sr-bar {
+  height: 0.55rem;
+  border-radius: 999px;
+  background: #efe1c5;
+  overflow: hidden;
+}
+
+.sr-bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #6faebc, #c45c3e);
+}
+
+.sr-score--hi {
+  color: #2d4a33;
+}
+
+.sr-score--mid {
+  color: #76580f;
+}
+
+.sr-score--lo {
+  color: #8f3f29;
+}
+
+.sr-notes {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.sr-notes div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.sr-notes dt {
+  font-weight: 800;
+  font-size: 0.82rem;
+}
+
+.sr-notes dd {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+@media print {
+  .sky,
+  .home-tools,
+  .ghost-btn,
+  .sr-print,
+  .sr-filters,
+  .sr-entry {
+    display: none !important;
+  }
+
+  .app-shell,
+  .app-shell--report {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .school-report {
+    gap: 0.6rem;
+  }
+
+  .sr-card {
+    break-inside: avoid;
+  }
+}

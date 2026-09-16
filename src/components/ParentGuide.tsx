@@ -5,9 +5,10 @@ type Props = {
   stars: number
   onReset: () => void
   onBack: () => void
+  onOpenSchools?: () => void
 }
 
-export function ParentGuide({ stars, onReset, onBack }: Props) {
+export function ParentGuide({ stars, onReset, onBack, onOpenSchools }: Props) {
   return (
     <section className="parent">
       <header className="session__top">
@@ -21,6 +22,16 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
       <p className="parent__lead">
         內容來自《名校模擬面試》第一週字詞表與 Day 1–6。目標不是全部做對，而是建立勇氣、表達與不放棄。
       </p>
+
+      {onOpenSchools ? (
+        <button type="button" className="sr-entry" onClick={onOpenSchools}>
+          <span className="sr-entry__date">9月25截止</span>
+          <span className="sr-entry__text">
+            <strong>碩孜小一選校評分</strong>
+            <em>校園 · 龍校 · 升中 · 新聞 · 樓價 · 活躍適合 · 競爭</em>
+          </span>
+        </button>
+      ) : null}
 
       <VoiceSettingsPanel />
 

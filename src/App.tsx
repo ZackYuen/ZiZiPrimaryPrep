@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { DayCard } from './components/DayCard'
 import { PracticeSession } from './components/PracticeSession'
 import { ParentGuide } from './components/ParentGuide'
+import { SchoolReport } from './components/SchoolReport'
 import { VocabSession } from './components/VocabSession'
 import { StoryInterviewSession } from './components/StoryInterviewSession'
 import { Mascot } from './components/Mascot'
@@ -23,6 +24,7 @@ type View =
   | { name: 'vocab' }
   | { name: 'story' }
   | { name: 'parent' }
+  | { name: 'schools' }
 
 function dayNumber(id: DayId): number {
   const n = Number(String(id).replace(/\D/g, ''))
@@ -42,7 +44,7 @@ export default function App() {
           ? 'mock'
         : view.name === 'vocab'
           ? 'vocab'
-          : view.name === 'parent'
+          : view.name === 'parent' || view.name === 'schools'
             ? 'parent'
             : 'home'
 
@@ -88,10 +90,25 @@ export default function App() {
     )
   }
 
+  if (view.name === 'schools') {
+    return (
+      <div className="app-shell app-shell--report">
+        <ErrorBoundary onReset={goHome}>
+          <SchoolReport onBack={() => go({ name: 'parent' })} />
+        </ErrorBoundary>
+      </div>
+    )
+  }
+
   if (view.name === 'parent') {
     return shell(
       false,
-      <ParentGuide stars={progress.stars} onReset={reset} onBack={() => go({ name: 'home' })} />,
+      <ParentGuide
+        stars={progress.stars}
+        onReset={reset}
+        onBack={() => go({ name: 'home' })}
+        onOpenSchools={() => go({ name: 'schools' })}
+      />,
     )
   }
 
