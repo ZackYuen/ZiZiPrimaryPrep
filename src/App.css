@@ -4015,8 +4015,7 @@ button.picture-strip__item--choice {
 }
 
 .tan-tray__piece,
-.build-tray__piece,
-.tan-pick {
+.build-tray__piece {
   width: 3.4rem;
   padding: 0.15rem;
   border: 3px solid transparent;
@@ -4025,16 +4024,43 @@ button.picture-strip__item--choice {
   cursor: pointer;
 }
 
+.tan-pick {
+  width: auto;
+  height: 100%;
+  min-height: 5.2rem;
+  padding: 0.35rem;
+  border: 3px solid rgba(27, 58, 75, 0.12);
+  border-radius: 16px;
+  background: #fff8e8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .tan-tray__piece.is-selected,
 .build-tray__piece.is-selected,
 .tan-pick.is-selected {
   border-color: var(--ink);
 }
 
+.tan-board--pick {
+  flex: 1 1 auto;
+}
+
+.tan-pick .tan-shape {
+  width: 78%;
+  max-height: 4.8rem;
+}
+
 .tan-pick-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.4rem;
+  flex: 1 1 auto;
+  min-height: 10rem;
+  align-content: stretch;
+  grid-auto-rows: minmax(5.2rem, 1fr);
 }
 
 .tan-ghost {
@@ -4060,7 +4086,7 @@ button.picture-strip__item--choice {
 }
 
 .simon-kid {
-  width: min(42vw, 160px);
+  width: min(58vw, 220px);
   height: auto;
 }
 
@@ -4157,13 +4183,18 @@ button.picture-strip__item--choice {
 
 .memory-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
   gap: 0.4rem;
   flex: 1 1 auto;
+  min-height: 12rem;
+  align-content: stretch;
 }
 
 .memory-card {
-  aspect-ratio: 1;
+  aspect-ratio: auto;
+  min-height: 4.4rem;
+  height: 100%;
   padding: 0.15rem;
   border: 3px solid rgba(27, 58, 75, 0.12);
   border-radius: 14px;

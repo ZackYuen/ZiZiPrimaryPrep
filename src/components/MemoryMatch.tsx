@@ -55,6 +55,7 @@ function FaceArt({ face }: { face: MemoryFace }) {
       <svg viewBox="0 0 80 80" aria-hidden>
         <rect x="34" y="12" width="12" height="56" rx="4" fill="#6bcb8b" stroke="#2c1810" strokeWidth="3" />
         <path d="M34 30 H46 M34 48 H46" stroke="#2c1810" strokeWidth="3" />
+        <path d="M46 18 L62 8" stroke="#6bcb8b" strokeWidth="4" />
       </svg>
     )
   }
@@ -65,34 +66,71 @@ function FaceArt({ face }: { face: MemoryFace }) {
       </svg>
     )
   }
-  const colors: Partial<Record<MemoryFace, string>> = {
-    penguin: '#4a5564',
-    elephant: '#b7c0cc',
-    rabbit: '#f3d2b3',
-    lion: '#e8a820',
-    panda: '#f7f4ee',
-    monkey: '#c47a4a',
+  if (face === 'penguin') {
+    return (
+      <svg viewBox="0 0 80 80" aria-hidden>
+        <ellipse cx="40" cy="46" rx="20" ry="24" fill="#2c1810" />
+        <ellipse cx="40" cy="50" rx="12" ry="16" fill="#fff" />
+        <circle cx="34" cy="36" r="3" fill="#fff" />
+        <circle cx="46" cy="36" r="3" fill="#fff" />
+        <path d="M36 42 L40 48 L44 42 Z" fill="#ff9f6b" />
+      </svg>
+    )
+  }
+  if (face === 'elephant') {
+    return (
+      <svg viewBox="0 0 80 80" aria-hidden>
+        <circle cx="36" cy="40" r="18" fill="#b7c0cc" stroke="#2c1810" strokeWidth="3" />
+        <ellipse cx="22" cy="42" rx="8" ry="14" fill="#b7c0cc" stroke="#2c1810" strokeWidth="3" />
+        <path d="M50 46 Q68 58 52 70" fill="none" stroke="#b7c0cc" strokeWidth="8" strokeLinecap="round" />
+        <circle cx="32" cy="36" r="2.5" fill="#2c1810" />
+      </svg>
+    )
+  }
+  if (face === 'rabbit') {
+    return (
+      <svg viewBox="0 0 80 80" aria-hidden>
+        <ellipse cx="28" cy="20" rx="6" ry="16" fill="#f3d2b3" stroke="#2c1810" strokeWidth="2.5" />
+        <ellipse cx="48" cy="20" rx="6" ry="16" fill="#f3d2b3" stroke="#2c1810" strokeWidth="2.5" />
+        <circle cx="38" cy="46" r="18" fill="#f3d2b3" stroke="#2c1810" strokeWidth="3" />
+        <circle cx="32" cy="44" r="2.5" fill="#2c1810" />
+        <circle cx="44" cy="44" r="2.5" fill="#2c1810" />
+        <circle cx="38" cy="52" r="3" fill="#e85d75" />
+      </svg>
+    )
+  }
+  if (face === 'lion') {
+    return (
+      <svg viewBox="0 0 80 80" aria-hidden>
+        <circle cx="40" cy="42" r="26" fill="#e8a820" />
+        <circle cx="40" cy="42" r="16" fill="#f3d2b3" stroke="#2c1810" strokeWidth="3" />
+        <circle cx="34" cy="40" r="2.5" fill="#2c1810" />
+        <circle cx="46" cy="40" r="2.5" fill="#2c1810" />
+        <path d="M34 50 Q40 54 46 50" fill="none" stroke="#2c1810" strokeWidth="2.5" />
+      </svg>
+    )
+  }
+  if (face === 'panda') {
+    return (
+      <svg viewBox="0 0 80 80" aria-hidden>
+        <circle cx="40" cy="44" r="20" fill="#fff" stroke="#2c1810" strokeWidth="3" />
+        <circle cx="26" cy="28" r="8" fill="#2c1810" />
+        <circle cx="54" cy="28" r="8" fill="#2c1810" />
+        <ellipse cx="32" cy="42" rx="6" ry="7" fill="#2c1810" />
+        <ellipse cx="48" cy="42" rx="6" ry="7" fill="#2c1810" />
+        <circle cx="32" cy="42" r="2" fill="#fff" />
+        <circle cx="48" cy="42" r="2" fill="#fff" />
+      </svg>
+    )
   }
   return (
     <svg viewBox="0 0 80 80" aria-hidden>
-      <circle cx="40" cy="42" r="24" fill={colors[face] || '#ddd'} stroke="#2c1810" strokeWidth="3" />
-      <circle cx="32" cy="38" r="3" fill="#2c1810" />
-      <circle cx="48" cy="38" r="3" fill="#2c1810" />
-      {face === 'penguin' && <ellipse cx="40" cy="50" rx="10" ry="12" fill="#fff" />}
-      {face === 'panda' && (
-        <>
-          <circle cx="28" cy="32" r="8" fill="#2c1810" />
-          <circle cx="52" cy="32" r="8" fill="#2c1810" />
-        </>
-      )}
-      {face === 'rabbit' && (
-        <>
-          <ellipse cx="28" cy="18" rx="6" ry="14" fill="#f3d2b3" stroke="#2c1810" strokeWidth="2" />
-          <ellipse cx="52" cy="18" rx="6" ry="14" fill="#f3d2b3" stroke="#2c1810" strokeWidth="2" />
-        </>
-      )}
-      {face === 'elephant' && <path d="M58 46 Q74 58 52 62" fill="none" stroke="#2c1810" strokeWidth="6" />}
-      {face === 'lion' && <circle cx="40" cy="42" r="30" fill="none" stroke="#e8a820" strokeWidth="8" />}
+      <circle cx="40" cy="46" r="16" fill="#c47a4a" stroke="#2c1810" strokeWidth="3" />
+      <circle cx="24" cy="34" r="8" fill="#c47a4a" stroke="#2c1810" strokeWidth="3" />
+      <circle cx="56" cy="34" r="8" fill="#c47a4a" stroke="#2c1810" strokeWidth="3" />
+      <circle cx="34" cy="44" r="2.5" fill="#2c1810" />
+      <circle cx="46" cy="44" r="2.5" fill="#2c1810" />
+      <ellipse cx="40" cy="52" rx="5" ry="3" fill="#2c1810" />
     </svg>
   )
 }

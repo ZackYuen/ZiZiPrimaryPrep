@@ -54,13 +54,13 @@ const TRIANGLE_SLOTS: SlotLayout[] = [
 ]
 
 const BOAT_SLOTS: SlotLayout[] = [
-  { id: 'M', left: '36%', top: '2%', width: '28%' },
-  { id: 'S2', left: '62%', top: '8%', width: '16%', rotate: -20 },
-  { id: 'SQ', left: '40%', top: '32%', width: '18%' },
-  { id: 'S1', left: '58%', top: '32%', width: '16%' },
-  { id: 'L1', left: '8%', top: '54%', width: '34%', rotate: -12 },
-  { id: 'P', left: '36%', top: '62%', width: '28%' },
-  { id: 'L2', left: '58%', top: '54%', width: '34%', rotate: 192 },
+  { id: 'M', left: '34%', top: '1%', width: '32%' },
+  { id: 'S2', left: '64%', top: '10%', width: '16%', rotate: -18 },
+  { id: 'SQ', left: '38%', top: '28%', width: '18%' },
+  { id: 'S1', left: '56%', top: '30%', width: '16%' },
+  { id: 'L1', left: '4%', top: '50%', width: '38%', rotate: -18 },
+  { id: 'P', left: '34%', top: '64%', width: '32%' },
+  { id: 'L2', left: '58%', top: '50%', width: '38%', rotate: 198 },
 ]
 
 function TanShape({ id, ghost }: { id: PieceId; ghost?: boolean }) {
