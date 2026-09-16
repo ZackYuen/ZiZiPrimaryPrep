@@ -3927,6 +3927,24 @@
   font-size: 0.9rem;
 }
 
+@media (max-width: 640px) {
+  .sr-table th:nth-child(4),
+  .sr-table th:nth-child(5),
+  .sr-table th:nth-child(6),
+  .sr-table th:nth-child(7),
+  .sr-table td:nth-child(4),
+  .sr-table td:nth-child(5),
+  .sr-table td:nth-child(6),
+  .sr-table td:nth-child(7) {
+    display: none;
+  }
+
+  .sr-bars li {
+    grid-template-columns: 5.4rem 1fr 1.4rem;
+    font-size: 0.78rem;
+  }
+}
+
 @media print {
   .sky,
   .home-tools,

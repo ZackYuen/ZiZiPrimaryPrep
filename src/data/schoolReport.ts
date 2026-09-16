@@ -18,7 +18,7 @@ export const REPORT_META = {
   dpResult: '2026年11月23日',
   caChoice: '2027年1月18日至24日',
   caResult: '2027年6月2日',
-  updated: '2026-09-16',
+  updated: '2026年9月16日',
 }
 
 export const WEIGHTS = {
