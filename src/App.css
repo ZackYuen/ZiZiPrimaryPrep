@@ -2804,6 +2804,17 @@
   grid-template-columns: 1fr 1fr 1fr;
 }
 
+.picture-strip--4 {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+@media (max-width: 559px) {
+  .picture-strip--3,
+  .picture-strip--4 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 .picture-strip__item {
   margin: 0;
   background: #fff;
@@ -2963,6 +2974,7 @@
 
 .session--practice .session__layout {
   min-height: 0;
+  overflow: hidden;
   gap: 0;
 }
 
@@ -2970,6 +2982,7 @@
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  padding-bottom: 0.35rem;
 }
 
 .session--practice .session__footer,
