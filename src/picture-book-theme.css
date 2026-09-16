@@ -56,7 +56,7 @@ body {
 .voice-settings,
 .vocab-card,
 .story-choice,
-.story-viewer,
+.story-order__slot,
 .story-recall__prompt,
 .story-parent-check,
 .listen-panel,
@@ -105,7 +105,6 @@ body {
 .pill-btn,
 .ghost-btn,
 .choice-btn,
-.story-nav__button,
 .numpad__key {
   border: 2px solid rgba(75, 69, 53, 0.11);
   box-shadow: 0 5px 0 rgba(78, 68, 49, 0.14);
@@ -153,7 +152,9 @@ body {
 .math-dots,
 .sort-bucket,
 .reorder__sentence,
-.reorder__pool {
+.reorder__pool,
+.story-order__slot,
+.story-order__pool {
   border-color: rgba(88, 79, 60, 0.17);
   background-color: rgba(255, 250, 238, 0.9);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
@@ -175,8 +176,8 @@ body {
   filter: saturate(0.72);
 }
 
-.story-hidden div {
-  border-color: rgba(93, 82, 60, 0.25);
+.story-order__slot:not(.is-filled) {
+  border-style: dashed;
   background:
     repeating-radial-gradient(circle at 20% 20%, rgba(83, 76, 61, 0.025) 0 0.6px, transparent 0.7px 4px),
     rgba(255, 253, 247, 0.72);

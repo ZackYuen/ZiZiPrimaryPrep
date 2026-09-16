@@ -10,11 +10,31 @@ export type StoryInterview = {
   shortTitle: string
   accent: string
   frames: StoryFrame[]
-  memoryPrompt: string
+  tellPrompt: string
   endingQuestion: string
 }
 
-export const STORY_BROWSE_SECONDS = 60
+export const STORY_ORDER_LABELS = ['首先', '跟住', '然後', '最後'] as const
+
+export function shuffleStoryIds(ids: string[]): string[] {
+  const original = ids.join('|')
+  const next = [...ids]
+  for (let attempt = 0; attempt < 12; attempt++) {
+    for (let i = next.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      const swap = next[i]
+      next[i] = next[j]
+      next[j] = swap
+    }
+    if (next.join('|') !== original) return next
+  }
+  if (next.length > 1) {
+    const swap = next[0]
+    next[0] = next[1]
+    next[1] = swap
+  }
+  return next
+}
 
 export const storyInterviews: StoryInterview[] = [
   {
@@ -22,8 +42,8 @@ export const storyInterviews: StoryInterview[] = [
     title: '落雨了，啤啤熊呢？',
     shortTitle: '雨天的啤啤熊',
     accent: '#1B6B8A',
-    memoryPrompt:
-      '圖片收起咗。唔使背句子，跟住你記得嘅畫面慢慢講：碩孜帶咗邊個去公園？見到蝴蝶後做咗咩？落雨時漏低咗咩？返到屋企先發現咩？最後，如果你係碩孜，你會點做？',
+    tellPrompt:
+      '跟住四格圖，由首先講到最後。講清楚邊個、喺邊、發生咗咩事。講完之後答：如果你係碩孜，會點樣搵返啤啤熊？',
     endingQuestion: '如果你係碩孜，會點樣搵返啤啤熊？',
     frames: [
       { id: 'teddy-1', image: 'teddy-1.jpg', alt: '碩孜帶住心愛嘅啤啤熊去公園' },
@@ -37,8 +57,8 @@ export const storyInterviews: StoryInterview[] = [
     title: '飛走了的皮球',
     shortTitle: '課室小意外',
     accent: '#B85C45',
-    memoryPrompt:
-      '圖片收起咗。唔使背句子，跟住你記得嘅畫面慢慢講：碩孜同美美做緊咩？個波飛咗去邊？花盆變成點？老師返嚟見到咩？最後，如果你係佢哋，你會點做？',
+    tellPrompt:
+      '跟住四格圖，由首先講到最後。講清楚邊個、喺邊、發生咗咩事。講完之後答：老師入嚟之後，兩個小朋友會點做？',
     endingQuestion: '老師入嚟之後，兩個小朋友會點做？',
     frames: [
       { id: 'plant-1', image: 'plant-1.jpg', alt: '碩孜同美美喺課室玩皮球' },

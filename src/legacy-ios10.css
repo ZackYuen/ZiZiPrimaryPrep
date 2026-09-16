@@ -46,6 +46,9 @@
 .home-main,
 .mock-cta,
 .vocab-cta,
+.story-cta,
+.story-interview,
+.story-order,
 .module-grid,
 .module-card,
 .day-card,
@@ -74,6 +77,8 @@
   .reorder__pool > * + *,
   .reorder__sentence > * + *,
   .sort-bucket__items > * + *,
+  .story-order__slots > * + *,
+  .story-order__pool > * + *,
   .listen-panel__chips > * + *,
   .choice-list > * + *,
   .prompt-fields > * + * {
@@ -85,7 +90,9 @@
   .listen-panel > * + *,
   .speak-box > * + *,
   .reorder > * + *,
-  .sort-buckets > * + * {
+  .sort-buckets > * + *,
+  .story-order > * + *,
+  .story-play > * + * {
     margin-top: 0.55rem;
   }
 
@@ -94,6 +101,8 @@
   .reorder__pool,
   .reorder__sentence,
   .sort-bucket__items,
+  .story-order__slots,
+  .story-order__pool,
   .listen-panel__chips {
     margin-left: -0.2rem;
   }
@@ -103,6 +112,8 @@
   .reorder__pool > *,
   .reorder__sentence > *,
   .sort-bucket__items > *,
+  .story-order__slots > *,
+  .story-order__pool > *,
   .listen-panel__chips > * {
     margin: 0.25rem;
   }

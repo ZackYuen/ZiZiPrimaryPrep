@@ -74,7 +74,7 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>五歲唔使打字</h3>
           <p>
-            中英文題：碩孜大聲講。分類／排句：拖詞。數學：大數字鍵盤。
+            中英文題：碩孜大聲講。分類／排句：拖詞。看圖講故事：拖圖入四格排次序，再睇圖講。數學：大數字鍵盤。
           </p>
         </article>
         <article className="parent__item">

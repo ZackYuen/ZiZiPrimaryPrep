@@ -224,7 +224,7 @@ export default function App() {
           </span>
           <span className="story-cta__text">
             <span className="story-cta__label">▣ 看圖講故事</span>
-            <span className="story-cta__sub">1 分鐘逐張掃 · 收圖後講故事＋作結尾</span>
+            <span className="story-cta__sub">拖圖入四格 · 排好先後再講故事</span>
           </span>
           <span className="story-cta__progress">
             {storyInterviews.filter((story) => progress.completed[story.id]).length}/{storyInterviews.length} ★

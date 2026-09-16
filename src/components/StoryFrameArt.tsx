@@ -6,7 +6,7 @@ type Props = {
   className?: string
 }
 
-/** Wordless picture-book art used by the timed visual-memory exercise. */
+/** Wordless picture-book art used by the four-picture story sequence. */
 export function StoryFrameArt({ image, alt, className = '' }: Props) {
   return (
     <img
