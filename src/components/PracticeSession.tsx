@@ -488,6 +488,7 @@ export function PracticeSession({
 
       <div className={`session__layout ${isStoryFocus ? 'session__layout--story' : ''}`}>
         <div className={`session__card ${isStoryFocus ? 'session__card--story' : ''}`} key={item.id}>
+          <div className="session__stem">
           <div className="session__badges">
             {(item.section || item.cue) && (
               <p className="session__cue">
@@ -633,7 +634,9 @@ export function PracticeSession({
               </div>
             </>
           )}
+          </div>
 
+          <div className="session__response">
           {item.kind === 'speak' && (
             <div className={`speak-box ${isStoryFocus ? 'speak-box--story' : 'speak-box--compact'}`}>
 
@@ -1300,6 +1303,7 @@ export function PracticeSession({
                 </div>
               </div>
             )}
+          </div>
         </div>
       </div>
 
