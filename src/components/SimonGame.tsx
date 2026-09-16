@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { playSfx } from '../hooks/useSfx'
 import type { SimonAction, SimonGame as SimonConfig } from '../data/content'
+import { gameArt, SIMON_ART } from '../lib/gameArt'
 
 type Props = {
   config: SimonConfig
@@ -24,79 +25,8 @@ const ACTION_LABEL: Record<SimonAction, string> = {
 
 function KidPose({ action, still }: { action: SimonAction | 'idle'; still?: boolean }) {
   const pose = still ? 'idle' : action
-  return (
-    <svg className="simon-kid" viewBox="0 0 180 170" aria-hidden>
-      <ellipse cx="90" cy="158" rx="48" ry="8" fill="#d8c2a0" />
-      {pose === 'sit' ? (
-        <>
-          <rect x="62" y="96" width="56" height="38" rx="16" fill="#f4c24a" />
-          <circle cx="90" cy="58" r="26" fill="#f3d2b3" />
-          <circle cx="80" cy="54" r="3" fill="#2c1810" />
-          <circle cx="100" cy="54" r="3" fill="#2c1810" />
-          <path d="M80 68 Q90 74 100 68" fill="none" stroke="#2c1810" strokeWidth="2.5" />
-          <path d="M58 78 Q90 40 122 78" fill="#2c1810" />
-          <path d="M48 108 Q70 118 90 112" fill="none" stroke="#f3d2b3" strokeWidth="10" strokeLinecap="round" />
-          <path d="M132 108 Q110 118 90 112" fill="none" stroke="#f3d2b3" strokeWidth="10" strokeLinecap="round" />
-        </>
-      ) : (
-        <>
-          <rect x="68" y="78" width="44" height="54" rx="16" fill="#f4c24a" />
-          <circle cx="90" cy="48" r="26" fill="#f3d2b3" />
-          <circle cx="80" cy="44" r="3" fill="#2c1810" />
-          <circle cx="100" cy="44" r="3" fill="#2c1810" />
-          <path d="M80 58 Q90 64 100 58" fill="none" stroke="#2c1810" strokeWidth="2.5" />
-          {pose === 'turn' ? (
-            <path d="M64 38 Q90 8 116 38 Q90 28 64 38" fill="#2c1810" />
-          ) : (
-            <path d="M62 38 Q90 10 118 38" fill="#2c1810" />
-          )}
-          {pose === 'head' && (
-            <>
-              <path d="M58 86 Q48 40 78 28" fill="none" stroke="#f3d2b3" strokeWidth="10" strokeLinecap="round" />
-              <path d="M122 86 Q132 40 102 28" fill="none" stroke="#f3d2b3" strokeWidth="10" strokeLinecap="round" />
-            </>
-          )}
-          {pose === 'clap' && (
-            <path d="M62 96 Q90 78 118 96" fill="none" stroke="#f3d2b3" strokeWidth="10" strokeLinecap="round" />
-          )}
-          {pose === 'foot' && (
-            <>
-              <path d="M78 130 L70 154" stroke="#c47a4a" strokeWidth="8" strokeLinecap="round" />
-              <path d="M102 128 L126 112" stroke="#c47a4a" strokeWidth="8" strokeLinecap="round" />
-              <path d="M54 96 L42 118" fill="none" stroke="#f3d2b3" strokeWidth="10" strokeLinecap="round" />
-              <path d="M126 96 L138 118" fill="none" stroke="#f3d2b3" strokeWidth="10" strokeLinecap="round" />
-            </>
-          )}
-          {pose === 'nose' && (
-            <path d="M118 88 Q132 58 98 52" fill="none" stroke="#f3d2b3" strokeWidth="10" strokeLinecap="round" />
-          )}
-          {(pose === 'blue' || pose === 'door') && (
-            <>
-              <path d="M54 96 L40 118" fill="none" stroke="#f3d2b3" strokeWidth="10" strokeLinecap="round" />
-              <path d="M126 90 L156 72" fill="none" stroke="#f3d2b3" strokeWidth="10" strokeLinecap="round" />
-              {pose === 'blue' ? (
-                <circle cx="166" cy="62" r="12" fill="#5B8DEF" stroke="#2c1810" strokeWidth="3" />
-              ) : (
-                <rect x="156" y="44" width="18" height="32" rx="3" fill="#c47a4a" stroke="#2c1810" strokeWidth="3" />
-              )}
-            </>
-          )}
-          {(pose === 'idle' || pose === 'turn') && (
-            <>
-              <path d="M58 92 L46 118" fill="none" stroke="#f3d2b3" strokeWidth="10" strokeLinecap="round" />
-              <path d="M122 92 L134 118" fill="none" stroke="#f3d2b3" strokeWidth="10" strokeLinecap="round" />
-            </>
-          )}
-          {pose !== 'foot' && (
-            <>
-              <path d="M78 130 L72 154" stroke="#c47a4a" strokeWidth="8" strokeLinecap="round" />
-              <path d="M102 130 L108 154" stroke="#c47a4a" strokeWidth="8" strokeLinecap="round" />
-            </>
-          )}
-        </>
-      )}
-    </svg>
-  )
+  const file = SIMON_ART[pose] || SIMON_ART.idle
+  return <img className="simon-kid" src={gameArt(file)} alt="" draggable={false} />
 }
 
 export function SimonGame({ config, locked, reveal, onSolved, onWrong, onSpeak }: Props) {
@@ -150,8 +80,7 @@ export function SimonGame({ config, locked, reveal, onSolved, onWrong, onSpeak }
 
   useEffect(() => {
     if (!reveal || locked) return
-    if (config.mode === 'listen') onSolved()
-    else onSolved()
+    onSolved()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reveal])
 

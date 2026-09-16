@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointer
 import { createPortal } from 'react-dom'
 import { playSfx } from '../hooks/useSfx'
 import type { TangramMode, TangramShape } from '../data/content'
+import { gameArt } from '../lib/gameArt'
 
 export type PieceId = 'L1' | 'L2' | 'M' | 'S1' | 'S2' | 'SQ' | 'P'
 
@@ -28,15 +29,15 @@ type Props = {
 
 const TANGRAM_PIECES: Record<
   PieceId,
-  { color: string; viewBox: string; path: string; triangle: boolean }
+  { color: string; wash: string; viewBox: string; path: string; triangle: boolean }
 > = {
-  L1: { color: '#E85D75', viewBox: '0 0 100 100', path: 'M8 8 H92 L8 92 Z', triangle: true },
-  L2: { color: '#5B8DEF', viewBox: '0 0 100 100', path: 'M8 8 V92 H92 Z', triangle: true },
-  M: { color: '#6BCB8B', viewBox: '0 0 80 80', path: 'M8 72 H72 L40 8 Z', triangle: true },
-  S1: { color: '#F5C84C', viewBox: '0 0 56 56', path: 'M6 6 H50 L6 50 Z', triangle: true },
-  S2: { color: '#C9A0DC', viewBox: '0 0 56 56', path: 'M6 50 H50 V6 Z', triangle: true },
-  SQ: { color: '#FF9F6B', viewBox: '0 0 56 56', path: 'M6 6 H50 V50 H6 Z', triangle: false },
-  P: { color: '#7EC8E3', viewBox: '0 0 84 56', path: 'M22 6 H78 L62 50 H6 Z', triangle: false },
+  L1: { color: '#d97860', wash: '#e8a08c', viewBox: '0 0 100 100', path: 'M8 8 H92 L8 92 Z', triangle: true },
+  L2: { color: '#6faebc', wash: '#9cc9d3', viewBox: '0 0 100 100', path: 'M8 8 V92 H92 Z', triangle: true },
+  M: { color: '#79aa82', wash: '#a3c7a8', viewBox: '0 0 80 80', path: 'M8 72 H72 L40 8 Z', triangle: true },
+  S1: { color: '#e9bd55', wash: '#f3d48a', viewBox: '0 0 56 56', path: 'M6 6 H50 L6 50 Z', triangle: true },
+  S2: { color: '#c4a3d4', wash: '#d8c2e4', viewBox: '0 0 56 56', path: 'M6 50 H50 V6 Z', triangle: true },
+  SQ: { color: '#e09a6a', wash: '#eec09a', viewBox: '0 0 56 56', path: 'M6 6 H50 V50 H6 Z', triangle: false },
+  P: { color: '#8bb8c8', wash: '#b5d4de', viewBox: '0 0 84 56', path: 'M22 6 H78 L62 50 H6 Z', triangle: false },
 }
 
 const PIECE_ORDER: PieceId[] = ['L1', 'L2', 'M', 'S1', 'S2', 'SQ', 'P']
@@ -65,9 +66,23 @@ const BOAT_SLOTS: SlotLayout[] = [
 
 function TanShape({ id, ghost }: { id: PieceId; ghost?: boolean }) {
   const def = TANGRAM_PIECES[id]
+  const gradId = `tan-wash-${id}`
   return (
     <svg viewBox={def.viewBox} className={`tan-shape ${ghost ? 'tan-shape--ghost' : ''}`} aria-hidden>
-      <path d={def.path} fill={def.color} stroke="#2c1810" strokeWidth="4" strokeLinejoin="round" />
+      <defs>
+        <linearGradient id={gradId} x1="18%" y1="8%" x2="86%" y2="94%">
+          <stop offset="0%" stopColor={def.wash} />
+          <stop offset="55%" stopColor={def.color} />
+          <stop offset="100%" stopColor={def.wash} />
+        </linearGradient>
+      </defs>
+      <path
+        d={def.path}
+        fill={`url(#${gradId})`}
+        stroke="#5a4a38"
+        strokeWidth="3.2"
+        strokeLinejoin="round"
+      />
     </svg>
   )
 }
@@ -281,6 +296,12 @@ export function TangramBoard({ mode, shape = 'triangle', locked, reveal, onSolve
         {ghost}
         <p className="reorder__hint">{hint}</p>
         <div className={`tan-stage tan-stage--${shape}`}>
+          <img
+            className="tan-stage__paper"
+            src={gameArt(shape === 'boat' ? 'tan-water.jpg' : 'tan-table.jpg')}
+            alt=""
+            draggable={false}
+          />
           {slots.map((slot) => {
             const filled = !!placed[slot.id]
             const isSource = drag?.from.kind === 'slot' && drag.id === slot.id && ghostOn

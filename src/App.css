@@ -3957,14 +3957,25 @@ button.picture-strip__item--choice {
   min-height: 13rem;
   border-radius: 20px;
   background:
-    linear-gradient(180deg, #fff8e8 0%, #f3e2c4 100%);
-  border: 3px solid rgba(27, 58, 75, 0.12);
+    linear-gradient(180deg, rgba(251, 244, 229, 0.55) 0%, rgba(239, 225, 197, 0.42) 100%);
+  border: 3px solid rgba(90, 82, 64, 0.14);
   overflow: hidden;
+}
+
+.tan-stage__paper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.55;
+  filter: saturate(0.82) sepia(0.08);
+  pointer-events: none;
 }
 
 .tan-stage--boat {
   background:
-    linear-gradient(180deg, #d8f0ff 0%, #7ec8e3 55%, #1b6b8a 100%);
+    linear-gradient(180deg, #dceef1 0%, #a9d5df 48%, #6faebc 100%);
 }
 
 .tan-slot,
@@ -4088,6 +4099,27 @@ button.picture-strip__item--choice {
 .simon-kid {
   width: min(58vw, 220px);
   height: auto;
+  object-fit: contain;
+  filter: saturate(0.88) sepia(0.04);
+  border-radius: 18px;
+}
+
+.memory-face,
+.build-part {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: saturate(0.88) sepia(0.04);
+  pointer-events: none;
+}
+
+.build-stage__bg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  filter: saturate(0.86) sepia(0.05);
 }
 
 .simon-phrase {
@@ -4113,13 +4145,13 @@ button.picture-strip__item--choice {
 }
 
 .simon-choice--do {
-  background: #6bcb8b;
-  color: #14321d;
+  background: #79aa82;
+  color: #243e4a;
 }
 
 .simon-choice--stay {
-  background: #e85d75;
-  color: #fff;
+  background: #d97860;
+  color: #fffdf7;
 }
 
 .simon-choice.is-ok {
@@ -4148,8 +4180,8 @@ button.picture-strip__item--choice {
 
 .simon-act.is-done,
 .build-order__card.is-done {
-  border-color: #6bcb8b;
-  background: #e8f8ee;
+  border-color: #79aa82;
+  background: #eef5ee;
 }
 
 .simon-act .simon-kid {
@@ -4162,12 +4194,7 @@ button.picture-strip__item--choice {
   min-height: 12rem;
   border-radius: 20px;
   overflow: hidden;
-}
-
-.build-stage__bg {
-  width: 100%;
-  height: 100%;
-  display: block;
+  border: 3px solid rgba(90, 82, 64, 0.14);
 }
 
 .build-slot__ghost {
@@ -4195,11 +4222,12 @@ button.picture-strip__item--choice {
   aspect-ratio: auto;
   min-height: 4.4rem;
   height: 100%;
-  padding: 0.15rem;
-  border: 3px solid rgba(27, 58, 75, 0.12);
+  padding: 0;
+  overflow: hidden;
+  border: 3px solid rgba(90, 82, 64, 0.16);
   border-radius: 14px;
-  background: #5b8def;
-  color: #fff;
+  background: #8aa3a8;
+  color: #fffdf7;
   cursor: pointer;
 }
 
@@ -4209,7 +4237,7 @@ button.picture-strip__item--choice {
 }
 
 .memory-card.is-matched {
-  border-color: #6bcb8b;
+  border-color: #79aa82;
 }
 
 .memory-card__back {
@@ -4217,7 +4245,7 @@ button.picture-strip__item--choice {
   font-weight: 900;
 }
 
-.memory-card svg {
+.memory-card img {
   width: 100%;
   height: 100%;
   display: block;

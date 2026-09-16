@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } f
 import { createPortal } from 'react-dom'
 import { playSfx } from '../hooks/useSfx'
 import type { BuildScene } from '../data/content'
+import { BUILD_ART, gameArt } from '../lib/gameArt'
 
 type PartId = 'star' | 'friend1' | 'friend2' | 'cake' | 'gift' | 'fun' | 'deck' | 'railL' | 'railR' | 'postL' | 'postR'
 
@@ -42,65 +43,7 @@ const BRIDGE_SLOTS: Slot[] = [
 const ORDER: PartId[] = ['postL', 'deck', 'railL']
 
 function PartArt({ id }: { id: PartId }) {
-  if (id === 'cake') {
-    return (
-      <svg viewBox="0 0 80 70" aria-hidden>
-        <rect x="14" y="32" width="52" height="28" rx="8" fill="#f7d7e8" stroke="#2c1810" strokeWidth="3" />
-        <rect x="18" y="20" width="44" height="18" rx="8" fill="#fff" stroke="#2c1810" strokeWidth="3" />
-        <rect x="36" y="8" width="6" height="14" fill="#f4c24a" />
-        <circle cx="39" cy="8" r="5" fill="#ff7a59" />
-      </svg>
-    )
-  }
-  if (id === 'gift') {
-    return (
-      <svg viewBox="0 0 70 70" aria-hidden>
-        <rect x="12" y="24" width="46" height="36" rx="6" fill="#e85d75" stroke="#2c1810" strokeWidth="3" />
-        <rect x="32" y="24" width="8" height="36" fill="#f5c84c" />
-        <rect x="12" y="38" width="46" height="8" fill="#f5c84c" />
-        <path d="M22 24 Q35 8 35 24" fill="none" stroke="#6bcb8b" strokeWidth="4" />
-      </svg>
-    )
-  }
-  if (id === 'fun') {
-    return (
-      <svg viewBox="0 0 70 70" aria-hidden>
-        <ellipse cx="35" cy="38" rx="22" ry="16" fill="#c9a0dc" stroke="#2c1810" strokeWidth="3" />
-        <rect x="32" y="10" width="6" height="20" fill="#2c1810" />
-        <circle cx="35" cy="10" r="6" fill="#f5c84c" />
-      </svg>
-    )
-  }
-  if (id === 'deck') {
-    return (
-      <svg viewBox="0 0 140 36" aria-hidden>
-        <rect x="6" y="8" width="128" height="20" rx="6" fill="#c47a4a" stroke="#2c1810" strokeWidth="3" />
-      </svg>
-    )
-  }
-  if (id === 'railL' || id === 'railR') {
-    return (
-      <svg viewBox="0 0 70 50" aria-hidden>
-        <path d="M8 42 V12 H62 V42" fill="none" stroke="#6bcb8b" strokeWidth="8" strokeLinejoin="round" />
-        <path d="M8 42 V12 H62 V42" fill="none" stroke="#2c1810" strokeWidth="3" />
-      </svg>
-    )
-  }
-  if (id === 'postL' || id === 'postR') {
-    return (
-      <svg viewBox="0 0 70 70" aria-hidden>
-        <path d="M8 62 L35 8 L62 62 Z" fill="#f5c84c" stroke="#2c1810" strokeWidth="3" strokeLinejoin="round" />
-      </svg>
-    )
-  }
-  const fill = id === 'star' ? '#f4c24a' : '#7ec8e3'
-  return (
-    <svg viewBox="0 0 70 90" aria-hidden>
-      <circle cx="35" cy="22" r="14" fill="#f3d2b3" stroke="#2c1810" strokeWidth="3" />
-      <rect x="20" y="36" width="30" height="28" rx="10" fill={fill} stroke="#2c1810" strokeWidth="3" />
-      {id === 'star' && <path d="M24 14 L35 4 L46 14" fill="#e85d75" />}
-    </svg>
-  )
+  return <img className="build-part" src={gameArt(BUILD_ART[id])} alt="" draggable={false} />
 }
 
 export function BuildBoard({ scene, locked, reveal, onSolved, onWrong }: Props) {
@@ -249,11 +192,7 @@ export function BuildBoard({ scene, locked, reveal, onSolved, onWrong }: Props) 
       <div className={`build-board ${shake ? 'is-shake' : ''}`}>
         <p className="reorder__hint">撳令橋更穩嘅形狀（三角形支柱）</p>
         <div className="build-stage build-stage--bridge">
-          <svg className="build-stage__bg" viewBox="0 0 300 160" aria-hidden>
-            <rect width="300" height="160" rx="18" fill="#cfe8f5" />
-            <ellipse cx="150" cy="130" rx="120" ry="22" fill="#7ec8e3" />
-            <path d="M0 118 Q80 96 150 118 T300 118 V160 H0 Z" fill="#6bcb8b" />
-          </svg>
+          <img className="build-stage__bg" src={gameArt('bridge-bg.jpg')} alt="" draggable={false} />
           {BRIDGE_SLOTS.map((slot) => {
             const isTri = slot.id === 'postL' || slot.id === 'postR'
             const picked = !!placed[slot.id]
@@ -335,19 +274,10 @@ export function BuildBoard({ scene, locked, reveal, onSolved, onWrong }: Props) 
       </p>
       <div className={`build-stage build-stage--${scene}`}>
         {scene === 'bridge' && (
-          <svg className="build-stage__bg" viewBox="0 0 300 160" aria-hidden>
-            <rect width="300" height="160" rx="18" fill="#cfe8f5" />
-            <ellipse cx="150" cy="130" rx="120" ry="22" fill="#7ec8e3" />
-            <path d="M0 118 Q80 96 150 118 T300 118 V160 H0 Z" fill="#6bcb8b" />
-          </svg>
+          <img className="build-stage__bg" src={gameArt('bridge-bg.jpg')} alt="" draggable={false} />
         )}
         {scene === 'party' && (
-          <svg className="build-stage__bg" viewBox="0 0 300 180" aria-hidden>
-            <rect width="300" height="180" rx="18" fill="#fff4d6" />
-            <rect x="20" y="118" width="260" height="18" rx="6" fill="#c47a4a" />
-            <path d="M30 40 Q80 10 90 48" fill="none" stroke="#e85d75" strokeWidth="6" />
-            <path d="M210 18 Q250 8 270 50" fill="none" stroke="#5b8def" strokeWidth="6" />
-          </svg>
+          <img className="build-stage__bg" src={gameArt('party-bg.jpg')} alt="" draggable={false} />
         )}
         {slots.map((slot) => {
           const filled = !!placed[slot.id]
