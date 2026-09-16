@@ -65,11 +65,18 @@ export type HintVisualId =
   | 'minus'
   | 'story'
 
+export type MathOp = '+' | '-' | '×' | '÷' | '='
+
+export type MathPiece =
+  | { kind: 'count'; n: number }
+  | { kind: 'num'; n: number | string; blank?: boolean }
+  | { kind: 'op'; op: MathOp }
+  | { kind: 'blank' }
+  | { kind: 'groups'; groups: number; each: number }
+
 export type MathModel = {
-  left: number
-  right?: number
-  op?: '+' | '-'
   icon: 'dot' | 'apple' | 'book' | 'kid' | 'star'
+  pieces: MathPiece[]
 }
 
 export type TeachHint = {
@@ -434,38 +441,207 @@ function defaultKidLine(kind: ActivityKind): { kidLine: string; moreLine: string
 
 function iconForPrompt(prompt: string): MathModel['icon'] {
   if (/書/.test(prompt)) return 'book'
-  if (/糖|蘋果|橙|粒/.test(prompt)) return 'apple'
+  if (/糖|蘋果|橙|粒|積木/.test(prompt)) return 'apple'
   if (/小朋友|人/.test(prompt)) return 'kid'
   if (/星/.test(prompt)) return 'star'
   return 'dot'
 }
 
-export function parseMathModel(prompt: string): MathModel | undefined {
-  const add = prompt.match(/(\d{1,3})\s*[＋+]\s*(\d{1,3})/)
-  if (add) {
-    return { left: Number(add[1]), right: Number(add[2]), op: '+', icon: iconForPrompt(prompt) }
+const OP_ONLY = /^[＋+－−\-–]$/
+
+function prevChar(text: string, i: number) {
+  return i > 0 ? text[i - 1] : ''
+}
+
+function nextChar(text: string, i: number) {
+  return i < text.length ? text[i] : ''
+}
+
+function isDigitOrDot(ch: string) {
+  return ch === '.' || (ch >= '0' && ch <= '9')
+}
+
+type IntHit = { n: number; start: number; end: number }
+
+function wholeInts(prompt: string): IntHit[] {
+  const hits: IntHit[] = []
+  const re = /\d{1,3}/g
+  let m: RegExpExecArray | null
+  while ((m = re.exec(prompt))) {
+    const start = m.index
+    const end = start + m[0].length
+    if (isDigitOrDot(prevChar(prompt, start)) || isDigitOrDot(nextChar(prompt, end))) continue
+    hits.push({ n: Number(m[0]), start, end })
   }
-  const sub = prompt.match(/(\d{1,3})\s*[－−\-–]\s*(\d{1,3})/)
-  if (sub) {
-    return { left: Number(sub[1]), right: Number(sub[2]), op: '-', icon: iconForPrompt(prompt) }
-  }
-  const nums = [...prompt.matchAll(/(\d{1,3})/g)].map((m) => Number(m[1])).filter((n) => n > 0 && n <= 99)
-  if (nums.length >= 2) {
-    const op: '+' | '-' = /再給|又來|再來|加|共|一共|多/.test(prompt) && !/借走|剩|減|少/.test(prompt) ? '+' : '-'
-    if (/借走|剩|減|少了|吃了/.test(prompt)) {
-      return { left: nums[0], right: nums[1], op: '-', icon: iconForPrompt(prompt) }
+  return hits
+}
+
+function opGlyph(ch: string): MathOp {
+  if (/[＋+]/.test(ch)) return '+'
+  if (/[×xX]/.test(ch)) return '×'
+  if (/[÷]/.test(ch)) return '÷'
+  return '-'
+}
+
+function modelOf(prompt: string, pieces: MathPiece[]): MathModel {
+  return { icon: iconForPrompt(prompt), pieces }
+}
+
+function parseExplicitChain(prompt: string): MathModel | undefined {
+  const hits = wholeInts(prompt)
+  if (hits.length < 2) return undefined
+  let best: MathPiece[] | undefined
+  for (let i = 0; i < hits.length - 1; i++) {
+    const pieces: MathPiece[] = [{ kind: 'count', n: hits[i].n }]
+    let j = i
+    while (j < hits.length - 1) {
+      const span = prompt.slice(hits[j].end, hits[j + 1].start).trim()
+      if (!OP_ONLY.test(span)) break
+      pieces.push({ kind: 'op', op: opGlyph(span) })
+      pieces.push({ kind: 'count', n: hits[j + 1].n })
+      j += 1
     }
-    if (/再給|又來|再來|加|共有|一共/.test(prompt)) {
-      return { left: nums[0], right: nums[1], op: '+', icon: iconForPrompt(prompt) }
-    }
-    if (op && nums[0] <= 40 && nums[1] <= 40) {
-      return { left: nums[0], right: nums[1], op, icon: iconForPrompt(prompt) }
-    }
+    if (pieces.length >= 3 && (!best || pieces.length > best.length)) best = pieces
   }
-  if (nums.length === 1 && nums[0] <= 20) {
-    return { left: nums[0], icon: iconForPrompt(prompt) }
-  }
+  if (!best) return undefined
+  return modelOf(prompt, best)
+}
+
+function opFromSpan(text: string): MathOp | undefined {
+  if (/小時後|小時之後/.test(text)) return '+'
+  if (/用去|借走|減|少了|吃了|拿走|還剩|剩多少/.test(text)) return '-'
+  if (/再給|又來|再來|放入|再放|加[了上]|和|共有|一共|再來了/.test(text)) return '+'
+  if (/倍/.test(text)) return '×'
+  if (/平均/.test(text)) return '÷'
   return undefined
+}
+
+export function parseSequence(prompt: string): MathModel | undefined {
+  const listed = parseNumberList(prompt)
+  if (listed) return listed
+  return parseCompare(prompt)
+}
+
+function parseCompare(prompt: string): MathModel | undefined {
+  if (!/誰比較多|哪[班個]比較多/.test(prompt)) return undefined
+  const hits = wholeInts(prompt)
+  if (hits.length < 2) return undefined
+  return modelOf(prompt, [
+    { kind: 'count', n: hits[0].n },
+    { kind: 'count', n: hits[1].n },
+  ])
+}
+
+function parseNumberList(prompt: string): MathModel | undefined {
+  if (!/____|＿＿|＿+|空格|下一個|少了邊一個|中間係|唔屬於同一組|不屬於/.test(prompt)) return undefined
+  const tokens: MathPiece[] = []
+  const re = /(\d{1,3})|(____|＿+)/g
+  let m: RegExpExecArray | null
+  let sawBlank = false
+  while ((m = re.exec(prompt))) {
+    if (m[1]) tokens.push({ kind: 'num', n: Number(m[1]) })
+    else {
+      sawBlank = true
+      tokens.push({ kind: 'blank' })
+    }
+  }
+  if (tokens.length < 3) return undefined
+  if (/唔屬於|不屬於/.test(prompt) && !sawBlank) {
+    return modelOf(prompt, tokens)
+  }
+  if (!sawBlank && /下一個/.test(prompt)) tokens.push({ kind: 'blank' })
+  return modelOf(prompt, tokens)
+}
+
+function parseStory(prompt: string): MathModel | undefined {
+  if (/\d+\.\d+/.test(prompt)) return undefined
+  if (/月/.test(prompt) && /日/.test(prompt)) return undefined
+  if (/一個數|這個數/.test(prompt)) return undefined
+
+  const hits = wholeInts(prompt)
+  if (hits.length === 0) return undefined
+
+  if (/倍/.test(prompt) && hits.length >= 2) {
+    const each = hits[0].n
+    const groups = hits[1].n
+    if (each <= 20 && groups <= 8) {
+      return modelOf(prompt, [{ kind: 'groups', groups, each }])
+    }
+  }
+
+  if (/平均/.test(prompt) && hits.length >= 2) {
+    const people = hits[0].n
+    const total = hits[1].n
+    if (people > 0 && total % people === 0 && total <= 40) {
+      return modelOf(prompt, [{ kind: 'groups', groups: people, each: total / people }])
+    }
+  }
+
+  if (/找回|找續/.test(prompt) && hits.length >= 2) {
+    const paid = hits[hits.length - 1].n
+    const costs = hits.slice(0, -1).map((h) => h.n)
+    const pieces: MathPiece[] = [{ kind: 'count', n: paid }]
+    costs.forEach((n) => {
+      pieces.push({ kind: 'op', op: '-' })
+      pieces.push({ kind: 'count', n })
+    })
+    return modelOf(prompt, pieces)
+  }
+
+  if (/多多少|多幾多/.test(prompt) && hits.length >= 2) {
+    return modelOf(prompt, [
+      { kind: 'count', n: hits[0].n },
+      { kind: 'op', op: '-' },
+      { kind: 'count', n: hits[1].n },
+    ])
+  }
+
+  if (/共/.test(prompt) && /幾個/.test(prompt) && hits.length === 2 && !/再來|又來|再給|小時/.test(prompt)) {
+    return modelOf(prompt, [
+      { kind: 'count', n: hits[0].n },
+      { kind: 'op', op: '-' },
+      { kind: 'count', n: hits[1].n },
+    ])
+  }
+
+  if (hits.length === 1) {
+    if (hits[0].n > 20) return undefined
+    return modelOf(prompt, [{ kind: 'count', n: hits[0].n }])
+  }
+
+  const pieces: MathPiece[] = [{ kind: 'count', n: hits[0].n }]
+  for (let i = 1; i < hits.length; i++) {
+    const span = prompt.slice(hits[i - 1].end, hits[i].start)
+    const after = prompt.slice(hits[i].end)
+    const op = opFromSpan(span) || opFromSpan(after)
+    if (!op || op === '×' || op === '÷') return undefined
+    pieces.push({ kind: 'op', op })
+    pieces.push({ kind: 'count', n: hits[i].n })
+  }
+  return modelOf(prompt, pieces)
+}
+
+/** Count-dots / number tiles that match the question. Skip if it would mislead. */
+export function parseMathModel(prompt: string): MathModel | undefined {
+  const sequence = parseSequence(prompt)
+  if (sequence) return sequence
+  const chain = parseExplicitChain(prompt)
+  if (chain) {
+    if (/找回|找續/.test(prompt)) {
+      const story = parseStory(prompt)
+      if (story) return story
+    }
+    return chain
+  }
+  return parseStory(prompt)
+}
+
+export function mathHasMinus(math?: MathModel): boolean {
+  return !!math?.pieces.some((p) => p.kind === 'op' && p.op === '-')
+}
+
+export function mathHasPlus(math?: MathModel): boolean {
+  return !!math?.pieces.some((p) => p.kind === 'op' && p.op === '+')
 }
 
 function inferVisual(item: Activity, math?: MathModel): HintVisualId {
@@ -505,8 +681,8 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (/happy|開心|興奮/.test(p)) return 'happy'
   if (/job|工作|老師/.test(p)) return 'job'
   if (item.kind === 'math') {
-    if (math?.op === '-') return 'minus'
-    if (math?.op === '+') return 'plus'
+    if (mathHasMinus(math) && !mathHasPlus(math)) return 'minus'
+    if (mathHasPlus(math) && !mathHasMinus(math)) return 'plus'
     return 'mix'
   }
   if (/誰比較多|哪班比較多|多多少|比較多/.test(p)) return 'mix'
@@ -570,9 +746,11 @@ export function vocabVisual(catId: string, zh: string): HintVisualId {
 }
 export function resolveTeachHint(item: Activity): TeachHint {
   const math =
-    item.kind === 'math' || item.kind === 'clock' || item.kind === 'money'
+    item.kind === 'math'
       ? parseMathModel(item.promptZh)
-      : undefined
+      : item.kind === 'choice'
+        ? parseSequence(item.promptZh)
+        : undefined
   const visual = inferVisual(item, math)
   const copy = ID_KID[item.id] || defaultKidLine(item.kind)
   let moreLine = copy.moreLine
@@ -583,6 +761,6 @@ export function resolveTeachHint(item: Activity): TeachHint {
     visual,
     kidLine: copy.kidLine,
     moreLine,
-    math: item.kind === 'math' ? math : undefined,
+    math: item.kind === 'math' || item.kind === 'choice' ? math : undefined,
   }
 }

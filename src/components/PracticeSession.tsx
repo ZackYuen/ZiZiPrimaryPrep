@@ -615,7 +615,7 @@ export function PracticeSession({
             !item.clock &&
             !item.coins &&
             item.calendarDay == null &&
-            !(item.kind === 'math' && teach.math && !item.hintImage && !item.pictureStrip) &&
+            !(teach.math && !item.hintImage && !item.pictureStrip) &&
             !item.hintImage &&
             !item.pictureStrip &&
             !item.hideArt &&
@@ -627,9 +627,6 @@ export function PracticeSession({
             <div className="hint-pic-wrap">
               <HintPicture visual={teach.visual} />
             </div>
-          )}
-          {item.kind === 'math' && teach.math && item.calendarDay == null && !item.hintImage && (
-            <MathDots model={teach.math} />
           )}
           {item.clock && <AnalogClock hour={item.clock.hour} minute={item.clock.minute} />}
           {item.coins && item.purseOwner && <CoinPurse owner={item.purseOwner} coins={item.coins} />}
@@ -690,11 +687,13 @@ export function PracticeSession({
                   open={helpOpen}
                   step={helpStep}
                   hideArt={
+                    !!teach.math ||
                     (!item.scene &&
                       !item.clock &&
                       !item.coins &&
                       item.calendarDay == null &&
-                      !(item.kind === 'math' && teach.math && !item.hintImage)) ||
+                      !item.hintImage &&
+                      !item.pictureStrip) ||
                     (!!item.hintImage && !artHidden && !item.hideArt) ||
                     (!!item.pictureStrip && !artHidden && !item.hideArt)
                   }
@@ -722,6 +721,9 @@ export function PracticeSession({
                 />
               </div>
             </>
+          )}
+          {teach.math && item.calendarDay == null && !item.hintImage && !item.pictureStrip && (
+            <MathDots model={teach.math} />
           )}
           </div>
 
