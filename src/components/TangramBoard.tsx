@@ -54,15 +54,31 @@ const TRIANGLE_SLOTS: SlotLayout[] = [
   { id: 'L2', left: '62%', top: '52%', width: '32%', rotate: 180 },
 ]
 
+/** Classic sailboat: sail on top, pointed bow/stern hull below. */
 const BOAT_SLOTS: SlotLayout[] = [
-  { id: 'M', left: '34%', top: '1%', width: '32%' },
-  { id: 'S2', left: '64%', top: '10%', width: '16%', rotate: -18 },
-  { id: 'SQ', left: '38%', top: '28%', width: '18%' },
-  { id: 'S1', left: '56%', top: '30%', width: '16%' },
-  { id: 'L1', left: '4%', top: '50%', width: '38%', rotate: -18 },
-  { id: 'P', left: '34%', top: '64%', width: '32%' },
-  { id: 'L2', left: '58%', top: '50%', width: '38%', rotate: 198 },
+  { id: 'M', left: '36%', top: '2%', width: '28%' },
+  { id: 'S2', left: '23%', top: '16%', width: '14%', rotate: -28 },
+  { id: 'S1', left: '63%', top: '16%', width: '14%', rotate: 28 },
+  { id: 'SQ', left: '42%', top: '40%', width: '16%' },
+  { id: 'L1', left: '8%', top: '50%', width: '26%', rotate: 180 },
+  { id: 'L2', left: '66%', top: '50%', width: '26%' },
+  { id: 'P', left: '32%', top: '60%', width: '36%' },
 ]
+
+function BoatOutline() {
+  return (
+    <svg className="tan-boat-outline" viewBox="0 0 200 180" aria-hidden>
+      <path
+        className="tan-boat-outline__sail"
+        d="M100 6 L146 80 L54 80 Z"
+      />
+      <path
+        className="tan-boat-outline__hull"
+        d="M12 86 L188 86 L160 172 L40 172 Z"
+      />
+    </svg>
+  )
+}
 
 function TanShape({ id, ghost }: { id: PieceId; ghost?: boolean }) {
   const def = TANGRAM_PIECES[id]
@@ -270,10 +286,14 @@ export function TangramBoard({ mode, shape = 'triangle', locked, reveal, onSolve
       ? canPointer
         ? selected
           ? '拖去或者撳同一個形狀'
-          : '拖圖形去上面空位'
+          : shape === 'boat'
+            ? '拖去帆船：上面係帆，下面係船身'
+            : '拖圖形去上面空位'
         : selected
           ? '再撳同一個形狀'
-          : '先撳圖形，再撳空位'
+          : shape === 'boat'
+            ? '先撳圖形，再撳帆船上同一個形狀'
+            : '先撳圖形，再撳空位'
       : mode === 'pair'
         ? '撳兩塊可以合成正方形嘅'
         : mode === 'count-tri'
@@ -302,6 +322,7 @@ export function TangramBoard({ mode, shape = 'triangle', locked, reveal, onSolve
             alt=""
             draggable={false}
           />
+          {shape === 'boat' && <BoatOutline />}
           {slots.map((slot) => {
             const filled = !!placed[slot.id]
             const isSource = drag?.from.kind === 'slot' && drag.id === slot.id && ghostOn

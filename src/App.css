@@ -4045,6 +4045,32 @@ button.picture-strip__item--choice {
     linear-gradient(180deg, #dceef1 0%, #a9d5df 48%, #6faebc 100%);
 }
 
+.tan-stage--boat .tan-stage__paper {
+  opacity: 0.42;
+}
+
+.tan-boat-outline {
+  position: absolute;
+  inset: 2% 6% 4%;
+  width: auto;
+  height: auto;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tan-boat-outline__sail,
+.tan-boat-outline__hull {
+  fill: rgba(255, 253, 247, 0.38);
+  stroke: #5a4a38;
+  stroke-width: 3.4;
+  stroke-linejoin: round;
+  stroke-dasharray: 8 6;
+}
+
+.tan-stage--boat .tan-slot {
+  z-index: 1;
+}
+
 .tan-slot,
 .build-slot {
   position: absolute;
