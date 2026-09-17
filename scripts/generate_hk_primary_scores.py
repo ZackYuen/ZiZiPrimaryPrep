@@ -14,6 +14,7 @@ BASE = "https://schoolfit.hk/api/schools"
 ROOT = Path(__file__).resolve().parent
 OUT = Path("/workspace/docs/hk-primary-school-scores-2026.csv")
 P1_PATH = ROOT / "data" / "p1_places_schooland_2026.json"
+SEC_GENDER_PATH = ROOT / "data" / "secondary_gender_schoolfit.json"
 CACHE_PATH = Path("/tmp/schoolfit_primary_details.json")
 
 # 碩孜 Zizi — 現居觀塘月華街（校網48）
@@ -63,8 +64,8 @@ ELITE_SEC = [
 ]
 GOOD_SEC = [
     "觀塘官立中學", "何文田官立中學", "賽馬會官立中學", "觀塘功樂官立中學",
-    "嘉諾撒聖家書院", "順利天主教中學", "聖言中學", "觀塘瑪利諾書院",
-    "梁式芝書院", "華英中學", "沙田官立中學", "荃灣官立中學", "屯門官立中學",
+    "順利天主教中學", "聖言中學", "觀塘瑪利諾書院",
+    "華英中學", "沙田官立中學", "荃灣官立中學", "屯門官立中學",
     "將軍澳官立中學", "陳瑞祺（喇沙）書院", "陳瑞祺(喇沙)書院",
     "聖公會林護紀念中學", "嗇色園主辦可譽中學", "真道書院",
 ]
@@ -371,11 +372,69 @@ def _name_hit(names: list[str], keys: list[str]) -> bool:
     return any(k and k in blob for k in keys)
 
 
+def norm_zh(s: str) -> str:
+    s = (s or "").replace("衞", "衛").replace("(", "（").replace(")", "）")
+    return re.sub(r"[\s（）]", "", s)
+
+
+def load_secondary_gender() -> dict:
+    rows = json.loads(SEC_GENDER_PATH.read_text(encoding="utf-8"))
+    by_norm = {}
+    for r in rows:
+        by_norm[norm_zh(r["nameZh"])] = r.get("gender", "男女校")
+    return by_norm
+
+
+def secondary_gender(name: str, index: dict) -> str | None:
+    n = norm_zh(name)
+    if not n:
+        return None
+    if n in index:
+        return index[n]
+    hits = []
+    for key, gender in index.items():
+        if key and (key in n or n in key) and min(len(key), len(n)) >= 4:
+            hits.append((len(key), gender))
+    if hits:
+        hits.sort(reverse=True)
+        return hits[0][1]
+    if _name_hit([name], GIRLS_SEC):
+        return "女校"
+    return None
+
+
+def split_sec_names(val: str) -> list[str]:
+    return [x.strip() for x in re.split(r"[、,]", val or "") if x.strip()]
+
+
+def filter_link_for_boy(link: dict, sec_gender: dict) -> dict:
+    """Drop girls secondaries so they count as no 升中聯繫 for Zizi."""
+    dropped = [n for n in link["names"] if secondary_gender(n, sec_gender) == "女校"]
+    kept = [n for n in link["names"] if n not in dropped]
+
+    def keep_text(val: str) -> str:
+        parts = [p for p in split_sec_names(val) if secondary_gender(p, sec_gender) != "女校"]
+        return "、".join(parts)
+
+    out = {
+        "dragon": keep_text(link.get("dragon", "")),
+        "linked": keep_text(link.get("linked", "")),
+        "type": "none",
+        "names": kept,
+        "dropped_girls": dropped,
+    }
+    if out["dragon"]:
+        out["type"] = "dragon"
+    elif link.get("type") == "direct" and out["linked"]:
+        out["type"] = "direct"
+    elif out["linked"]:
+        out["type"] = "linked"
+    return out
+
+
 def score_dragon(link: dict) -> float:
-    if link["type"] == "none":
+    if link["type"] == "none" or not link.get("names"):
         return 3.0
-    if _name_hit(link["names"], GIRLS_SEC):
-        return 3.0  # 女生中學路徑對碩孜無幫助
     elite = _name_hit(link["names"], ELITE_SEC)
     good = _name_hit(link["names"], GOOD_SEC)
     # 一條龍/直屬才把精英中學當穩定路徑；普通「聯繫」只是派位篮子
@@ -542,6 +601,8 @@ def main():
     print("Loading P1 quotas...")
     p1_index = load_p1_index()
     print(f"P1 rows: {len(p1_index['rows'])}")
+    sec_gender = load_secondary_gender()
+    print(f"Secondary gender map: {len(sec_gender)}")
 
     print("Fetching school list...")
     schools = fetch_all_list()
@@ -620,7 +681,7 @@ def main():
         path = stay_path(funding, school_net, district, has_p1)
         stay_display = path in ("留現址-統一派位+自行分配", "直資私立可通勤") and district == HOME_DISTRICT
         sqm = parse_area(facts)
-        link = parse_linkage(facts)
+        link = filter_link_for_boy(parse_linkage(facts), sec_gender)
         house = score_housing(district, stay_display)
         commute = score_commute(name_zh, district)
         dragon = score_dragon(link)
@@ -663,6 +724,10 @@ def main():
         link_text = link["dragon"] or link["linked"] or "無"
         if link["dragon"] and link["linked"]:
             link_text = f"龍:{link['dragon']} | 聯:{link['linked']}"
+        if link.get("dropped_girls") and not link["names"]:
+            link_text = "無（原聯繫為女校中學）"
+        elif link.get("dropped_girls"):
+            link_text = f"{link_text}｜已剔除女校:{'、'.join(link['dropped_girls'])}"
 
         source_note = "校網48自行額=教育局2027名冊；其餘學額=升學天地2026"
         if funding in ("直資", "私立"):
