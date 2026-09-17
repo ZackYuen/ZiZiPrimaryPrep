@@ -1,1 +1,2648 @@
-[{"nameZh": "拔萃男書院", "nameEn": "Diocesan Boys' School", "gender": "男校"}, {"nameZh": "拔萃女書院", "nameEn": "Diocesan Girls' School", "gender": "女校"}, {"nameZh": "保良局羅傑承（一九八三）中學", "nameEn": "Po Leung Kuk Lo Kit Sing (1983) College", "gender": "男女校"}, {"nameZh": "保良局百周年李兆忠紀念中學", "nameEn": "Po Leung Kuk Centenary Li Shiu Chung Memorial College", "gender": "男女校"}, {"nameZh": "保良局第一張永慶中學", "nameEn": "Po Leung Kuk No.1 W.H. Cheung College", "gender": "男女校"}, {"nameZh": "保良局董玉娣中學", "nameEn": "Po Leung Kuk Tang Yuk Tien College", "gender": "男女校"}, {"nameZh": "保良局何蔭棠中學", "nameEn": "Po Leung Kuk Celine Ho Yam Tong College", "gender": "男女校"}, {"nameZh": "保良局胡忠中學", "nameEn": "Po Leung Kuk Wu Chung College", "gender": "男女校"}, {"nameZh": "保良局甲子何玉清中學", "nameEn": "Po Leung Kuk Ho Yuk Ching (1984) College", "gender": "男女校"}, {"nameZh": "保良局李城璧中學", "nameEn": "Po Leung Kuk Lee Shing Pik College", "gender": "男女校"}, {"nameZh": "保良局羅氏基金中學", "nameEn": "PLK Laws Foundation College", "gender": "男女校"}, {"nameZh": "保良局馬錦明夫人章馥仙中學", "nameEn": "PLK Mrs. Ma Kam Ming-Cheung Fook Sien College", "gender": "男女校"}, {"nameZh": "保良局馬錦明中學", "nameEn": "Po Leung Kuk Ma Kam Ming College", "gender": "男女校"}, {"nameZh": "保良局唐乃勤初中書院", "nameEn": "Po Leung Kuk Tong Nai Kan Junior Secondary College", "gender": "男女校"}, {"nameZh": "保良局顏寶鈴書院", "nameEn": "Po Leung Kuk Ngan Po Ling College", "gender": "男女校"}, {"nameZh": "保良局姚連生中學", "nameEn": "Po Leung Kuk Yao Ling Sun College", "gender": "男女校"}, {"nameZh": "保良局朱敬文中學", "nameEn": "Po Leung Kuk C. W. Chu College", "gender": "男女校"}, {"nameZh": "保祿六世書院", "nameEn": "Pope Paul VI College", "gender": "女校"}, {"nameZh": "寶安商會王少清中學", "nameEn": "Po On Commercial Association Wong Siu Ching Secondary School", "gender": "男女校"}, {"nameZh": "寶覺中學", "nameEn": "Po Kok Secondary School", "gender": "男女校"}, {"nameZh": "寶血會上智英文書院", "nameEn": "Holy Trinity College", "gender": "女校"}, {"nameZh": "寶血女子中學", "nameEn": "Precious Blood Secondary School", "gender": "女校"}, {"nameZh": "北角協同中學", "nameEn": "Concordia Lutheran School - North Point", "gender": "男女校"}, {"nameZh": "庇理羅士女子中學", "nameEn": "Belilios Public School", "gender": "女校"}, {"nameZh": "播道書院", "nameEn": "Evangel College", "gender": "男女校"}, {"nameZh": "萬鈞伯裘書院", "nameEn": "Man Kwan Pak Kau College", "gender": "男女校"}, {"nameZh": "伯特利中學", "nameEn": "Bethel High School", "gender": "男女校"}, {"nameZh": "博愛醫院八十週年鄧英喜中學", "nameEn": "POH 80th Anniversary Tang Ying Hei College", "gender": "男女校"}, {"nameZh": "博愛醫院陳楷紀念中學", "nameEn": "POH Chan Kai Memorial College", "gender": "男女校"}, {"nameZh": "博愛醫院鄧佩瓊紀念中學", "nameEn": "Pok Oi Hospital Tang Pui King Memorial College", "gender": "男女校"}, {"nameZh": "博愛醫院歷屆總理聯誼會梁省德中學", "nameEn": "AD&FD POHL Leung Sing Tak College", "gender": "男女校"}, {"nameZh": "彩虹邨天主教英文中學", "nameEn": "Choi Hung Estate Catholic Secondary School", "gender": "男校"}, {"nameZh": "長沙灣天主教英文中學", "nameEn": "Cheung Sha Wan Catholic Secondary School", "gender": "男校"}, {"nameZh": "長洲官立中學", "nameEn": "Cheung Chau Government Secondary School", "gender": "男女校"}, {"nameZh": "廠商會蔡章閣中學", "nameEn": "CMA Choi Cheung Kok Secondary School", "gender": "男女校"}, {"nameZh": "廠商會中學", "nameEn": "CMA Secondary School", "gender": "男女校"}, {"nameZh": "潮州會館中學", "nameEn": "Chiu Chow Association Secondary School", "gender": "男女校"}, {"nameZh": "陳瑞祺（喇沙）書院", "nameEn": "Chan Sui Ki (La Salle) College", "gender": "男校"}, {"nameZh": "崇真書院", "nameEn": "Tsung Tsin College", "gender": "男女校"}, {"nameZh": "慈幼英文學校", "nameEn": "Salesian English School", "gender": "男校"}, {"nameZh": "大埔三育中學", "nameEn": "Tai Po Sam Yuk Secondary School", "gender": "男女校"}, {"nameZh": "德愛中學", "nameEn": "Tak Oi Secondary School", "gender": "女校"}, {"nameZh": "德蘭中學", "nameEn": "St. Teresa Secondary School", "gender": "女校"}, {"nameZh": "德望學校", "nameEn": "Good Hope School", "gender": "女校"}, {"nameZh": "德信中學", "nameEn": "Tak Sun Secondary School", "gender": "男校"}, {"nameZh": "德雅中學", "nameEn": "Tak Nga Secondary School", "gender": "女校"}, {"nameZh": "德貞女子中學", "nameEn": "Tack Ching Girls' Secondary School", "gender": "女校"}, {"nameZh": "鄧鏡波學校", "nameEn": "Tang King Po School", "gender": "男校"}, {"nameZh": "鄧肇堅維多利亞官立中學", "nameEn": "Tang Shiu Kin Victoria Government Secondary School", "gender": "男女校"}, {"nameZh": "地利亞修女紀念學校（百老匯）", "nameEn": "Delia Memorial School (Broadway)", "gender": "男女校"}, {"nameZh": "地利亞修女紀念學校（吉利徑）", "nameEn": "Delia Memorial School (Glee Path)", "gender": "男女校"}, {"nameZh": "地利亞修女紀念學校（協和二中）", "nameEn": "Delia Memorial School (Hip Wo No.2 College)", "gender": "男女校"}, {"nameZh": "地利亞修女紀念學校（協和）", "nameEn": "Delia Memorial School (Hip Wo)", "gender": "男女校"}, {"nameZh": "東華三院陳兆民中學", "nameEn": "TWGHs Chen Zao Men College", "gender": "男女校"}, {"nameZh": "東華三院馮黃鳳亭中學", "nameEn": "TWGHs Mrs. Fung Wong Fung Ting College", "gender": "男女校"}, {"nameZh": "東華三院郭一葦中學", "nameEn": "TWGHs Kwok Yat Wai College", "gender": "男女校"}, {"nameZh": "東華三院黃鳳翎中學", "nameEn": "TWGHs Wong Fung Ling College", "gender": "男女校"}, {"nameZh": "東華三院黃笏南中學", "nameEn": "TWGHs Wong Fut Nam College", "gender": "男女校"}, {"nameZh": "東華三院甲寅年總理中學", "nameEn": "TWGHs Kap Yan Directors' College", "gender": "男女校"}, {"nameZh": "東華三院鄺錫坤伉儷中學", "nameEn": "TWGHs Mr & Mrs Kwong Sik Kwan College", "gender": "男女校"}, {"nameZh": "東華三院李嘉誠中學", "nameEn": "TWGHs Li Ka Shing College", "gender": "男女校"}, {"nameZh": "東華三院李潤田紀念中學", "nameEn": "TWGHs Lee Ching Dea Memorial College", "gender": "男女校"}, {"nameZh": "東華三院盧幹庭紀念中學", "nameEn": "Tung Wah Group of Hospitals Lo Kon Ting Memorial College", "gender": "男女校"}, {"nameZh": "東華三院呂潤財紀念中學", "nameEn": "TWGHs Lui Yun Choy Memorial College", "gender": "男女校"}, {"nameZh": "東華三院馬振玉紀念中學", "nameEn": "TWGHs C.Y. Ma Memorial College", "gender": "男女校"}, {"nameZh": "東華三院邱金元中學", "nameEn": "TWGHs Yow Kam Yuen College", "gender": "男女校"}, {"nameZh": "東華三院邱子田紀念中學", "nameEn": "TWGHs Yau Tze Tin Memorial College", "gender": "男女校"}, {"nameZh": "東華三院吳祥川紀念中學", "nameEn": "TWGHs S. C. Gaw Memorial College", "gender": "男女校"}, {"nameZh": "東華三院伍若瑜夫人紀念中學", "nameEn": "Tung Wah Group of Hospitals Mrs. Wu York Yu Memorial College", "gender": "男女校"}, {"nameZh": "東華三院辛亥年總理中學", "nameEn": "TWGHs Sun Hoi Directors' College", "gender": "男女校"}, {"nameZh": "東華三院張明添中學", "nameEn": "TWGHs Chang Ming Thien College", "gender": "男女校"}, {"nameZh": "東莞工商總會劉百樂中學", "nameEn": "GCC&ITKD Lau Pak Lok Secondary School", "gender": "男女校"}, {"nameZh": "東涌天主教學校", "nameEn": "Tung Chung Catholic School", "gender": "男女校"}, {"nameZh": "恩平工商會李琳明中學", "nameEn": "YPI & CA Lee Lim Ming College", "gender": "男女校"}, {"nameZh": "恩主教書院", "nameEn": "Valtorta College", "gender": "男女校"}, {"nameZh": "紡織學會美國商會胡漢輝中學", "nameEn": "TIACC Woo Hon Fai Secondary School", "gender": "男女校"}, {"nameZh": "粉嶺官立中學", "nameEn": "Fanling Government Secondary School", "gender": "男女校"}, {"nameZh": "粉嶺救恩書院", "nameEn": "Fanling Kau Yan College", "gender": "男女校"}, {"nameZh": "粉嶺禮賢會中學", "nameEn": "Fanling Rhenish Church Secondary School", "gender": "男女校"}, {"nameZh": "風采中學（教育評議會主辦）", "nameEn": "Elegantia College (Sponsored by Education Convergence)", "gender": "男女校"}, {"nameZh": "鳳溪第一中學", "nameEn": "Fung Kai No. 1 Secondary School", "gender": "男女校"}, {"nameZh": "鳳溪廖萬石堂中學", "nameEn": "Fung Kai Liu Man Shek Tong Secondary School", "gender": "男女校"}, {"nameZh": "佛教大光慈航中學", "nameEn": "Buddhist Tai Kwong Chi Hong College", "gender": "男女校"}, {"nameZh": "佛教大雄中學", "nameEn": "Buddhist Tai Hung College", "gender": "男女校"}, {"nameZh": "佛教筏可紀念中學", "nameEn": "Buddhist Fat Ho Memorial College", "gender": "男女校"}, {"nameZh": "佛教何南金中學", "nameEn": "Buddhist Ho Nam Kam College", "gender": "男女校"}, {"nameZh": "佛教黃鳳翎中學", "nameEn": "Buddhist Wong Fung Ling College", "gender": "男女校"}, {"nameZh": "佛教黃允畋中學", "nameEn": "Buddhist Wong Wan Tin College", "gender": "男女校"}, {"nameZh": "佛教覺光法師中學", "nameEn": "Buddhist Kok Kwong Secondary School", "gender": "男女校"}, {"nameZh": "佛教孔仙洲紀念中學", "nameEn": "Buddhist Hung Sean Chau Memorial College", "gender": "男女校"}, {"nameZh": "佛教茂峰法師紀念中學", "nameEn": "Buddhist Mau Fung Memorial College", "gender": "男女校"}, {"nameZh": "佛教善德英文中學", "nameEn": "Buddhist Sin Tak College", "gender": "男女校"}, {"nameZh": "佛教沈香林紀念中學", "nameEn": "Buddhist Sum Heung Lam Memorial College", "gender": "男女校"}, {"nameZh": "佛教葉紀南紀念中學", "nameEn": "Buddhist Yip Kei Nam Memorial College", "gender": "男女校"}, {"nameZh": "佛教志蓮中學", "nameEn": "Chi Lin Buddhist Secondary School", "gender": "男女校"}, {"nameZh": "福建中學", "nameEn": "Fukien Secondary School", "gender": "男女校"}, {"nameZh": "福建中學（小西灣）", "nameEn": "Fukien Secondary School (Siu Sai Wan)", "gender": "男女校"}, {"nameZh": "港澳信義會慕德中學", "nameEn": "HKMLC Queen Maud Secondary School", "gender": "男女校"}, {"nameZh": "港大同學會書院", "nameEn": "HKUGA College", "gender": "男女校"}, {"nameZh": "港島民生書院", "nameEn": "Munsang College (Hong Kong Island)", "gender": "男女校"}, {"nameZh": "港九潮州公會中學", "nameEn": "HK & KLN Chiu Chow Public Assn. Sec. School", "gender": "男女校"}, {"nameZh": "港九街坊婦女會孫方中書院", "nameEn": "HK & KLN Kaifong Women's Association Sun Fong Chung College", "gender": "男女校"}, {"nameZh": "港青基信書院", "nameEn": "YMCA of Hong Kong Christian College", "gender": "男女校"}, {"nameZh": "高雷中學", "nameEn": "Ko Lui Secondary School", "gender": "男女校"}, {"nameZh": "高主教書院", "nameEn": "Raimondi College", "gender": "男女校"}, {"nameZh": "官立嘉道理爵士中學（西九龍）", "nameEn": "Sir Ellis Kadoorie Secondary School (West Kowloon)", "gender": "男女校"}, {"nameZh": "觀塘功樂官立中學", "nameEn": "Kwun Tong Kung Lok Government Secondary School", "gender": "男校"}, {"nameZh": "觀塘官立中學", "nameEn": "Kwun Tong Government Secondary School", "gender": "男女校"}, {"nameZh": "觀塘瑪利諾書院", "nameEn": "Kwun Tong Maryknoll College", "gender": "男校"}, {"nameZh": "漢華中學", "nameEn": "Hon Wah College", "gender": "男女校"}, {"nameZh": "何東中學", "nameEn": "Hotung Secondary School", "gender": "女校"}, {"nameZh": "何明華會督銀禧中學", "nameEn": "Bishop Hall Jubilee School", "gender": "男女校"}, {"nameZh": "何文田官立中學", "nameEn": "Homantin Government Secondary School", "gender": "男女校"}, {"nameZh": "華仁書院（九龍）", "nameEn": "Wah Yan College, Kowloon", "gender": "男校"}, {"nameZh": "華英中學", "nameEn": "Wa Ying College", "gender": "男女校"}, {"nameZh": "皇仁舊生會中學", "nameEn": "Queen's College Old Boys' Association Secondary School", "gender": "男女校"}, {"nameZh": "皇仁書院", "nameEn": "Queen's College", "gender": "男校"}, {"nameZh": "惠僑英文中學", "nameEn": "Wai Kiu College", "gender": "男女校"}, {"nameZh": "滙基書院", "nameEn": "United Christian College", "gender": "男女校"}, {"nameZh": "滙基書院（東九龍）", "nameEn": "United Christian College (Kowloon East)", "gender": "男女校"}, {"nameZh": "萬鈞匯知中學", "nameEn": "Man Kwan QualiEd College", "gender": "男女校"}, {"nameZh": "基督教崇真中學", "nameEn": "Tsung Tsin Christian Academy", "gender": "男女校"}, {"nameZh": "基督教女青年會丘佐榮中學", "nameEn": "The Y.W.C.A. Hioe Tjo Yoeng College", "gender": "男女校"}, {"nameZh": "基督教聖約教會堅樂中學", "nameEn": "The Mission Covenant Church Holm Glad College", "gender": "男女校"}, {"nameZh": "基督教香港信義會宏信書院", "nameEn": "ELCHK Lutheran Academy", "gender": "男女校"}, {"nameZh": "基督教香港信義會心誠中學", "nameEn": "Fanling Lutheran Secondary School", "gender": "男女校"}, {"nameZh": "基督教香港信義會信義中學", "nameEn": "ELCHK Lutheran Secondary School", "gender": "男女校"}, {"nameZh": "基督教香港信義會元朗信義中學", "nameEn": "The ELCHK Yuen Long Lutheran Secondary School", "gender": "男女校"}, {"nameZh": "基督教宣道會宣基中學", "nameEn": "Christian & Missionary Alliance Sun Kei Secondary School", "gender": "男女校"}, {"nameZh": "基督教中國佈道會聖道迦南書院", "nameEn": "ECF Saint Too Canaan College", "gender": "男女校"}, {"nameZh": "基督書院", "nameEn": "Christ College", "gender": "男女校"}, {"nameZh": "加拿大神召會嘉智中學", "nameEn": "PAOC Ka Chi Secondary School", "gender": "男女校"}, {"nameZh": "迦密愛禮信中學", "nameEn": "Carmel Alison Lam Foundation Secondary School", "gender": "男女校"}, {"nameZh": "迦密柏雨中學", "nameEn": "Carmel Pak U Secondary School", "gender": "男女校"}, {"nameZh": "迦密聖道中學", "nameEn": "Carmel Holy Word Secondary School", "gender": "男女校"}, {"nameZh": "迦密唐賓南紀念中學", "nameEn": "Carmel Bunnan Tong Memorial Secondary School", "gender": "男女校"}, {"nameZh": "迦密中學", "nameEn": "Carmel Secondary School", "gender": "男女校"}, {"nameZh": "迦密主恩中學", "nameEn": "Carmel Divine Grace Foundation Secondary School", "gender": "男女校"}, {"nameZh": "嘉諾撒培德書院", "nameEn": "Pui Tak Canossian College", "gender": "女校"}, {"nameZh": "嘉諾撒聖方濟各書院", "nameEn": "St. Francis' Canossian College", "gender": "女校"}, {"nameZh": "嘉諾撒聖家書院", "nameEn": "Holy Family Canossian College", "gender": "女校"}, {"nameZh": "嘉諾撒聖瑪利書院", "nameEn": "St. Mary's Canossian College", "gender": "女校"}, {"nameZh": "嘉諾撒聖心書院", "nameEn": "Sacred Heart Canossian College", "gender": "女校"}, {"nameZh": "嘉諾撒書院", "nameEn": "Canossa College", "gender": "女校"}, {"nameZh": "將軍澳官立中學", "nameEn": "Tseung Kwan O Government Secondary School", "gender": "男女校"}, {"nameZh": "將軍澳香島中學", "nameEn": "Heung To Secondary School (Tseung Kwan O)", "gender": "男女校"}, {"nameZh": "潔心林炳炎中學", "nameEn": "Kit Sam Lam Bing Yim Secondary School", "gender": "女校"}, {"nameZh": "金巴崙長老會耀道中學", "nameEn": "Cumberland Presbyterian Church Yao Dao Secondary School", "gender": "男女校"}, {"nameZh": "金文泰中學", "nameEn": "Clementi Secondary School", "gender": "男女校"}, {"nameZh": "浸信會呂明才中學", "nameEn": "Baptist Lui Ming Choi Secondary School", "gender": "男女校"}, {"nameZh": "浸信會永隆中學", "nameEn": "Baptist Wing Lung Secondary School", "gender": "男女校"}, {"nameZh": "景嶺書院", "nameEn": "King Ling College", "gender": "男女校"}, {"nameZh": "九龍工業學校", "nameEn": "Kowloon Technical School", "gender": "男女校"}, {"nameZh": "九龍三育中學", "nameEn": "Kowloon Sam Yuk Secondary School", "gender": "男女校"}, {"nameZh": "九龍塘學校（中學部）", "nameEn": "Kowloon Tong School (Secondary Section)", "gender": "男女校"}, {"nameZh": "九龍真光中學", "nameEn": "Kowloon True Light School", "gender": "女校"}, {"nameZh": "救恩書院", "nameEn": "Kau Yan College", "gender": "男女校"}, {"nameZh": "救世軍卜維廉中學", "nameEn": "Salvation Army William Booth Secondary School", "gender": "男女校"}, {"nameZh": "可道中學（嗇色園主辦）", "nameEn": "Ho Dao College (Sponsored by Sik Sik Yuen)", "gender": "男女校"}, {"nameZh": "可風中學（嗇色園主辦）", "nameEn": "Ho Fung College (Sponsored by Sik Sik Yuen)", "gender": "男女校"}, {"nameZh": "可立中學（嗇色園主辦）", "nameEn": "Ho Lap College (Sponsored by the Sik Sik Yuen)", "gender": "男女校"}, {"nameZh": "孔教學院大成何郭佩珍中學", "nameEn": "Confucian Tai Shing Ho Kwok Pui Chun College", "gender": "男女校"}, {"nameZh": "孔聖堂禮仁書院", "nameEn": "Academy of Innovation (Confucius Hall)", "gender": "男女校"}, {"nameZh": "葵涌蘇浙公學", "nameEn": "Kiangsu - Chekiang College (Kwai Chung)", "gender": "男女校"}, {"nameZh": "葵涌循道中學", "nameEn": "Kwai Chung Methodist College", "gender": "男女校"}, {"nameZh": "喇沙書院", "nameEn": "La Salle College", "gender": "男校"}, {"nameZh": "藍田聖保祿中學", "nameEn": "St. Paul's School (Lam Tin)", "gender": "女校"}, {"nameZh": "創知中學", "nameEn": "Scientia Secondary School", "gender": "男女校"}, {"nameZh": "樂道中學", "nameEn": "Lock Tao Secondary School", "gender": "男女校"}, {"nameZh": "樂善堂顧超文中學", "nameEn": "Lok Sin Tong Ku Chiu Man Secondary School", "gender": "男女校"}, {"nameZh": "樂善堂梁銶琚書院", "nameEn": "Lok Sin Tong Leung Kau Kui College", "gender": "男女校"}, {"nameZh": "樂善堂梁植偉紀念中學", "nameEn": "Lok Sin Tong Leung Chik Wai Memorial School", "gender": "男女校"}, {"nameZh": "樂善堂王仲銘中學", "nameEn": "Lok Sin Tong Wong Chung Ming Secondary School", "gender": "男女校"}, {"nameZh": "樂善堂楊葛小琳中學", "nameEn": "Lok Sin Tong Young Ko Hsiao Lin Secondary School", "gender": "男女校"}, {"nameZh": "樂善堂余近卿中學", "nameEn": "Lok Sin Tong Yu Kan Hing Secondary School", "gender": "男女校"}, {"nameZh": "李求恩紀念中學", "nameEn": "Lee Kau Yan Memorial School", "gender": "男女校"}, {"nameZh": "禮賢會彭學高紀念中學", "nameEn": "Rhenish Church Pang Hok Ko Memorial College", "gender": "男女校"}, {"nameZh": "荔景天主教中學", "nameEn": "Lai King Catholic Secondary School", "gender": "男女校"}, {"nameZh": "麗澤中學", "nameEn": "Lai Chack Middle School", "gender": "男女校"}, {"nameZh": "梁式芝書院", "nameEn": "Leung Shek Chee College", "gender": "女校"}, {"nameZh": "梁文燕紀念中學（沙田）", "nameEn": "Helen Liang Memorial Secondary School (Shatin)", "gender": "男女校"}, {"nameZh": "廖寶珊紀念書院", "nameEn": "Liu Po Shan Memorial College", "gender": "男女校"}, {"nameZh": "林大輝中學", "nameEn": "Lam Tai Fai College", "gender": "男女校"}, {"nameZh": "靈糧堂劉梅軒中學", "nameEn": "Ling Liang Church M H Lau Secondary School", "gender": "男女校"}, {"nameZh": "靈糧堂怡文中學", "nameEn": "Ling Liang Church E Wun Secondary School", "gender": "男女校"}, {"nameZh": "嶺南衡怡紀念中學", "nameEn": "Lingnan Hang Yee Memorial Secondary School", "gender": "男女校"}, {"nameZh": "嶺南中學", "nameEn": "Lingnan Secondary School", "gender": "男女校"}, {"nameZh": "嶺南鍾榮光博士紀念中學", "nameEn": "Lingnan Dr. Chung Wing Kwong Memorial Secondary School", "gender": "男女校"}, {"nameZh": "路德會呂明才中學", "nameEn": "Lui Ming Choi Lutheran College", "gender": "男女校"}, {"nameZh": "路德會呂祥光中學", "nameEn": "Lui Cheung Kwong Lutheran College", "gender": "男女校"}, {"nameZh": "路德會西門英才中學", "nameEn": "Gertrude Simon Lutheran College", "gender": "男女校"}, {"nameZh": "路德會協同中學", "nameEn": "Concordia Lutheran School", "gender": "男女校"}, {"nameZh": "旅港開平商會中學", "nameEn": "Hoi Ping Chamber of Commerce Secondary School", "gender": "男女校"}, {"nameZh": "羅定邦中學", "nameEn": "Law Ting Pong Secondary School", "gender": "男女校"}, {"nameZh": "馬鞍山崇真中學", "nameEn": "Ma On Shan Tsung Tsin Secondary School", "gender": "男女校"}, {"nameZh": "馬鞍山聖若瑟中學", "nameEn": "Ma On Shan St. Joseph's Secondary School", "gender": "男女校"}, {"nameZh": "馬錦明慈善基金馬陳端喜紀念中學", "nameEn": "MKMCF Ma Chan Duen Hey Memorial College", "gender": "男女校"}, {"nameZh": "馬錦明慈善基金馬可賓紀念中學", "nameEn": "Stewards MKMCF Ma Ko Pan Memorial College", "gender": "男女校"}, {"nameZh": "瑪利曼中學", "nameEn": "Marymount Secondary School", "gender": "女校"}, {"nameZh": "瑪利諾神父教會學校", "nameEn": "Maryknoll Fathers' School", "gender": "男女校"}, {"nameZh": "瑪利諾修院學校（中學部）", "nameEn": "Maryknoll Convent School (Secondary Section)", "gender": "女校"}, {"nameZh": "瑪利諾中學", "nameEn": "Maryknoll Secondary School", "gender": "男女校"}, {"nameZh": "棉紡會中學", "nameEn": "Cotton Spinners Association Secondary School", "gender": "男女校"}, {"nameZh": "圓玄學院妙法寺內明陳呂重德紀念中學", "nameEn": "The Yuen Yuen Institute MFBM Nei Ming Chan Lui Chung Tak Mem. College", "gender": "男女校"}, {"nameZh": "妙法寺劉金龍中學", "nameEn": "Madam Lau Kam Lung Secondary School of Miu Fat Buddhist Monastery", "gender": "女校"}, {"nameZh": "民生書院", "nameEn": "Munsang College", "gender": "男女校"}, {"nameZh": "閩僑中學", "nameEn": "Man Kiu College", "gender": "男女校"}, {"nameZh": "明愛柴灣馬登基金中學", "nameEn": "Caritas Chai Wan Marden Foundation Secondary School", "gender": "男女校"}, {"nameZh": "明愛粉嶺陳震夏中學", "nameEn": "Caritas Fanling Chan Chun Ha Secondary School", "gender": "男女校"}, {"nameZh": "明愛胡振中書院", "nameEn": "Caritas Wu Cheng-Chung College", "gender": "男女校"}, {"nameZh": "明愛馬鞍山中學", "nameEn": "Caritas Ma On Shan Secondary School", "gender": "男女校"}, {"nameZh": "明愛聖若瑟中學", "nameEn": "Caritas St. Joseph Secondary School", "gender": "男女校"}, {"nameZh": "明愛屯門馬登基金中學", "nameEn": "Caritas Tuen Mun Marden Foundation Secondary School", "gender": "男女校"}, {"nameZh": "明愛元朗陳震夏中學", "nameEn": "Caritas Yuen Long Chan Chun Ha Secondary School", "gender": "男女校"}, {"nameZh": "明愛莊月明中學", "nameEn": "Caritas Chong Yuet Ming Secondary School", "gender": "男女校"}, {"nameZh": "慕光英文書院", "nameEn": "Mu Kuang English School", "gender": "男女校"}, {"nameZh": "南屯門官立中學", "nameEn": "South Tuen Mun Government Secondary School", "gender": "男女校"}, {"nameZh": "南亞路德會沐恩中學", "nameEn": "SALEM-Immanuel Lutheran College", "gender": "男女校"}, {"nameZh": "寧波第二中學", "nameEn": "Ning Po No. 2 College", "gender": "男女校"}, {"nameZh": "寧波公學", "nameEn": "Ning Po College", "gender": "男女校"}, {"nameZh": "炮台山循道衛理中學", "nameEn": "Fortress Hill Methodist Secondary School", "gender": "男女校"}, {"nameZh": "培僑書院", "nameEn": "Pui Kiu College", "gender": "男女校"}, {"nameZh": "培僑中學", "nameEn": "Pui Kiu Middle School", "gender": "男女校"}, {"nameZh": "培英中學", "nameEn": "Pui Ying Secondary School", "gender": "男女校"}, {"nameZh": "啓思中學", "nameEn": "Creative Secondary School", "gender": "男女校"}, {"nameZh": "青年會書院", "nameEn": "Chinese Y.M.C.A. College", "gender": "男女校"}, {"nameZh": "青松侯寶垣中學", "nameEn": "Ching Chung Hau Po Woon Secondary School", "gender": "男女校"}, {"nameZh": "裘錦秋中學（葵涌）", "nameEn": "Ju Ching Chu Secondary School (Kwai Chung)", "gender": "男女校"}, {"nameZh": "裘錦秋中學（屯門）", "nameEn": "Ju Ching Chu Secondary School (Tuen Mun)", "gender": "男女校"}, {"nameZh": "裘錦秋中學（元朗）", "nameEn": "Ju Ching Chu Secondary School (Yuen Long)", "gender": "男女校"}, {"nameZh": "荃灣公立何傳耀紀念中學", "nameEn": "Tsuen Wan Public Ho Chuen Yiu Memorial College", "gender": "男女校"}, {"nameZh": "荃灣官立中學", "nameEn": "Tsuen Wan Government Secondary School", "gender": "男女校"}, {"nameZh": "荃灣聖芳濟中學", "nameEn": "St. Francis Xavier's School Tsuen Wan", "gender": "男校"}, {"nameZh": "仁愛堂陳黃淑芳紀念中學", "nameEn": "Yan Oi Tong Chan Wong Suk Fong Memorial Secondary School", "gender": "男女校"}, {"nameZh": "仁愛堂田家炳中學", "nameEn": "Yan Oi Tong Tin Ka Ping Secondary School", "gender": "男女校"}, {"nameZh": "仁濟醫院第二中學", "nameEn": "Yan Chai Hospital No. 2 Secondary School", "gender": "男女校"}, {"nameZh": "仁濟醫院董之英紀念中學", "nameEn": "Yan Chai Hospital Tung Chi Ying Memorial Secondary School", "gender": "男女校"}, {"nameZh": "仁濟醫院靚次伯紀念中學", "nameEn": "Yan Chai Hospital Lan Chi Pat Memorial Secondary School", "gender": "男女校"}, {"nameZh": "仁濟醫院林百欣中學", "nameEn": "YCH Lim Por Yen Secondary School", "gender": "男女校"}, {"nameZh": "仁濟醫院羅陳楚思中學", "nameEn": "Yan Chai Hospital Law Chan Chor Si College", "gender": "男女校"}, {"nameZh": "仁濟醫院王華湘中學", "nameEn": "Yan Chai Hospital Wong Wha San Secondary School", "gender": "男女校"}, {"nameZh": "賽馬會官立中學", "nameEn": "Jockey Club Government Secondary School", "gender": "男女校"}, {"nameZh": "賽馬會體藝中學", "nameEn": "Jockey Club Ti-I College", "gender": "男女校"}, {"nameZh": "賽馬會萬鈞毅智書院", "nameEn": "Jockey Club Man Kwan EduYoung College", "gender": "男女校"}, {"nameZh": "嗇色園主辦可藝中學", "nameEn": "Ho Ngai College (Sponsored by Sik Sik Yuen)", "gender": "男女校"}, {"nameZh": "嗇色園主辦可譽中學暨可譽小學", "nameEn": "Ho Yu College and Primary School (Sponsored by Sik Sik Yuen)", "gender": "男女校"}, {"nameZh": "沙田崇真中學", "nameEn": "Shatin Tsung Tsin Secondary School", "gender": "男女校"}, {"nameZh": "沙田官立中學", "nameEn": "Sha Tin Government Secondary School", "gender": "男女校"}, {"nameZh": "沙田培英中學", "nameEn": "Shatin Pui Ying College", "gender": "男女校"}, {"nameZh": "沙田蘇浙公學", "nameEn": "Kiangsu-Chekiang College (Shatin)", "gender": "男女校"}, {"nameZh": "沙田循道衞理中學", "nameEn": "Sha Tin Methodist College", "gender": "男女校"}, {"nameZh": "上水官立中學", "nameEn": "Sheung Shui Government Secondary School", "gender": "男女校"}, {"nameZh": "筲箕灣東官立中學", "nameEn": "Shau Kei Wan East Government Secondary School", "gender": "男女校"}, {"nameZh": "筲箕灣官立中學", "nameEn": "Shau Kei Wan Government Secondary School", "gender": "男女校"}, {"nameZh": "深培中學", "nameEn": "Semple Memorial Secondary School", "gender": "男女校"}, {"nameZh": "神召會康樂中學", "nameEn": "Assembly of God Hebron Secondary School", "gender": "男女校"}, {"nameZh": "聖安當女書院", "nameEn": "St. Antonius Girls' College", "gender": "女校"}, {"nameZh": "聖保祿學校", "nameEn": "St. Paul's Convent School", "gender": "女校"}, {"nameZh": "聖保祿中學", "nameEn": "St. Paul's Secondary School", "gender": "女校"}, {"nameZh": "聖保羅男女中學", "nameEn": "St. Paul's Co-educational College", "gender": "男女校"}, {"nameZh": "聖保羅書院", "nameEn": "St. Paul's College", "gender": "男校"}, {"nameZh": "聖伯多祿中學", "nameEn": "St. Peter's Secondary School", "gender": "男女校"}, {"nameZh": "聖芳濟各書院", "nameEn": "St. Francis of Assisi's College", "gender": "男女校"}, {"nameZh": "聖芳濟書院", "nameEn": "St. Francis Xavier's College", "gender": "男校"}, {"nameZh": "聖公會白約翰會督中學", "nameEn": "S.K.H. Bishop Baker Secondary School", "gender": "男女校"}, {"nameZh": "聖公會蔡功譜中學", "nameEn": "SKH Tsoi Kung Po Secondary School", "gender": "男女校"}, {"nameZh": "聖公會陳融中學", "nameEn": "S.K.H. Chan Young Secondary School", "gender": "男女校"}, {"nameZh": "聖公會鄧肇堅中學", "nameEn": "S.K.H. Tang Shiu Kin Secondary School", "gender": "男女校"}, {"nameZh": "聖公會基孝中學", "nameEn": "S.K.H. Kei Hau Secondary School", "gender": "男女校"}, {"nameZh": "聖公會李炳中學", "nameEn": "S.K.H. Li Ping Secondary School", "gender": "男女校"}, {"nameZh": "聖公會李福慶中學", "nameEn": "SKH Li Fook Hing Secondary School", "gender": "男女校"}, {"nameZh": "聖公會梁季彜中學", "nameEn": "S.K.H. Leung Kwai Yee Secondary School", "gender": "男女校"}, {"nameZh": "聖公會林護紀念中學", "nameEn": "S.K.H. Lam Woo Memorial Secondary School", "gender": "男女校"}, {"nameZh": "聖公會林裘謀中學", "nameEn": "S.K.H. Lam Kau Mow Secondary School", "gender": "男女校"}, {"nameZh": "聖公會呂明才中學", "nameEn": "S.K.H. Lui Ming Choi Secondary School", "gender": "男女校"}, {"nameZh": "聖公會莫壽增會督中學", "nameEn": "SKH Bishop Mok Sau Tseng Secondary School", "gender": "男女校"}, {"nameZh": "聖公會聖本德中學", "nameEn": "S.K.H. St. Benedict's School", "gender": "男女校"}, {"nameZh": "聖公會聖馬利亞堂莫慶堯中學", "nameEn": "S.K.H. St. Mary's Church Mok Hing Yiu College", "gender": "男女校"}, {"nameZh": "聖公會聖三一堂中學", "nameEn": "S.K.H. Holy Trinity Church Secondary School", "gender": "男女校"}, {"nameZh": "聖公會聖西門呂明才中學", "nameEn": "S.K.H. St. Simon's Lui Ming Choi Secondary School", "gender": "男女校"}, {"nameZh": "聖公會曾肇添中學", "nameEn": "S.K.H. Tsang Shiu Tim Secondary School", "gender": "男女校"}, {"nameZh": "聖公會諸聖中學", "nameEn": "S.K.H. All Saints' Middle School", "gender": "男女校"}, {"nameZh": "聖嘉勒女書院", "nameEn": "St. Clare's Girls' School", "gender": "女校"}, {"nameZh": "聖公會聖匠中學", "nameEn": "SKH Holy Carpenter Secondary School", "gender": "男女校"}, {"nameZh": "聖傑靈女子中學", "nameEn": "St. Catharine's School for Girls", "gender": "女校"}, {"nameZh": "聖類斯中學", "nameEn": "St. Louis School", "gender": "男校"}, {"nameZh": "聖羅撒書院", "nameEn": "St. Rose of Lima's College", "gender": "女校"}, {"nameZh": "聖馬可中學", "nameEn": "St. Mark's School", "gender": "男女校"}, {"nameZh": "聖瑪加利男女英文中小學", "nameEn": "St. Margaret's Co-Educational English Secondary and Primary School", "gender": "男女校"}, {"nameZh": "聖母玫瑰書院", "nameEn": "Our Lady of The Rosary College", "gender": "女校"}, {"nameZh": "聖母書院", "nameEn": "Our Lady's College", "gender": "女校"}, {"nameZh": "聖母無玷聖心書院", "nameEn": "Immaculate Heart of Mary College", "gender": "男女校"}, {"nameZh": "獻主會聖母院書院", "nameEn": "Notre Dame College", "gender": "男女校"}, {"nameZh": "聖若瑟書院", "nameEn": "St. Joseph's College", "gender": "男校"}, {"nameZh": "聖若瑟英文中學", "nameEn": "St. Joseph's Anglo-Chinese School", "gender": "男校"}, {"nameZh": "聖士提反女子中學", "nameEn": "St. Stephen's Girls' College", "gender": "女校"}, {"nameZh": "聖士提反書院", "nameEn": "St. Stephen's College", "gender": "男女校"}, {"nameZh": "聖士提反堂中學", "nameEn": "St. Stephen's Church College", "gender": "男女校"}, {"nameZh": "聖文德書院", "nameEn": "St. Bonaventure College & High School", "gender": "男女校"}, {"nameZh": "聖言中學", "nameEn": "Sing Yin Secondary School", "gender": "男校"}, {"nameZh": "聖貞德中學", "nameEn": "St. Joan of Arc Secondary School", "gender": "男女校"}, {"nameZh": "獅子會蔣翠琼中學", "nameEn": "Lions Clubs International Tseung Chui King College", "gender": "男女校"}, {"nameZh": "十八鄉鄉事委員會公益社中學", "nameEn": "SPHRC Kung Yik She Secondary School", "gender": "男女校"}, {"nameZh": "石籬天主教中學", "nameEn": "Shek Lei Catholic Secondary School", "gender": "男女校"}, {"nameZh": "世界龍岡學校劉皇發中學", "nameEn": "Lung Kong WFSL Lau Wong Fat Secondary School", "gender": "男女校"}, {"nameZh": "順德聯誼總會胡兆熾中學", "nameEn": "STFA Seaward Woo College", "gender": "男女校"}, {"nameZh": "順德聯誼總會李兆基中學", "nameEn": "Shun Tak Fraternal Association Lee Shau Kee College", "gender": "男女校"}, {"nameZh": "順德聯誼總會梁銶琚中學", "nameEn": "Shun Tak Fraternal Association Leung Kau Kui College", "gender": "男女校"}, {"nameZh": "順德聯誼總會譚伯羽中學", "nameEn": "Shun Tak Fraternal Association Tam Pak Yu College", "gender": "男女校"}, {"nameZh": "順德聯誼總會翁祐中學", "nameEn": "Shun Tak Fraternal Association Yung Yau College", "gender": "男女校"}, {"nameZh": "順德聯誼總會鄭裕彤中學", "nameEn": "Shun Tak Fraternal Association Cheng Yu Tung Secondary School", "gender": "男女校"}, {"nameZh": "順利天主教中學", "nameEn": "Shun Lee Catholic Secondary School", "gender": "男女校"}, {"nameZh": "蘇浙公學", "nameEn": "Kiangsu-Chekiang College", "gender": "男女校"}, {"nameZh": "台山商會中學", "nameEn": "Toi Shan Association College", "gender": "男女校"}, {"nameZh": "天水圍官立中學", "nameEn": "Tin Shui Wai Government Secondary School", "gender": "男女校"}, {"nameZh": "天水圍香島中學", "nameEn": "Heung To Middle School (Tin Shui Wai)", "gender": "男女校"}, {"nameZh": "天水圍循道衞理中學", "nameEn": "Tin Shui Wai Methodist College", "gender": "男女校"}, {"nameZh": "天主教崇德英文書院", "nameEn": "Shung Tak Catholic English College", "gender": "男女校"}, {"nameZh": "天主教慈幼會伍少梅中學", "nameEn": "Salesians of Don Bosco Ng Siu Mui Secondary School", "gender": "男校"}, {"nameZh": "天主教郭得勝中學", "nameEn": "Kwok Tak Seng Catholic Secondary School", "gender": "男女校"}, {"nameZh": "天主教鳴遠中學", "nameEn": "Catholic Ming Yuen Secondary School", "gender": "男女校"}, {"nameZh": "天主教母佑會蕭明中學", "nameEn": "Daughters of Mary Help of Christians Siu Ming Catholic Secondary School", "gender": "女校"}, {"nameZh": "天主教南華中學", "nameEn": "Nam Wah Catholic Secondary School", "gender": "男女校"}, {"nameZh": "天主教培聖中學", "nameEn": "Pui Shing Catholic Secondary School", "gender": "男女校"}, {"nameZh": "天主教普照中學", "nameEn": "Po Chiu Catholic Secondary School", "gender": "男女校"}, {"nameZh": "天主教伍華中學", "nameEn": "Ng Wah Catholic Secondary School", "gender": "男女校"}, {"nameZh": "天主教新民書院", "nameEn": "Newman Catholic College", "gender": "男女校"}, {"nameZh": "田家炳中學", "nameEn": "Tin Ka Ping Secondary School", "gender": "男女校"}, {"nameZh": "屯門官立中學", "nameEn": "Tuen Mun Government Secondary School", "gender": "男女校"}, {"nameZh": "屯門天主教中學", "nameEn": "Tuen Mun Catholic Secondary School", "gender": "男女校"}, {"nameZh": "王肇枝中學", "nameEn": "Wong Shiu Chi Secondary School", "gender": "男女校"}, {"nameZh": "威靈頓教育機構張沛松紀念中學", "nameEn": "WEO Chang Pui Chung Memorial School", "gender": "男女校"}, {"nameZh": "衞理中學", "nameEn": "The Methodist Church HK Wesley College", "gender": "男女校"}, {"nameZh": "文理書院（九龍）", "nameEn": "Cognitio College (Kowloon)", "gender": "男女校"}, {"nameZh": "文理書院（香港）", "nameEn": "Cognitio College (HK)", "gender": "男女校"}, {"nameZh": "五旬節林漢光中學", "nameEn": "Pentecostal Lam Hon Kwong School", "gender": "男女校"}, {"nameZh": "五旬節聖潔會永光書院", "nameEn": "PHC Wing Kwong College", "gender": "男女校"}, {"nameZh": "五旬節中學", "nameEn": "Pentecostal School", "gender": "男女校"}, {"nameZh": "五邑司徒浩中學", "nameEn": "FDBWA Szeto Ho Secondary School", "gender": "男女校"}, {"nameZh": "五育中學", "nameEn": "Ng Yuk Secondary School", "gender": "男女校"}, {"nameZh": "西貢崇真天主教學校（中學部）", "nameEn": "Sai Kung Sung Tsun Catholic School (Secondary Section)", "gender": "男女校"}, {"nameZh": "顯理中學", "nameEn": "Henrietta Secondary School", "gender": "男女校"}, {"nameZh": "香島中學", "nameEn": "Heung To Middle School", "gender": "男女校"}, {"nameZh": "香港布廠商會朱石麟中學", "nameEn": "HKWMA Chu Shek Lun Secondary School", "gender": "男女校"}, {"nameZh": "香港道教聯合會鄧顯紀念中學", "nameEn": "Hong Kong Taoist Association Tang Hin Memorial Secondary School", "gender": "男女校"}, {"nameZh": "香港道教聯合會青松中學", "nameEn": "The Hong Kong Taoist Association Ching Chung Secondary School", "gender": "男女校"}, {"nameZh": "香港道教聯合會圓玄學院第二中學", "nameEn": "Hong Kong Taoist Association The Yuen Yuen Institute No. 2 Secondary Sch.", "gender": "男女校"}, {"nameZh": "香港道教聯合會圓玄學院第三中學", "nameEn": "Hong Kong Taoist Association The Yuen Yuen Institute No. 3 Secondary Sch.", "gender": "男女校"}, {"nameZh": "香港道教聯合會圓玄學院第一中學", "nameEn": "HKTA The Yuen Yuen Institute No. 1 Secondary School", "gender": "男女校"}, {"nameZh": "香港鄧鏡波書院", "nameEn": "Hong Kong Tang King Po College", "gender": "男校"}, {"nameZh": "香港管理專業協會李國寶中學", "nameEn": "HKMA David Li Kwok Po College", "gender": "男女校"}, {"nameZh": "香港管理專業協會羅桂祥中學", "nameEn": "The Hong Kong Management Association K. S. Lo College", "gender": "男女校"}, {"nameZh": "香港航海學校", "nameEn": "Hong Kong Sea School", "gender": "男校"}, {"nameZh": "香港紅卍字會大埔卍慈中學", "nameEn": "Hong Kong Red Swastika Society Tai Po Secondary School", "gender": "男女校"}, {"nameZh": "香港華人基督教聯會真道書院", "nameEn": "HKCCCU Logos Academy", "gender": "男女校"}, {"nameZh": "香港華仁書院", "nameEn": "Wah Yan College Hong Kong", "gender": "男校"}, {"nameZh": "香港教師會李興貴中學", "nameEn": "Hong Kong Teachers' Association Lee Heng Kwei Secondary School", "gender": "男女校"}, {"nameZh": "香港教育工作者聯會黃楚標中學", "nameEn": "HKFEW Wong Cho Bau Secondary School", "gender": "男女校"}, {"nameZh": "香港浸會大學附屬學校王錦輝中小學", "nameEn": "HKBU Affiliated School Wong Kam Fai Secondary & Primary School", "gender": "男女校"}, {"nameZh": "香港九龍塘基督教中華宣道會陳瑞芝紀念中學", "nameEn": "Christian Alliance S. C. Chan Memorial College", "gender": "男女校"}, {"nameZh": "香港九龍塘基督教中華宣道會鄭榮之中學", "nameEn": "Christian Alliance Cheng Wing Gee College", "gender": "男女校"}, {"nameZh": "香港培道中學", "nameEn": "Pooi To Middle School", "gender": "女校"}, {"nameZh": "香港培正中學", "nameEn": "Pui Ching Middle School", "gender": "男女校"}, {"nameZh": "香港青年協會李兆基書院", "nameEn": "HKFYG Lee Shau Kee College", "gender": "男女校"}, {"nameZh": "香港神託會培敦中學", "nameEn": "Stewards Pooi Tun Secondary School", "gender": "男女校"}, {"nameZh": "香港神託會培基書院", "nameEn": "Stewards Pooi Kei College", "gender": "男女校"}, {"nameZh": "香港聖公會何明華會督中學", "nameEn": "HKSKH Bishop Hall Secondary School", "gender": "男女校"}, {"nameZh": "香港四邑商工總會陳南昌紀念中學", "nameEn": "HKSYC & IA Chan Nam Chong Memorial College", "gender": "男女校"}, {"nameZh": "香港四邑商工總會黃棣珊紀念中學", "nameEn": "HKSYC & IA Wong Tai Shan Memorial College", "gender": "男女校"}, {"nameZh": "香港兆基創意書院 (李兆基基金會贊助、香港當代文化中心主辦)", "nameEn": "HKICC Lee Shau Kee School of Creativity", "gender": "男女校"}, {"nameZh": "香港真光書院", "nameEn": "Hong Kong True Light College", "gender": "女校"}, {"nameZh": "香港真光中學", "nameEn": "The True Light School of Hong Kong", "gender": "女校"}, {"nameZh": "香港中國婦女會馮堯敬紀念中學", "nameEn": "HKCWC Fung Yiu King Memorial Secondary School", "gender": "男女校"}, {"nameZh": "香港中國婦女會中學", "nameEn": "Hong Kong Chinese Women's Club College", "gender": "男女校"}, {"nameZh": "香港中文大學校友會聯會陳震夏中學", "nameEn": "CUHKFAA Chan Chun Ha Secondary School", "gender": "男女校"}, {"nameZh": "香港中文大學校友會聯會張煊昌中學", "nameEn": "CUHK FAA Thomas Cheung Secondary School", "gender": "男女校"}, {"nameZh": "香港仔工業學校", "nameEn": "Aberdeen Technical School", "gender": "男校"}, {"nameZh": "香港仔浸信會呂明才書院", "nameEn": "Aberdeen Baptist Lui Ming Choi College", "gender": "男女校"}, {"nameZh": "香海正覺蓮社佛教梁植偉中學", "nameEn": "HHCKLA Buddhist Leung Chik Wai College", "gender": "男女校"}, {"nameZh": "香海正覺蓮社佛教馬錦燦紀念英文中學", "nameEn": "HHCKLA Buddhist Ma Kam Chan Memorial English Secondary School", "gender": "男女校"}, {"nameZh": "香海正覺蓮社佛教正覺中學", "nameEn": "HHCKLA Buddhist Ching Kok Secondary School", "gender": "男女校"}, {"nameZh": "協恩中學", "nameEn": "Heep Yunn School", "gender": "女校"}, {"nameZh": "新會商會陳白沙紀念中學", "nameEn": "San Wui Commercial Soc. Chan Pak Sha School", "gender": "男女校"}, {"nameZh": "新會商會中學", "nameEn": "San Wui Commercial Society Secondary School", "gender": "男女校"}, {"nameZh": "新界喇沙中學", "nameEn": "De La Salle Secondary School NT", "gender": "男女校"}, {"nameZh": "新界西貢坑口區鄭植之中學", "nameEn": "Cheng Chek Chee Secondary School of SK & HH District N.T.", "gender": "男女校"}, {"nameZh": "新界鄉議局大埔區中學", "nameEn": "N.T. Heung Yee Kuk Tai Po District Secondary School", "gender": "男女校"}, {"nameZh": "新界鄉議局元朗區中學", "nameEn": "N.T. Heung Yee Kuk Yuen Long District Secondary School", "gender": "男女校"}, {"nameZh": "新生命教育協會呂郭碧鳳中學", "nameEn": "NLSI Lui Kwok Pat Fong College", "gender": "男女校"}, {"nameZh": "新生命教育協會平安福音中學", "nameEn": "NLSI Peace Evangelical Secondary School", "gender": "男女校"}, {"nameZh": "新亞中學", "nameEn": "New Asia Middle School", "gender": "男女校"}, {"nameZh": "宣道會陳朱素華紀念中學", "nameEn": "Christian Alliance S W Chan Memorial College", "gender": "男女校"}, {"nameZh": "宣道中學", "nameEn": "Christian Alliance College", "gender": "男女校"}, {"nameZh": "李惠利中學", "nameEn": "The Methodist Lee Wai Lee College", "gender": "男女校"}, {"nameZh": "循道中學", "nameEn": "Methodist College", "gender": "男女校"}, {"nameZh": "伊利沙伯中學", "nameEn": "Queen Elizabeth School", "gender": "男女校"}, {"nameZh": "伊利沙伯中學舊生會湯國華中學", "nameEn": "Queen Elizabeth School Old Students' Association Tong Kwok Wah Sec. Sch.", "gender": "男女校"}, {"nameZh": "伊利沙伯中學舊生會中學", "nameEn": "Queen Elizabeth School Old Students' Association Secondary School", "gender": "男女校"}, {"nameZh": "伊斯蘭脫維善紀念中學", "nameEn": "Islamic Kasim Tuet Memorial College", "gender": "男女校"}, {"nameZh": "英華女學校", "nameEn": "Ying Wa Girls' School", "gender": "女校"}, {"nameZh": "英華書院", "nameEn": "Ying Wa College", "gender": "男校"}, {"nameZh": "英皇書院", "nameEn": "King's College", "gender": "男校"}, {"nameZh": "優才（楊殷有娣）書院", "nameEn": "G.T. (Ellen Yeung) College", "gender": "男女校"}, {"nameZh": "余振強紀念第二中學", "nameEn": "Yu Chun Keung Memorial College No. 2", "gender": "男女校"}, {"nameZh": "余振強紀念中學", "nameEn": "Yu Chun Keung Memorial College", "gender": "男女校"}, {"nameZh": "元朗公立中學", "nameEn": "Yuen Long Public Secondary School", "gender": "男女校"}, {"nameZh": "元朗公立中學校友會鄧兆棠中學", "nameEn": "YLPMSAA Tang Siu Tong Secondary School", "gender": "男女校"}, {"nameZh": "元朗商會中學", "nameEn": "Yuen Long Merchants Association Secondary School", "gender": "男女校"}, {"nameZh": "元朗天主教中學", "nameEn": "Yuen Long Catholic Secondary School", "gender": "男女校"}, {"nameZh": "曾璧山（崇蘭）中學", "nameEn": "Tsang Pik Shan (Sung Lan) Secondary School", "gender": "男女校"}, {"nameZh": "張振興伉儷書院", "nameEn": "Chong Gene Hang College", "gender": "男女校"}, {"nameZh": "張祝珊英文中學", "nameEn": "Cheung Chuk Shan College", "gender": "男女校"}, {"nameZh": "趙聿修紀念中學", "nameEn": "Chiu Lut Sau Memorial Secondary School", "gender": "男女校"}, {"nameZh": "真光女書院", "nameEn": "True Light Girls' College", "gender": "女校"}, {"nameZh": "中華傳道會安柱中學", "nameEn": "CNEC Christian College", "gender": "男女校"}, {"nameZh": "中華傳道會李賢堯紀念中學", "nameEn": "CNEC Lee I Yao Memorial Secondary School", "gender": "男女校"}, {"nameZh": "中華傳道會劉永生中學", "nameEn": "CNEC Lau Wing Sang Secondary School", "gender": "男女校"}, {"nameZh": "中華基督教會方潤華中學", "nameEn": "CCC Fong Yun Wah Secondary School", "gender": "男女校"}, {"nameZh": "中華基督教會馮梁結紀念中學", "nameEn": "CCC Fung Leung Kit Memorial Secondary School", "gender": "男女校"}, {"nameZh": "中華基督教會扶輪中學", "nameEn": "CCC Rotary Secondary School", "gender": "男女校"}, {"nameZh": "中華基督教會公理書院", "nameEn": "CCC Kung Lee College", "gender": "男女校"}, {"nameZh": "中華基督教會桂華山中學", "nameEn": "CCC Kwei Wah Shan College", "gender": "男女校"}, {"nameZh": "中華基督教會何福堂書院", "nameEn": "CCC Hoh Fuk Tong College", "gender": "男女校"}, {"nameZh": "中華基督教會基道中學", "nameEn": "CCC Kei To Secondary School", "gender": "男女校"}, {"nameZh": "中華基督教會基朗中學", "nameEn": "CCC Kei Long College", "gender": "男女校"}, {"nameZh": "中華基督教會基協中學", "nameEn": "CCC Kei Heep Secondary School", "gender": "男女校"}, {"nameZh": "中華基督教會基新中學", "nameEn": "CCC Kei San Secondary School", "gender": "男女校"}, {"nameZh": "中華基督教會基元中學", "nameEn": "CCC Kei Yuen College", "gender": "男女校"}, {"nameZh": "中華基督教會基智中學", "nameEn": "CCC Kei Chi Secondary School", "gender": "男女校"}, {"nameZh": "中華基督教會蒙民偉書院", "nameEn": "CCC Mong Man Wai College", "gender": "男女校"}, {"nameZh": "中華基督教會銘基書院", "nameEn": "CCC Ming Kei College", "gender": "男女校"}, {"nameZh": "中華基督教會銘賢書院", "nameEn": "CCC Ming Yin College", "gender": "男女校"}, {"nameZh": "中華基督教會全完中學", "nameEn": "CCC Chuen Yuen College", "gender": "男女校"}, {"nameZh": "中華基督教會譚李麗芬紀念中學", "nameEn": "CCC Tam Lee Lai Fun Memorial Secondary School", "gender": "男女校"}, {"nameZh": "中華基督教會協和書院", "nameEn": "CCC Heep Woh College", "gender": "男女校"}, {"nameZh": "中華基督教會燕京書院", "nameEn": "CCC Yenching College", "gender": "男女校"}, {"nameZh": "中華基督教青年會中學", "nameEn": "Chinese Y.M.C.A. Secondary School", "gender": "男女校"}, {"nameZh": "中華基金中學", "nameEn": "The Chinese Foundation Secondary School", "gender": "男女校"}, {"nameZh": "中華聖潔會靈風中學", "nameEn": "China Holiness Church Living Spirit College", "gender": "男女校"}, {"nameZh": "中聖書院", "nameEn": "China Holiness College", "gender": "男女校"}, {"nameZh": "鐘聲慈善社胡陳金枝中學", "nameEn": "Chung Sing Benevolent Society Mrs. Aw Boon Haw Secondary School", "gender": "男女校"}]
+[
+  {
+    "nameZh": "拔萃男書院",
+    "nameEn": "Diocesan Boys' School",
+    "gender": "男校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "拔萃女書院",
+    "nameEn": "Diocesan Girls' School",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "保良局羅傑承（一九八三）中學",
+    "nameEn": "Po Leung Kuk Lo Kit Sing (1983) College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "保良局百周年李兆忠紀念中學",
+    "nameEn": "Po Leung Kuk Centenary Li Shiu Chung Memorial College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "保良局第一張永慶中學",
+    "nameEn": "Po Leung Kuk No.1 W.H. Cheung College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "保良局董玉娣中學",
+    "nameEn": "Po Leung Kuk Tang Yuk Tien College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "保良局何蔭棠中學",
+    "nameEn": "Po Leung Kuk Celine Ho Yam Tong College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "保良局胡忠中學",
+    "nameEn": "Po Leung Kuk Wu Chung College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "保良局甲子何玉清中學",
+    "nameEn": "Po Leung Kuk Ho Yuk Ching (1984) College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "保良局李城璧中學",
+    "nameEn": "Po Leung Kuk Lee Shing Pik College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "保良局羅氏基金中學",
+    "nameEn": "PLK Laws Foundation College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "保良局馬錦明夫人章馥仙中學",
+    "nameEn": "PLK Mrs. Ma Kam Ming-Cheung Fook Sien College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "保良局馬錦明中學",
+    "nameEn": "Po Leung Kuk Ma Kam Ming College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "保良局唐乃勤初中書院",
+    "nameEn": "Po Leung Kuk Tong Nai Kan Junior Secondary College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "保良局顏寶鈴書院",
+    "nameEn": "Po Leung Kuk Ngan Po Ling College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "保良局姚連生中學",
+    "nameEn": "Po Leung Kuk Yao Ling Sun College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "保良局朱敬文中學",
+    "nameEn": "Po Leung Kuk C. W. Chu College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "保祿六世書院",
+    "nameEn": "Pope Paul VI College",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "寶安商會王少清中學",
+    "nameEn": "Po On Commercial Association Wong Siu Ching Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "寶覺中學",
+    "nameEn": "Po Kok Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "寶血會上智英文書院",
+    "nameEn": "Holy Trinity College",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "寶血女子中學",
+    "nameEn": "Precious Blood Secondary School",
+    "gender": "女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "北角協同中學",
+    "nameEn": "Concordia Lutheran School - North Point",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "庇理羅士女子中學",
+    "nameEn": "Belilios Public School",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "播道書院",
+    "nameEn": "Evangel College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "萬鈞伯裘書院",
+    "nameEn": "Man Kwan Pak Kau College",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "伯特利中學",
+    "nameEn": "Bethel High School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "博愛醫院八十週年鄧英喜中學",
+    "nameEn": "POH 80th Anniversary Tang Ying Hei College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "博愛醫院陳楷紀念中學",
+    "nameEn": "POH Chan Kai Memorial College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "博愛醫院鄧佩瓊紀念中學",
+    "nameEn": "Pok Oi Hospital Tang Pui King Memorial College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "博愛醫院歷屆總理聯誼會梁省德中學",
+    "nameEn": "AD&FD POHL Leung Sing Tak College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "彩虹邨天主教英文中學",
+    "nameEn": "Choi Hung Estate Catholic Secondary School",
+    "gender": "男校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "長沙灣天主教英文中學",
+    "nameEn": "Cheung Sha Wan Catholic Secondary School",
+    "gender": "男校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "長洲官立中學",
+    "nameEn": "Cheung Chau Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "廠商會蔡章閣中學",
+    "nameEn": "CMA Choi Cheung Kok Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "廠商會中學",
+    "nameEn": "CMA Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "潮州會館中學",
+    "nameEn": "Chiu Chow Association Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "陳瑞祺（喇沙）書院",
+    "nameEn": "Chan Sui Ki (La Salle) College",
+    "gender": "男校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "崇真書院",
+    "nameEn": "Tsung Tsin College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "慈幼英文學校",
+    "nameEn": "Salesian English School",
+    "gender": "男校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "大埔三育中學",
+    "nameEn": "Tai Po Sam Yuk Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "德愛中學",
+    "nameEn": "Tak Oi Secondary School",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "德蘭中學",
+    "nameEn": "St. Teresa Secondary School",
+    "gender": "女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "德望學校",
+    "nameEn": "Good Hope School",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "德信中學",
+    "nameEn": "Tak Sun Secondary School",
+    "gender": "男校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "德雅中學",
+    "nameEn": "Tak Nga Secondary School",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "德貞女子中學",
+    "nameEn": "Tack Ching Girls' Secondary School",
+    "gender": "女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "鄧鏡波學校",
+    "nameEn": "Tang King Po School",
+    "gender": "男校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "鄧肇堅維多利亞官立中學",
+    "nameEn": "Tang Shiu Kin Victoria Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "地利亞修女紀念學校（百老匯）",
+    "nameEn": "Delia Memorial School (Broadway)",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "地利亞修女紀念學校（吉利徑）",
+    "nameEn": "Delia Memorial School (Glee Path)",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "地利亞修女紀念學校（協和二中）",
+    "nameEn": "Delia Memorial School (Hip Wo No.2 College)",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "地利亞修女紀念學校（協和）",
+    "nameEn": "Delia Memorial School (Hip Wo)",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "東華三院陳兆民中學",
+    "nameEn": "TWGHs Chen Zao Men College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "東華三院馮黃鳳亭中學",
+    "nameEn": "TWGHs Mrs. Fung Wong Fung Ting College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "東華三院郭一葦中學",
+    "nameEn": "TWGHs Kwok Yat Wai College",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "東華三院黃鳳翎中學",
+    "nameEn": "TWGHs Wong Fung Ling College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "東華三院黃笏南中學",
+    "nameEn": "TWGHs Wong Fut Nam College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "東華三院甲寅年總理中學",
+    "nameEn": "TWGHs Kap Yan Directors' College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "東華三院鄺錫坤伉儷中學",
+    "nameEn": "TWGHs Mr & Mrs Kwong Sik Kwan College",
+    "gender": "男女校",
+    "banding": "暫無可靠資料"
+  },
+  {
+    "nameZh": "東華三院李嘉誠中學",
+    "nameEn": "TWGHs Li Ka Shing College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "東華三院李潤田紀念中學",
+    "nameEn": "TWGHs Lee Ching Dea Memorial College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "東華三院盧幹庭紀念中學",
+    "nameEn": "Tung Wah Group of Hospitals Lo Kon Ting Memorial College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "東華三院呂潤財紀念中學",
+    "nameEn": "TWGHs Lui Yun Choy Memorial College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "東華三院馬振玉紀念中學",
+    "nameEn": "TWGHs C.Y. Ma Memorial College",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "東華三院邱金元中學",
+    "nameEn": "TWGHs Yow Kam Yuen College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "東華三院邱子田紀念中學",
+    "nameEn": "TWGHs Yau Tze Tin Memorial College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "東華三院吳祥川紀念中學",
+    "nameEn": "TWGHs S. C. Gaw Memorial College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "東華三院伍若瑜夫人紀念中學",
+    "nameEn": "Tung Wah Group of Hospitals Mrs. Wu York Yu Memorial College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "東華三院辛亥年總理中學",
+    "nameEn": "TWGHs Sun Hoi Directors' College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "東華三院張明添中學",
+    "nameEn": "TWGHs Chang Ming Thien College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "東莞工商總會劉百樂中學",
+    "nameEn": "GCC&ITKD Lau Pak Lok Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "東涌天主教學校",
+    "nameEn": "Tung Chung Catholic School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "恩平工商會李琳明中學",
+    "nameEn": "YPI & CA Lee Lim Ming College",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "恩主教書院",
+    "nameEn": "Valtorta College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "紡織學會美國商會胡漢輝中學",
+    "nameEn": "TIACC Woo Hon Fai Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "粉嶺官立中學",
+    "nameEn": "Fanling Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "粉嶺救恩書院",
+    "nameEn": "Fanling Kau Yan College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "粉嶺禮賢會中學",
+    "nameEn": "Fanling Rhenish Church Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "風采中學（教育評議會主辦）",
+    "nameEn": "Elegantia College (Sponsored by Education Convergence)",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "鳳溪第一中學",
+    "nameEn": "Fung Kai No. 1 Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "鳳溪廖萬石堂中學",
+    "nameEn": "Fung Kai Liu Man Shek Tong Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "佛教大光慈航中學",
+    "nameEn": "Buddhist Tai Kwong Chi Hong College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "佛教大雄中學",
+    "nameEn": "Buddhist Tai Hung College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "佛教筏可紀念中學",
+    "nameEn": "Buddhist Fat Ho Memorial College",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "佛教何南金中學",
+    "nameEn": "Buddhist Ho Nam Kam College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "佛教黃鳳翎中學",
+    "nameEn": "Buddhist Wong Fung Ling College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "佛教黃允畋中學",
+    "nameEn": "Buddhist Wong Wan Tin College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "佛教覺光法師中學",
+    "nameEn": "Buddhist Kok Kwong Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "佛教孔仙洲紀念中學",
+    "nameEn": "Buddhist Hung Sean Chau Memorial College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "佛教茂峰法師紀念中學",
+    "nameEn": "Buddhist Mau Fung Memorial College",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "佛教善德英文中學",
+    "nameEn": "Buddhist Sin Tak College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "佛教沈香林紀念中學",
+    "nameEn": "Buddhist Sum Heung Lam Memorial College",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "佛教葉紀南紀念中學",
+    "nameEn": "Buddhist Yip Kei Nam Memorial College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "佛教志蓮中學",
+    "nameEn": "Chi Lin Buddhist Secondary School",
+    "gender": "男女校",
+    "banding": "暫無可靠資料"
+  },
+  {
+    "nameZh": "福建中學",
+    "nameEn": "Fukien Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "福建中學（小西灣）",
+    "nameEn": "Fukien Secondary School (Siu Sai Wan)",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "港澳信義會慕德中學",
+    "nameEn": "HKMLC Queen Maud Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "港大同學會書院",
+    "nameEn": "HKUGA College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "港島民生書院",
+    "nameEn": "Munsang College (Hong Kong Island)",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "港九潮州公會中學",
+    "nameEn": "HK & KLN Chiu Chow Public Assn. Sec. School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "港九街坊婦女會孫方中書院",
+    "nameEn": "HK & KLN Kaifong Women's Association Sun Fong Chung College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "港青基信書院",
+    "nameEn": "YMCA of Hong Kong Christian College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "高雷中學",
+    "nameEn": "Ko Lui Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "高主教書院",
+    "nameEn": "Raimondi College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "官立嘉道理爵士中學（西九龍）",
+    "nameEn": "Sir Ellis Kadoorie Secondary School (West Kowloon)",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "觀塘功樂官立中學",
+    "nameEn": "Kwun Tong Kung Lok Government Secondary School",
+    "gender": "男校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "觀塘官立中學",
+    "nameEn": "Kwun Tong Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "觀塘瑪利諾書院",
+    "nameEn": "Kwun Tong Maryknoll College",
+    "gender": "男校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "漢華中學",
+    "nameEn": "Hon Wah College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "何東中學",
+    "nameEn": "Hotung Secondary School",
+    "gender": "女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "何明華會督銀禧中學",
+    "nameEn": "Bishop Hall Jubilee School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "何文田官立中學",
+    "nameEn": "Homantin Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "華仁書院（九龍）",
+    "nameEn": "Wah Yan College, Kowloon",
+    "gender": "男校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "華英中學",
+    "nameEn": "Wa Ying College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "皇仁舊生會中學",
+    "nameEn": "Queen's College Old Boys' Association Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "皇仁書院",
+    "nameEn": "Queen's College",
+    "gender": "男校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "惠僑英文中學",
+    "nameEn": "Wai Kiu College",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "滙基書院",
+    "nameEn": "United Christian College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "滙基書院（東九龍）",
+    "nameEn": "United Christian College (Kowloon East)",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "萬鈞匯知中學",
+    "nameEn": "Man Kwan QualiEd College",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "基督教崇真中學",
+    "nameEn": "Tsung Tsin Christian Academy",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "基督教女青年會丘佐榮中學",
+    "nameEn": "The Y.W.C.A. Hioe Tjo Yoeng College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "基督教聖約教會堅樂中學",
+    "nameEn": "The Mission Covenant Church Holm Glad College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "基督教香港信義會宏信書院",
+    "nameEn": "ELCHK Lutheran Academy",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "基督教香港信義會心誠中學",
+    "nameEn": "Fanling Lutheran Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "基督教香港信義會信義中學",
+    "nameEn": "ELCHK Lutheran Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "基督教香港信義會元朗信義中學",
+    "nameEn": "The ELCHK Yuen Long Lutheran Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "基督教宣道會宣基中學",
+    "nameEn": "Christian & Missionary Alliance Sun Kei Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "基督教中國佈道會聖道迦南書院",
+    "nameEn": "ECF Saint Too Canaan College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "基督書院",
+    "nameEn": "Christ College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "加拿大神召會嘉智中學",
+    "nameEn": "PAOC Ka Chi Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "迦密愛禮信中學",
+    "nameEn": "Carmel Alison Lam Foundation Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "迦密柏雨中學",
+    "nameEn": "Carmel Pak U Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "迦密聖道中學",
+    "nameEn": "Carmel Holy Word Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "迦密唐賓南紀念中學",
+    "nameEn": "Carmel Bunnan Tong Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "迦密中學",
+    "nameEn": "Carmel Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "迦密主恩中學",
+    "nameEn": "Carmel Divine Grace Foundation Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "嘉諾撒培德書院",
+    "nameEn": "Pui Tak Canossian College",
+    "gender": "女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "嘉諾撒聖方濟各書院",
+    "nameEn": "St. Francis' Canossian College",
+    "gender": "女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "嘉諾撒聖家書院",
+    "nameEn": "Holy Family Canossian College",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "嘉諾撒聖瑪利書院",
+    "nameEn": "St. Mary's Canossian College",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "嘉諾撒聖心書院",
+    "nameEn": "Sacred Heart Canossian College",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "嘉諾撒書院",
+    "nameEn": "Canossa College",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "將軍澳官立中學",
+    "nameEn": "Tseung Kwan O Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "將軍澳香島中學",
+    "nameEn": "Heung To Secondary School (Tseung Kwan O)",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "潔心林炳炎中學",
+    "nameEn": "Kit Sam Lam Bing Yim Secondary School",
+    "gender": "女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "金巴崙長老會耀道中學",
+    "nameEn": "Cumberland Presbyterian Church Yao Dao Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "金文泰中學",
+    "nameEn": "Clementi Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "浸信會呂明才中學",
+    "nameEn": "Baptist Lui Ming Choi Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "浸信會永隆中學",
+    "nameEn": "Baptist Wing Lung Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "景嶺書院",
+    "nameEn": "King Ling College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "九龍工業學校",
+    "nameEn": "Kowloon Technical School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "九龍三育中學",
+    "nameEn": "Kowloon Sam Yuk Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "九龍塘學校（中學部）",
+    "nameEn": "Kowloon Tong School (Secondary Section)",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "九龍真光中學",
+    "nameEn": "Kowloon True Light School",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "救恩書院",
+    "nameEn": "Kau Yan College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "救世軍卜維廉中學",
+    "nameEn": "Salvation Army William Booth Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "可道中學（嗇色園主辦）",
+    "nameEn": "Ho Dao College (Sponsored by Sik Sik Yuen)",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "可風中學（嗇色園主辦）",
+    "nameEn": "Ho Fung College (Sponsored by Sik Sik Yuen)",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "可立中學（嗇色園主辦）",
+    "nameEn": "Ho Lap College (Sponsored by the Sik Sik Yuen)",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "孔教學院大成何郭佩珍中學",
+    "nameEn": "Confucian Tai Shing Ho Kwok Pui Chun College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "孔聖堂禮仁書院",
+    "nameEn": "Academy of Innovation (Confucius Hall)",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "葵涌蘇浙公學",
+    "nameEn": "Kiangsu - Chekiang College (Kwai Chung)",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "葵涌循道中學",
+    "nameEn": "Kwai Chung Methodist College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "喇沙書院",
+    "nameEn": "La Salle College",
+    "gender": "男校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "藍田聖保祿中學",
+    "nameEn": "St. Paul's School (Lam Tin)",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "創知中學",
+    "nameEn": "Scientia Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "樂道中學",
+    "nameEn": "Lock Tao Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "樂善堂顧超文中學",
+    "nameEn": "Lok Sin Tong Ku Chiu Man Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "樂善堂梁銶琚書院",
+    "nameEn": "Lok Sin Tong Leung Kau Kui College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "樂善堂梁植偉紀念中學",
+    "nameEn": "Lok Sin Tong Leung Chik Wai Memorial School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "樂善堂王仲銘中學",
+    "nameEn": "Lok Sin Tong Wong Chung Ming Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "樂善堂楊葛小琳中學",
+    "nameEn": "Lok Sin Tong Young Ko Hsiao Lin Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "樂善堂余近卿中學",
+    "nameEn": "Lok Sin Tong Yu Kan Hing Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "李求恩紀念中學",
+    "nameEn": "Lee Kau Yan Memorial School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "禮賢會彭學高紀念中學",
+    "nameEn": "Rhenish Church Pang Hok Ko Memorial College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "荔景天主教中學",
+    "nameEn": "Lai King Catholic Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "麗澤中學",
+    "nameEn": "Lai Chack Middle School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "梁式芝書院",
+    "nameEn": "Leung Shek Chee College",
+    "gender": "女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "梁文燕紀念中學（沙田）",
+    "nameEn": "Helen Liang Memorial Secondary School (Shatin)",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "廖寶珊紀念書院",
+    "nameEn": "Liu Po Shan Memorial College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "林大輝中學",
+    "nameEn": "Lam Tai Fai College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "靈糧堂劉梅軒中學",
+    "nameEn": "Ling Liang Church M H Lau Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "靈糧堂怡文中學",
+    "nameEn": "Ling Liang Church E Wun Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "嶺南衡怡紀念中學",
+    "nameEn": "Lingnan Hang Yee Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "嶺南中學",
+    "nameEn": "Lingnan Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "嶺南鍾榮光博士紀念中學",
+    "nameEn": "Lingnan Dr. Chung Wing Kwong Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "路德會呂明才中學",
+    "nameEn": "Lui Ming Choi Lutheran College",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "路德會呂祥光中學",
+    "nameEn": "Lui Cheung Kwong Lutheran College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "路德會西門英才中學",
+    "nameEn": "Gertrude Simon Lutheran College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "路德會協同中學",
+    "nameEn": "Concordia Lutheran School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "旅港開平商會中學",
+    "nameEn": "Hoi Ping Chamber of Commerce Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "羅定邦中學",
+    "nameEn": "Law Ting Pong Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "馬鞍山崇真中學",
+    "nameEn": "Ma On Shan Tsung Tsin Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "馬鞍山聖若瑟中學",
+    "nameEn": "Ma On Shan St. Joseph's Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "馬錦明慈善基金馬陳端喜紀念中學",
+    "nameEn": "MKMCF Ma Chan Duen Hey Memorial College",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "馬錦明慈善基金馬可賓紀念中學",
+    "nameEn": "Stewards MKMCF Ma Ko Pan Memorial College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "瑪利曼中學",
+    "nameEn": "Marymount Secondary School",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "瑪利諾神父教會學校",
+    "nameEn": "Maryknoll Fathers' School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "瑪利諾修院學校（中學部）",
+    "nameEn": "Maryknoll Convent School (Secondary Section)",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "瑪利諾中學",
+    "nameEn": "Maryknoll Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "棉紡會中學",
+    "nameEn": "Cotton Spinners Association Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "圓玄學院妙法寺內明陳呂重德紀念中學",
+    "nameEn": "The Yuen Yuen Institute MFBM Nei Ming Chan Lui Chung Tak Mem. College",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "妙法寺劉金龍中學",
+    "nameEn": "Madam Lau Kam Lung Secondary School of Miu Fat Buddhist Monastery",
+    "gender": "女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "民生書院",
+    "nameEn": "Munsang College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "閩僑中學",
+    "nameEn": "Man Kiu College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "明愛柴灣馬登基金中學",
+    "nameEn": "Caritas Chai Wan Marden Foundation Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "明愛粉嶺陳震夏中學",
+    "nameEn": "Caritas Fanling Chan Chun Ha Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "明愛胡振中書院",
+    "nameEn": "Caritas Wu Cheng-Chung College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "明愛馬鞍山中學",
+    "nameEn": "Caritas Ma On Shan Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "明愛聖若瑟中學",
+    "nameEn": "Caritas St. Joseph Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "明愛屯門馬登基金中學",
+    "nameEn": "Caritas Tuen Mun Marden Foundation Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "明愛元朗陳震夏中學",
+    "nameEn": "Caritas Yuen Long Chan Chun Ha Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "明愛莊月明中學",
+    "nameEn": "Caritas Chong Yuet Ming Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "慕光英文書院",
+    "nameEn": "Mu Kuang English School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "南屯門官立中學",
+    "nameEn": "South Tuen Mun Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "南亞路德會沐恩中學",
+    "nameEn": "SALEM-Immanuel Lutheran College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "寧波第二中學",
+    "nameEn": "Ning Po No. 2 College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "寧波公學",
+    "nameEn": "Ning Po College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "炮台山循道衛理中學",
+    "nameEn": "Fortress Hill Methodist Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "培僑書院",
+    "nameEn": "Pui Kiu College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "培僑中學",
+    "nameEn": "Pui Kiu Middle School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "培英中學",
+    "nameEn": "Pui Ying Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "啓思中學",
+    "nameEn": "Creative Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "青年會書院",
+    "nameEn": "Chinese Y.M.C.A. College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "青松侯寶垣中學",
+    "nameEn": "Ching Chung Hau Po Woon Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "裘錦秋中學（葵涌）",
+    "nameEn": "Ju Ching Chu Secondary School (Kwai Chung)",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "裘錦秋中學（屯門）",
+    "nameEn": "Ju Ching Chu Secondary School (Tuen Mun)",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "裘錦秋中學（元朗）",
+    "nameEn": "Ju Ching Chu Secondary School (Yuen Long)",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "荃灣公立何傳耀紀念中學",
+    "nameEn": "Tsuen Wan Public Ho Chuen Yiu Memorial College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "荃灣官立中學",
+    "nameEn": "Tsuen Wan Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "荃灣聖芳濟中學",
+    "nameEn": "St. Francis Xavier's School Tsuen Wan",
+    "gender": "男校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "仁愛堂陳黃淑芳紀念中學",
+    "nameEn": "Yan Oi Tong Chan Wong Suk Fong Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "仁愛堂田家炳中學",
+    "nameEn": "Yan Oi Tong Tin Ka Ping Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "仁濟醫院第二中學",
+    "nameEn": "Yan Chai Hospital No. 2 Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "仁濟醫院董之英紀念中學",
+    "nameEn": "Yan Chai Hospital Tung Chi Ying Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "仁濟醫院靚次伯紀念中學",
+    "nameEn": "Yan Chai Hospital Lan Chi Pat Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "仁濟醫院林百欣中學",
+    "nameEn": "YCH Lim Por Yen Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "仁濟醫院羅陳楚思中學",
+    "nameEn": "Yan Chai Hospital Law Chan Chor Si College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "仁濟醫院王華湘中學",
+    "nameEn": "Yan Chai Hospital Wong Wha San Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "賽馬會官立中學",
+    "nameEn": "Jockey Club Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "賽馬會體藝中學",
+    "nameEn": "Jockey Club Ti-I College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "賽馬會萬鈞毅智書院",
+    "nameEn": "Jockey Club Man Kwan EduYoung College",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "嗇色園主辦可藝中學",
+    "nameEn": "Ho Ngai College (Sponsored by Sik Sik Yuen)",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "嗇色園主辦可譽中學暨可譽小學",
+    "nameEn": "Ho Yu College and Primary School (Sponsored by Sik Sik Yuen)",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "沙田崇真中學",
+    "nameEn": "Shatin Tsung Tsin Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "沙田官立中學",
+    "nameEn": "Sha Tin Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "沙田培英中學",
+    "nameEn": "Shatin Pui Ying College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "沙田蘇浙公學",
+    "nameEn": "Kiangsu-Chekiang College (Shatin)",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "沙田循道衞理中學",
+    "nameEn": "Sha Tin Methodist College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "上水官立中學",
+    "nameEn": "Sheung Shui Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "筲箕灣東官立中學",
+    "nameEn": "Shau Kei Wan East Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "筲箕灣官立中學",
+    "nameEn": "Shau Kei Wan Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "深培中學",
+    "nameEn": "Semple Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "神召會康樂中學",
+    "nameEn": "Assembly of God Hebron Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "聖安當女書院",
+    "nameEn": "St. Antonius Girls' College",
+    "gender": "女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "聖保祿學校",
+    "nameEn": "St. Paul's Convent School",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "聖保祿中學",
+    "nameEn": "St. Paul's Secondary School",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "聖保羅男女中學",
+    "nameEn": "St. Paul's Co-educational College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "聖保羅書院",
+    "nameEn": "St. Paul's College",
+    "gender": "男校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "聖伯多祿中學",
+    "nameEn": "St. Peter's Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "聖芳濟各書院",
+    "nameEn": "St. Francis of Assisi's College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "聖芳濟書院",
+    "nameEn": "St. Francis Xavier's College",
+    "gender": "男校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "聖公會白約翰會督中學",
+    "nameEn": "S.K.H. Bishop Baker Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "聖公會蔡功譜中學",
+    "nameEn": "SKH Tsoi Kung Po Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "聖公會陳融中學",
+    "nameEn": "S.K.H. Chan Young Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "聖公會鄧肇堅中學",
+    "nameEn": "S.K.H. Tang Shiu Kin Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "聖公會基孝中學",
+    "nameEn": "S.K.H. Kei Hau Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "聖公會李炳中學",
+    "nameEn": "S.K.H. Li Ping Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "聖公會李福慶中學",
+    "nameEn": "SKH Li Fook Hing Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "聖公會梁季彜中學",
+    "nameEn": "S.K.H. Leung Kwai Yee Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "聖公會林護紀念中學",
+    "nameEn": "S.K.H. Lam Woo Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "聖公會林裘謀中學",
+    "nameEn": "S.K.H. Lam Kau Mow Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "聖公會呂明才中學",
+    "nameEn": "S.K.H. Lui Ming Choi Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "聖公會莫壽增會督中學",
+    "nameEn": "SKH Bishop Mok Sau Tseng Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "聖公會聖本德中學",
+    "nameEn": "S.K.H. St. Benedict's School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "聖公會聖馬利亞堂莫慶堯中學",
+    "nameEn": "S.K.H. St. Mary's Church Mok Hing Yiu College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "聖公會聖三一堂中學",
+    "nameEn": "S.K.H. Holy Trinity Church Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "聖公會聖西門呂明才中學",
+    "nameEn": "S.K.H. St. Simon's Lui Ming Choi Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "聖公會曾肇添中學",
+    "nameEn": "S.K.H. Tsang Shiu Tim Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "聖公會諸聖中學",
+    "nameEn": "S.K.H. All Saints' Middle School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "聖嘉勒女書院",
+    "nameEn": "St. Clare's Girls' School",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "聖公會聖匠中學",
+    "nameEn": "SKH Holy Carpenter Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "聖傑靈女子中學",
+    "nameEn": "St. Catharine's School for Girls",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "聖類斯中學",
+    "nameEn": "St. Louis School",
+    "gender": "男校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "聖羅撒書院",
+    "nameEn": "St. Rose of Lima's College",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "聖馬可中學",
+    "nameEn": "St. Mark's School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "聖瑪加利男女英文中小學",
+    "nameEn": "St. Margaret's Co-Educational English Secondary and Primary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "聖母玫瑰書院",
+    "nameEn": "Our Lady of The Rosary College",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "聖母書院",
+    "nameEn": "Our Lady's College",
+    "gender": "女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "聖母無玷聖心書院",
+    "nameEn": "Immaculate Heart of Mary College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "獻主會聖母院書院",
+    "nameEn": "Notre Dame College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "聖若瑟書院",
+    "nameEn": "St. Joseph's College",
+    "gender": "男校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "聖若瑟英文中學",
+    "nameEn": "St. Joseph's Anglo-Chinese School",
+    "gender": "男校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "聖士提反女子中學",
+    "nameEn": "St. Stephen's Girls' College",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "聖士提反書院",
+    "nameEn": "St. Stephen's College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "聖士提反堂中學",
+    "nameEn": "St. Stephen's Church College",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "聖文德書院",
+    "nameEn": "St. Bonaventure College & High School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "聖言中學",
+    "nameEn": "Sing Yin Secondary School",
+    "gender": "男校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "聖貞德中學",
+    "nameEn": "St. Joan of Arc Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "獅子會蔣翠琼中學",
+    "nameEn": "Lions Clubs International Tseung Chui King College",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "十八鄉鄉事委員會公益社中學",
+    "nameEn": "SPHRC Kung Yik She Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "石籬天主教中學",
+    "nameEn": "Shek Lei Catholic Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "世界龍岡學校劉皇發中學",
+    "nameEn": "Lung Kong WFSL Lau Wong Fat Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "順德聯誼總會胡兆熾中學",
+    "nameEn": "STFA Seaward Woo College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "順德聯誼總會李兆基中學",
+    "nameEn": "Shun Tak Fraternal Association Lee Shau Kee College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "順德聯誼總會梁銶琚中學",
+    "nameEn": "Shun Tak Fraternal Association Leung Kau Kui College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "順德聯誼總會譚伯羽中學",
+    "nameEn": "Shun Tak Fraternal Association Tam Pak Yu College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "順德聯誼總會翁祐中學",
+    "nameEn": "Shun Tak Fraternal Association Yung Yau College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "順德聯誼總會鄭裕彤中學",
+    "nameEn": "Shun Tak Fraternal Association Cheng Yu Tung Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "順利天主教中學",
+    "nameEn": "Shun Lee Catholic Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "蘇浙公學",
+    "nameEn": "Kiangsu-Chekiang College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "台山商會中學",
+    "nameEn": "Toi Shan Association College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "天水圍官立中學",
+    "nameEn": "Tin Shui Wai Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "天水圍香島中學",
+    "nameEn": "Heung To Middle School (Tin Shui Wai)",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "天水圍循道衞理中學",
+    "nameEn": "Tin Shui Wai Methodist College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "天主教崇德英文書院",
+    "nameEn": "Shung Tak Catholic English College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "天主教慈幼會伍少梅中學",
+    "nameEn": "Salesians of Don Bosco Ng Siu Mui Secondary School",
+    "gender": "男校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "天主教郭得勝中學",
+    "nameEn": "Kwok Tak Seng Catholic Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "天主教鳴遠中學",
+    "nameEn": "Catholic Ming Yuen Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "天主教母佑會蕭明中學",
+    "nameEn": "Daughters of Mary Help of Christians Siu Ming Catholic Secondary School",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "天主教南華中學",
+    "nameEn": "Nam Wah Catholic Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "天主教培聖中學",
+    "nameEn": "Pui Shing Catholic Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "天主教普照中學",
+    "nameEn": "Po Chiu Catholic Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "天主教伍華中學",
+    "nameEn": "Ng Wah Catholic Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "天主教新民書院",
+    "nameEn": "Newman Catholic College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "田家炳中學",
+    "nameEn": "Tin Ka Ping Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "屯門官立中學",
+    "nameEn": "Tuen Mun Government Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "屯門天主教中學",
+    "nameEn": "Tuen Mun Catholic Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "王肇枝中學",
+    "nameEn": "Wong Shiu Chi Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "威靈頓教育機構張沛松紀念中學",
+    "nameEn": "WEO Chang Pui Chung Memorial School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "衞理中學",
+    "nameEn": "The Methodist Church HK Wesley College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "文理書院（九龍）",
+    "nameEn": "Cognitio College (Kowloon)",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "文理書院（香港）",
+    "nameEn": "Cognitio College (HK)",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "五旬節林漢光中學",
+    "nameEn": "Pentecostal Lam Hon Kwong School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "五旬節聖潔會永光書院",
+    "nameEn": "PHC Wing Kwong College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "五旬節中學",
+    "nameEn": "Pentecostal School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "五邑司徒浩中學",
+    "nameEn": "FDBWA Szeto Ho Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "五育中學",
+    "nameEn": "Ng Yuk Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "西貢崇真天主教學校（中學部）",
+    "nameEn": "Sai Kung Sung Tsun Catholic School (Secondary Section)",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "顯理中學",
+    "nameEn": "Henrietta Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "香島中學",
+    "nameEn": "Heung To Middle School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "香港布廠商會朱石麟中學",
+    "nameEn": "HKWMA Chu Shek Lun Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "香港道教聯合會鄧顯紀念中學",
+    "nameEn": "Hong Kong Taoist Association Tang Hin Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "香港道教聯合會青松中學",
+    "nameEn": "The Hong Kong Taoist Association Ching Chung Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "香港道教聯合會圓玄學院第二中學",
+    "nameEn": "Hong Kong Taoist Association The Yuen Yuen Institute No. 2 Secondary Sch.",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "香港道教聯合會圓玄學院第三中學",
+    "nameEn": "Hong Kong Taoist Association The Yuen Yuen Institute No. 3 Secondary Sch.",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "香港道教聯合會圓玄學院第一中學",
+    "nameEn": "HKTA The Yuen Yuen Institute No. 1 Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "香港鄧鏡波書院",
+    "nameEn": "Hong Kong Tang King Po College",
+    "gender": "男校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "香港管理專業協會李國寶中學",
+    "nameEn": "HKMA David Li Kwok Po College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "香港管理專業協會羅桂祥中學",
+    "nameEn": "The Hong Kong Management Association K. S. Lo College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "香港航海學校",
+    "nameEn": "Hong Kong Sea School",
+    "gender": "男校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "香港紅卍字會大埔卍慈中學",
+    "nameEn": "Hong Kong Red Swastika Society Tai Po Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  },
+  {
+    "nameZh": "香港華人基督教聯會真道書院",
+    "nameEn": "HKCCCU Logos Academy",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "香港華仁書院",
+    "nameEn": "Wah Yan College Hong Kong",
+    "gender": "男校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "香港教師會李興貴中學",
+    "nameEn": "Hong Kong Teachers' Association Lee Heng Kwei Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "香港教育工作者聯會黃楚標中學",
+    "nameEn": "HKFEW Wong Cho Bau Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "香港浸會大學附屬學校王錦輝中小學",
+    "nameEn": "HKBU Affiliated School Wong Kam Fai Secondary & Primary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "香港九龍塘基督教中華宣道會陳瑞芝紀念中學",
+    "nameEn": "Christian Alliance S. C. Chan Memorial College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "香港九龍塘基督教中華宣道會鄭榮之中學",
+    "nameEn": "Christian Alliance Cheng Wing Gee College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "香港培道中學",
+    "nameEn": "Pooi To Middle School",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "香港培正中學",
+    "nameEn": "Pui Ching Middle School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "香港青年協會李兆基書院",
+    "nameEn": "HKFYG Lee Shau Kee College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "香港神託會培敦中學",
+    "nameEn": "Stewards Pooi Tun Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "香港神託會培基書院",
+    "nameEn": "Stewards Pooi Kei College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "香港聖公會何明華會督中學",
+    "nameEn": "HKSKH Bishop Hall Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "香港四邑商工總會陳南昌紀念中學",
+    "nameEn": "HKSYC & IA Chan Nam Chong Memorial College",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "香港四邑商工總會黃棣珊紀念中學",
+    "nameEn": "HKSYC & IA Wong Tai Shan Memorial College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "香港兆基創意書院 (李兆基基金會贊助、香港當代文化中心主辦)",
+    "nameEn": "HKICC Lee Shau Kee School of Creativity",
+    "gender": "男女校",
+    "banding": "暫無可靠資料"
+  },
+  {
+    "nameZh": "香港真光書院",
+    "nameEn": "Hong Kong True Light College",
+    "gender": "女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "香港真光中學",
+    "nameEn": "The True Light School of Hong Kong",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "香港中國婦女會馮堯敬紀念中學",
+    "nameEn": "HKCWC Fung Yiu King Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "香港中國婦女會中學",
+    "nameEn": "Hong Kong Chinese Women's Club College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "香港中文大學校友會聯會陳震夏中學",
+    "nameEn": "CUHKFAA Chan Chun Ha Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "香港中文大學校友會聯會張煊昌中學",
+    "nameEn": "CUHK FAA Thomas Cheung Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "香港仔工業學校",
+    "nameEn": "Aberdeen Technical School",
+    "gender": "男校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "香港仔浸信會呂明才書院",
+    "nameEn": "Aberdeen Baptist Lui Ming Choi College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "香海正覺蓮社佛教梁植偉中學",
+    "nameEn": "HHCKLA Buddhist Leung Chik Wai College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "香海正覺蓮社佛教馬錦燦紀念英文中學",
+    "nameEn": "HHCKLA Buddhist Ma Kam Chan Memorial English Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "香海正覺蓮社佛教正覺中學",
+    "nameEn": "HHCKLA Buddhist Ching Kok Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "協恩中學",
+    "nameEn": "Heep Yunn School",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "新會商會陳白沙紀念中學",
+    "nameEn": "San Wui Commercial Soc. Chan Pak Sha School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "新會商會中學",
+    "nameEn": "San Wui Commercial Society Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "新界喇沙中學",
+    "nameEn": "De La Salle Secondary School NT",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "新界西貢坑口區鄭植之中學",
+    "nameEn": "Cheng Chek Chee Secondary School of SK & HH District N.T.",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "新界鄉議局大埔區中學",
+    "nameEn": "N.T. Heung Yee Kuk Tai Po District Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "新界鄉議局元朗區中學",
+    "nameEn": "N.T. Heung Yee Kuk Yuen Long District Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "新生命教育協會呂郭碧鳳中學",
+    "nameEn": "NLSI Lui Kwok Pat Fong College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "新生命教育協會平安福音中學",
+    "nameEn": "NLSI Peace Evangelical Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "新亞中學",
+    "nameEn": "New Asia Middle School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "宣道會陳朱素華紀念中學",
+    "nameEn": "Christian Alliance S W Chan Memorial College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "宣道中學",
+    "nameEn": "Christian Alliance College",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "李惠利中學",
+    "nameEn": "The Methodist Lee Wai Lee College",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "循道中學",
+    "nameEn": "Methodist College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "伊利沙伯中學",
+    "nameEn": "Queen Elizabeth School",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "伊利沙伯中學舊生會湯國華中學",
+    "nameEn": "Queen Elizabeth School Old Students' Association Tong Kwok Wah Sec. Sch.",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "伊利沙伯中學舊生會中學",
+    "nameEn": "Queen Elizabeth School Old Students' Association Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "伊斯蘭脫維善紀念中學",
+    "nameEn": "Islamic Kasim Tuet Memorial College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "英華女學校",
+    "nameEn": "Ying Wa Girls' School",
+    "gender": "女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "英華書院",
+    "nameEn": "Ying Wa College",
+    "gender": "男校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "英皇書院",
+    "nameEn": "King's College",
+    "gender": "男校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "優才（楊殷有娣）書院",
+    "nameEn": "G.T. (Ellen Yeung) College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "余振強紀念第二中學",
+    "nameEn": "Yu Chun Keung Memorial College No. 2",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "余振強紀念中學",
+    "nameEn": "Yu Chun Keung Memorial College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "元朗公立中學",
+    "nameEn": "Yuen Long Public Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "元朗公立中學校友會鄧兆棠中學",
+    "nameEn": "YLPMSAA Tang Siu Tong Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "元朗商會中學",
+    "nameEn": "Yuen Long Merchants Association Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "元朗天主教中學",
+    "nameEn": "Yuen Long Catholic Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "曾璧山（崇蘭）中學",
+    "nameEn": "Tsang Pik Shan (Sung Lan) Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "張振興伉儷書院",
+    "nameEn": "Chong Gene Hang College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "張祝珊英文中學",
+    "nameEn": "Cheung Chuk Shan College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "趙聿修紀念中學",
+    "nameEn": "Chiu Lut Sau Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "真光女書院",
+    "nameEn": "True Light Girls' College",
+    "gender": "女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "中華傳道會安柱中學",
+    "nameEn": "CNEC Christian College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "中華傳道會李賢堯紀念中學",
+    "nameEn": "CNEC Lee I Yao Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "中華傳道會劉永生中學",
+    "nameEn": "CNEC Lau Wing Sang Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "中華基督教會方潤華中學",
+    "nameEn": "CCC Fong Yun Wah Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "中華基督教會馮梁結紀念中學",
+    "nameEn": "CCC Fung Leung Kit Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "中華基督教會扶輪中學",
+    "nameEn": "CCC Rotary Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "中華基督教會公理書院",
+    "nameEn": "CCC Kung Lee College",
+    "gender": "男女校",
+    "banding": "暫無可靠資料"
+  },
+  {
+    "nameZh": "中華基督教會桂華山中學",
+    "nameEn": "CCC Kwei Wah Shan College",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "中華基督教會何福堂書院",
+    "nameEn": "CCC Hoh Fuk Tong College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "中華基督教會基道中學",
+    "nameEn": "CCC Kei To Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "中華基督教會基朗中學",
+    "nameEn": "CCC Kei Long College",
+    "gender": "男女校",
+    "banding": "Band 2A"
+  },
+  {
+    "nameZh": "中華基督教會基協中學",
+    "nameEn": "CCC Kei Heep Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "中華基督教會基新中學",
+    "nameEn": "CCC Kei San Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "中華基督教會基元中學",
+    "nameEn": "CCC Kei Yuen College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "中華基督教會基智中學",
+    "nameEn": "CCC Kei Chi Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "中華基督教會蒙民偉書院",
+    "nameEn": "CCC Mong Man Wai College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "中華基督教會銘基書院",
+    "nameEn": "CCC Ming Kei College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "中華基督教會銘賢書院",
+    "nameEn": "CCC Ming Yin College",
+    "gender": "男女校",
+    "banding": "Band 1A"
+  },
+  {
+    "nameZh": "中華基督教會全完中學",
+    "nameEn": "CCC Chuen Yuen College",
+    "gender": "男女校",
+    "banding": "Band 1C"
+  },
+  {
+    "nameZh": "中華基督教會譚李麗芬紀念中學",
+    "nameEn": "CCC Tam Lee Lai Fun Memorial Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3B"
+  },
+  {
+    "nameZh": "中華基督教會協和書院",
+    "nameEn": "CCC Heep Woh College",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "中華基督教會燕京書院",
+    "nameEn": "CCC Yenching College",
+    "gender": "男女校",
+    "banding": "Band 2C"
+  },
+  {
+    "nameZh": "中華基督教青年會中學",
+    "nameEn": "Chinese Y.M.C.A. Secondary School",
+    "gender": "男女校",
+    "banding": "Band 2B"
+  },
+  {
+    "nameZh": "中華基金中學",
+    "nameEn": "The Chinese Foundation Secondary School",
+    "gender": "男女校",
+    "banding": "Band 1B"
+  },
+  {
+    "nameZh": "中華聖潔會靈風中學",
+    "nameEn": "China Holiness Church Living Spirit College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "中聖書院",
+    "nameEn": "China Holiness College",
+    "gender": "男女校",
+    "banding": "Band 3A"
+  },
+  {
+    "nameZh": "鐘聲慈善社胡陳金枝中學",
+    "nameEn": "Chung Sing Benevolent Society Mrs. Aw Boon Haw Secondary School",
+    "gender": "男女校",
+    "banding": "Band 3C"
+  }
+]

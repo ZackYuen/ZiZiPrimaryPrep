@@ -67,7 +67,7 @@ GOOD_SEC = [
     "順利天主教中學", "聖言中學", "觀塘瑪利諾書院",
     "華英中學", "沙田官立中學", "荃灣官立中學", "屯門官立中學",
     "將軍澳官立中學", "陳瑞祺（喇沙）書院", "陳瑞祺(喇沙)書院",
-    "聖公會林護紀念中學", "嗇色園主辦可譽中學", "真道書院",
+    "聖公會林護紀念中學", "真道書院",
 ]
 GIRLS_SEC = [
     "拔萃女書院", "協恩中學", "瑪利諾修院", "嘉諾撒聖瑪利", "嘉諾撒書院",
@@ -377,27 +377,34 @@ def norm_zh(s: str) -> str:
     return re.sub(r"[\s（）]", "", s)
 
 
-def load_secondary_gender() -> dict:
+def load_secondary_index() -> dict:
     rows = json.loads(SEC_GENDER_PATH.read_text(encoding="utf-8"))
     by_norm = {}
     for r in rows:
-        by_norm[norm_zh(r["nameZh"])] = r.get("gender", "男女校")
+        by_norm[norm_zh(r["nameZh"])] = r
     return by_norm
 
 
-def secondary_gender(name: str, index: dict) -> str | None:
+def lookup_sec(name: str, index: dict) -> dict | None:
     n = norm_zh(name)
     if not n:
         return None
     if n in index:
         return index[n]
     hits = []
-    for key, gender in index.items():
+    for key, row in index.items():
         if key and (key in n or n in key) and min(len(key), len(n)) >= 4:
-            hits.append((len(key), gender))
+            hits.append((len(key), row))
     if hits:
-        hits.sort(reverse=True)
+        hits.sort(key=lambda x: x[0], reverse=True)
         return hits[0][1]
+    return None
+
+
+def secondary_gender(name: str, index: dict) -> str | None:
+    row = lookup_sec(name, index)
+    if row:
+        return row.get("gender")
     if _name_hit([name], GIRLS_SEC):
         return "女校"
     return None
@@ -437,7 +444,7 @@ def score_dragon(link: dict) -> float:
         return 3.0
     elite = _name_hit(link["names"], ELITE_SEC)
     good = _name_hit(link["names"], GOOD_SEC)
-    # 一條龍/直屬才把精英中學當穩定路徑；普通「聯繫」只是派位篮子
+    # 一條龍/直屬只代表「有位」，質素另外用升中成分（Band）
     if link["type"] in ("dragon", "direct"):
         base = 9.0 if elite else (7.0 if good else 5.0)
         if link["type"] == "dragon":
@@ -449,8 +456,40 @@ def score_dragon(link: dict) -> float:
     return round(base, 1)
 
 
-def score_s1(dragon_score: float) -> float:
-    return round(min(10.0, max(3.0, dragon_score)), 1)
+BAND_SCORE = {
+    "Band 1A": 10.0,
+    "Band 1B": 9.2,
+    "Band 1C": 8.4,
+    "Band 2A": 7.2,
+    "Band 2B": 6.4,
+    "Band 2C": 5.6,
+    "Band 3A": 4.8,
+    "Band 3B": 4.2,
+    "Band 3C": 3.6,
+}
+
+
+def linked_banding(link: dict, sec_index: dict) -> str:
+    best = ""
+    best_s = -1
+    for n in link.get("names") or []:
+        row = lookup_sec(n, sec_index)
+        band = (row or {}).get("banding") or ""
+        s = BAND_SCORE.get(band, -1)
+        if s > best_s:
+            best_s = s
+            best = band
+    return best
+
+
+def score_s1(link: dict, sec_index: dict) -> float:
+    """升中成分 = 聯繫中學 Band（女校已剔除），唔再用龍校分複製。"""
+    if link["type"] == "none" or not link.get("names"):
+        return 3.0
+    band = linked_banding(link, sec_index)
+    if band in BAND_SCORE:
+        return BAND_SCORE[band]
+    return 5.0  # 有聯繫但無 Band 資料
 
 
 def score_negative(review_signals) -> float:
@@ -601,8 +640,8 @@ def main():
     print("Loading P1 quotas...")
     p1_index = load_p1_index()
     print(f"P1 rows: {len(p1_index['rows'])}")
-    sec_gender = load_secondary_gender()
-    print(f"Secondary gender map: {len(sec_gender)}")
+    sec_index = load_secondary_index()
+    print(f"Secondary index: {len(sec_index)}")
 
     print("Fetching school list...")
     schools = fetch_all_list()
@@ -681,10 +720,11 @@ def main():
         path = stay_path(funding, school_net, district, has_p1)
         stay_display = path in ("留現址-統一派位+自行分配", "直資私立可通勤") and district == HOME_DISTRICT
         sqm = parse_area(facts)
-        link = filter_link_for_boy(parse_linkage(facts), sec_gender)
+        link = filter_link_for_boy(parse_linkage(facts), sec_index)
         house = score_housing(district, stay_display)
         commute = score_commute(name_zh, district)
         dragon = score_dragon(link)
+        s1 = score_s1(link, sec_index)
         area_s = score_area(sqm)
         active = score_active(facts, area_s, gender)
         ease_dp = score_ease_dp(p1, school_net, funding)
@@ -693,19 +733,19 @@ def main():
         ease_std = ease_dp if funding in ("直資", "私立") else ease_ca_move
 
         scores_std = {
-            "area": area_s, "dragon": dragon, "s1": score_s1(dragon),
+            "area": area_s, "dragon": dragon, "s1": s1,
             "negative": score_negative(d.get("reviewSignals")),
             "housing": house["housing_score"], "active": active, "ease": ease_std,
         }
         scores_rel = {**scores_std, "ease": ease_ca_move if funding not in ("直資", "私立") else 3.0}
         scores_stay = {
-            "area": area_s, "dragon": dragon, "s1": score_s1(dragon),
+            "area": area_s, "dragon": dragon, "s1": s1,
             "negative": scores_std["negative"], "active": active,
             "ease": ease_ca_stay if funding not in ("直資", "私立") else ease_dp,
             "commute": commute,
         }
         scores_dp = {
-            "area": area_s, "dragon": dragon, "s1": score_s1(dragon),
+            "area": area_s, "dragon": dragon, "s1": s1,
             "negative": scores_std["negative"], "active": active,
             "ease": ease_dp, "commute": commute,
         }
@@ -798,7 +838,8 @@ def main():
             "佔地平方米": sqm or "",
             "龍校分": dragon,
             "升中聯繫": link_text,
-            "升中成分": score_s1(dragon),
+            "聯繫中學Band": linked_banding(link, sec_index) or "",
+            "升中成分": s1,
             "負面新聞分": scores_std["negative"],
             "孜孜活躍分": active,
             "自行分配易入分": ease_dp,
