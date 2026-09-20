@@ -153,33 +153,6 @@ NET_EASE = {
     "12": 3.5, "14": 3.5, "11": 5.0, "18": 4.5,
 }
 
-# 教育局無公布每網適齡兒童。全港2027推算約48,500；2026統籌約37,600
-# （19,656已獲自行，約17,900入統一）。校網供求用該網自行／統一額加總。
-NET_SUPPLY_NOTE = {
-    "48": "學位相對鬆。23校、小一約2,650、統一1,453 > 自行1,330（統一/自行=1.09）",
-    "41": "學位緊。10校、小一約1,045、統一502 < 自行523（0.96）。喇沙2026統一被世襲多佔6個",
-    "12": "中等偏緊。14校、小一約1,300、統一/自行=1.04",
-    "14": "中等。11校、小一約1,175、統一/自行=1.11",
-    "40": "學位較鬆。22校、小一約2,540、統一/自行=1.16",
-    "34": "中等。18校、小一約1,650、統一/自行=1.10",
-    "35": "細網。7校、小一約750、統一/自行=1.14",
-    "46": "中等。9校、小一約1,050、統一/自行=1.14",
-}
-
-# 打喇沙嘅家庭常跳過、但校園／升中／學額有料。
-SLEEPER_NOTES = {
-    "聖公會德田李兆強小學": "校網48最大校園之一（約11,000㎡、4操場）；屋邨校常被跳過；2027自行75",
-    "中華基督教會基法小學（油塘）": "4操場、自行75；油塘港鐵；活躍仔啱，無名校光環",
-    "樂華天主教小學": "約9,000㎡，月華街最近嘅大校園之一",
-    "觀塘官立小學（秀明道）": "聯繫觀塘官立／何文田官立 Band 1C；官立常被名校蓋過",
-    "聖安當小學": "約7,800㎡、4操場、油塘港鐵；自行63",
-    "瑪利諾神父教會學校（小學部）": "真一條龍 Band 1C、4操場；深水埗網40學位鬆過網41",
-    "馬頭涌官立小學（紅磡灣）": "聯繫伊利沙伯 Band 1A；紅磡住屋平過九龍塘",
-    "保良局何壽南小學": "直屬保良局第一張永慶 Band 1A；土瓜灣／網34",
-    "葛量洪校友會黃埔學校": "2026統一86>自行63，自行收唔滿滾入統一；黃埔大校園",
-    "獻主會小學": "2026統一88>自行63；網34收生偏鬆",
-}
-
 NAME_ALIASES = {
     "基法小學": "中華基督教會基法小學",
     "基法小學油塘": "中華基督教會基法小學（油塘）",
@@ -543,98 +516,25 @@ def score_commute(name_zh: str, district: str) -> float:
     return DISTRICT_COMMUTE.get(district, 4.0)
 
 
-def place_split(p1: dict) -> dict:
-    """EDB: 自行約50%；甲類世襲上限約總額30%；乙類計分不少於總額20%。"""
-    total = p1.get("total") or 0
-    dp = p1.get("self") or 0
-    ca = p1.get("central") or 0
-    b_floor = int(round(total * 0.20)) if total else ""
-    heir_cap = int(round(total * 0.30)) if total else ""
-    ratio = round(ca / dp, 2) if dp else ""
-    return {
-        "b_floor": b_floor,
-        "heir_cap": heir_cap,
-        "ca_over_dp": ratio,
-        "classes": p1.get("classes") or "",
-    }
-
-
-def net_place_table(p1_index: dict) -> dict:
-    """Sum Schooland 2026 places by net, overlay EDB 2027 Net48 DP."""
-    table = {}
-    for r in p1_index["rows"]:
-        n = str(r.get("net") or "")
-        if not n:
-            continue
-        row = dict(r)
-        zh = NAME_ALIASES.get(row["name"], row["name"])
-        if zh in NET48_DP_EDB:
-            row["dp"] = NET48_DP_EDB[zh]
-        rec = table.setdefault(n, {"schools": 0, "total": 0, "dp": 0, "ca": 0})
-        rec["schools"] += 1
-        rec["total"] += row.get("total") or 0
-        rec["dp"] += row.get("dp") or 0
-        rec["ca"] += row.get("ca") or 0
-    return table
-
-
-def score_competition(p1: dict, school_net: str, funding: str, dragon: float, nets: dict) -> tuple:
-    """Higher = harder. 15-point family; not 'big school = easy'."""
+def score_ease_dp(p1: dict, school_net: str, funding: str) -> float:
     if funding in ("直資", "私立"):
-        return "", "直資/私立自行面試，唔經教育局15分"
+        return 3.0
     if not p1.get("total"):
-        return 5.0, "缺學額"
-    parts = ["底4.5"]
-    comp = 4.5
-    if dragon >= 9.0:
-        comp += 4.0
-        parts.append("直屬名校男中+4")
-    elif dragon >= 7.0:
-        comp += 2.2
-        parts.append("龍校+2.2")
-    elif dragon >= 5.5:
-        comp += 1.2
-        parts.append("一條龍/中上中學+1.2")
-    ns = nets.get(str(school_net)) if nets else None
-    if ns and ns.get("dp"):
-        ratio = ns["ca"] / ns["dp"]
-        if ratio < 1.0:
-            comp += 1.4
-            parts.append(f"校網{school_net}緊(統/自{ratio:.2f})+1.4")
-        elif ratio < 1.08:
-            comp += 0.6
-            parts.append(f"校網{school_net}偏緊+0.6")
-        elif ratio >= 1.20:
-            comp -= 0.8
-            parts.append(f"校網{school_net}鬆-0.8")
+        return 4.0
     dp = p1.get("self") or 0
-    ca = p1.get("central") or 0
-    if dp:
-        fill = ca / dp
-        if fill >= 1.25:
-            comp -= 1.5
-            parts.append(f"自行收唔滿滾入統一({fill:.2f})-1.5")
-        elif fill >= 1.12:
-            comp -= 0.7
-            parts.append("自行有剩餘-0.7")
-        elif fill < 0.85:
-            comp += 0.6
-            parts.append("自行收滿+0.6")
-    score = round(min(10.0, max(1.5, comp)), 1)
-    return score, "；".join(parts)
-
-
-def score_ease_dp(p1: dict, school_net: str, funding: str, dragon: float = 3.0, nets=None) -> float:
-    """15分家庭嘅自行易入分 = 11 − 競爭，本網非名校再+1.2。"""
-    if funding in ("直資", "私立"):
-        return 3.0
-    comp, _ = score_competition(p1, school_net, funding, dragon, nets or {})
-    if comp == "":
-        return 3.0
-    ease = 11.0 - float(comp)
-    if str(school_net) == HOME_SCHOOL_NET and dragon < 8:
-        ease += 1.2
-    return round(min(10.0, max(2.0, ease)), 1)
+    ca = p1.get("central") or dp or 1
+    fill = ca / max(dp, 1)
+    if fill >= 1.2:
+        competition = 8.0
+    elif fill >= 0.9:
+        competition = 6.5
+    elif fill >= 0.7:
+        competition = 5.0
+    else:
+        competition = 3.5
+    net_bonus = 1.5 if str(school_net) == HOME_SCHOOL_NET else 0.0
+    size_bonus = min(1.5, (dp or 0) / 80)
+    return round(min(10.0, max(2.0, competition + net_bonus + size_bonus)), 1)
 
 
 def score_ease_ca(p1: dict, school_net: str, funding: str, mode: str) -> float:
@@ -739,8 +639,7 @@ def rank_subset(rows_in: list, key: str, field: str, predicate):
 def main():
     print("Loading P1 quotas...")
     p1_index = load_p1_index()
-    nets = net_place_table(p1_index)
-    print(f"P1 rows: {len(p1_index['rows'])}; nets: {len(nets)}")
+    print(f"P1 rows: {len(p1_index['rows'])}")
     sec_index = load_secondary_index()
     print(f"Secondary index: {len(sec_index)}")
 
@@ -828,10 +727,7 @@ def main():
         s1 = score_s1(link, sec_index)
         area_s = score_area(sqm)
         active = score_active(facts, area_s, gender)
-        ease_dp = score_ease_dp(p1, school_net, funding, dragon, nets)
-        comp, comp_why = score_competition(p1, school_net, funding, dragon, nets)
-        split = place_split(p1)
-        net_rec = nets.get(str(school_net), {})
+        ease_dp = score_ease_dp(p1, school_net, funding)
         ease_ca_stay = score_ease_ca(p1, school_net, funding, "ca_stay")
         ease_ca_move = score_ease_ca(p1, school_net, funding, "ca_move")
         ease_std = ease_dp if funding in ("直資", "私立") else ease_ca_move
@@ -948,21 +844,10 @@ def main():
             "孜孜活躍分": active,
             "自行分配易入分": ease_dp,
             "統一派位易入分": ease_ca_stay if str(school_net) == HOME_SCHOOL_NET else ease_ca_move,
-            "競爭激烈度": comp if dp_ok else "",
-            "競爭拆解": comp_why if dp_ok else "",
-            "小一班數": split["classes"],
+            "競爭激烈度": round(10.0 - ease_dp + 2.0, 1) if dp_ok else "",
             "小一學額": p1.get("total") or "",
             "自行分配額": p1.get("self") or "",
-            "乙類計分下限": split["b_floor"],
-            "世襲上限": split["heir_cap"],
             "統一派位額": p1.get("central") or "",
-            "統一相對自行": split["ca_over_dp"],
-            "校網官津校數": net_rec.get("schools") or "",
-            "校網小一總額": net_rec.get("total") or "",
-            "校網自行總額": net_rec.get("dp") or "",
-            "校網統一總額": net_rec.get("ca") or "",
-            "校網供求": NET_SUPPLY_NOTE.get(str(school_net), "教育局無公布該網適齡人數；用該網學額加總做代理"),
-            "忽略潛力": SLEEPER_NOTES.get(name_zh, ""),
             "操場數": parse_facility(facts, "操場數目") or "",
             "CHSC": d.get("chscId", ""),
             "學額來源": source_note,
