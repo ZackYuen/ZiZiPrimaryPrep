@@ -148,6 +148,90 @@ DISTRICT_COMMUTE = {
 
 STAY_DSS_DISTRICTS = {"觀塘區", "黃大仙區", "九龍城區"}
 
+# 2027/28 小一取錄結果公佈（直資／私立）。官立／資助用教育局統籌，此欄留空。
+# 優先校方網頁；其次 2026 公開時間表（Champimom／HK01），標「約」。
+DSS_PRIVATE_RESULT = {
+    "香港浸會大學附屬學校王錦輝中小學": {
+        "date": "2026年12月",
+        "note": "校方：最終結果公布＝十二月",
+    },
+    "福建中學附屬學校": {
+        "date": "2026年12月前",
+        "note": "校方第一階段：12月前電郵公佈次輪結果及註冊；第二階段約2027年4月",
+    },
+    "聖保羅男女中學附屬小學": {
+        "date": "暫定2027年1月中下旬",
+        "note": "校方暫定",
+    },
+    "拔萃男書院附屬小學": {
+        "date": "約2026年12月–2027年1月",
+        "note": "校方未寫死日期；公開時間表多寫12月，往年亦見1月",
+    },
+    "英華小學": {
+        "date": "約2027年1月",
+        "note": "公開時間表：次輪約10月，結果翌年1月",
+    },
+    "香港華人基督教聯會真道書院": {
+        "date": "約2026年12月",
+        "note": "次輪約11月中下旬後；校方未寫死日期",
+    },
+    "優才（楊殷有娣）書院": {
+        "date": "2026年7–8月（首輪後）",
+        "note": "27/28面試已於6–7月完成，首輪結果已出",
+    },
+    "聖保羅書院小學": {"date": "約2026年12月", "note": "公開時間表"},
+    "港大同學會小學": {"date": "約2026年11月", "note": "公開時間表"},
+    "救恩學校": {"date": "約2026年10月", "note": "公開時間表"},
+    "拔萃女小學": {"date": "約2026年12月", "note": "公開時間表"},
+    "保良局陳守仁小學": {"date": "約2027年1月", "note": "公開時間表：次輪12月後"},
+    "香港培正小學": {"date": "約2026年11月", "note": "公開時間表；本輪申請多已截止"},
+    "保良局陸慶濤小學": {"date": "約2026年12月", "note": "次輪2026-12-05後"},
+    "保良局林文燦英文小學": {"date": "約2026年11月底–12月", "note": "次輪2026-11-14後"},
+    "保良局香港道教聯合會圓玄小學": {"date": "約2026年10月", "note": "次輪2026-10-03後"},
+    "和富慈善基金李宗德小學": {"date": "約2026年9月底–10月", "note": "次輪2026-09-19後"},
+    "嶺南大學香港同學會小學": {"date": "約2026年9月底–10月", "note": "次輪2026-09-12／19後"},
+    "漢華中學（小學部）": {"date": "約2026年12月", "note": "面試10–11月"},
+    "聖士提反書院附屬小學": {"date": "約2026年11月", "note": "公開時間表"},
+    "九龍塘宣道小學": {"date": "約2026年11月", "note": "公開時間表"},
+    "嘉諾撒聖心學校私立部": {"date": "約2026年11月", "note": "公開時間表"},
+    "香港真光中學附屬小學暨幼稚園": {"date": "約2026年11月", "note": "公開時間表"},
+    "聖方濟各英文小學": {"date": "約2026年11月", "note": "公開時間表"},
+    "九龍塘學校（小學部）": {"date": "約2027年5月", "note": "公開時間表"},
+    "播道書院": {"date": "待校方公布", "note": "27/28面試日期尚未公佈"},
+    "培僑書院": {"date": "待校方公布", "note": "27/28面試日期尚未公佈"},
+    "基督教香港信義會宏信書院": {"date": "待校方公布", "note": "27/28面試日期尚未公佈"},
+    "聖瑪加利男女英文中小學": {"date": "待校方公布", "note": "面試個別通知"},
+    "地利亞（閩僑）英文小學": {"date": "待校方公布", "note": ""},
+    "民生書院小學": {"date": "往年約入學年夏季", "note": "往年約同年5月先收生；以校網為準"},
+}
+
+
+def dss_tuition(detail: dict, funding: str):
+    """Return (annual_fee_hkd, fee_note) for DSS/private; blank otherwise."""
+    if funding not in ("直資", "私立"):
+        return "", ""
+    fee = detail.get("annualTuitionHkd")
+    if fee in (None, "", 0):
+        for f in detail.get("facts") or []:
+            if (f.get("label") or "") == "學費":
+                m = re.search(r"\$?\s*([\d,]+)", str(f.get("value") or ""))
+                if m:
+                    fee = int(m.group(1).replace(",", ""))
+                    break
+    if not fee:
+        return "", ""
+    note = "教育局小學概覽2026（年費）"
+    return int(fee), note
+
+
+def dss_result(name_zh: str, funding: str):
+    if funding not in ("直資", "私立"):
+        return "", ""
+    row = DSS_PRIVATE_RESULT.get(name_zh)
+    if not row:
+        return "待查／未公佈", "未見校方或公開時間表寫死日期"
+    return row["date"], row.get("note", "")
+
 NET_EASE = {
     "48": 6.5, "65": 6.0, "46": 4.0, "34": 4.5, "35": 5.0, "41": 4.0,
     "12": 3.5, "14": 3.5, "11": 5.0, "18": 4.5,
@@ -786,6 +870,9 @@ def main():
         else:
             score_use = ""
 
+        fee_hkd, fee_note = dss_tuition(d, funding)
+        result_date, result_note = dss_result(name_zh, funding)
+
         rows.append({
             "男生排名": 0,
             "男生搬屋排名": 0,
@@ -802,6 +889,10 @@ def main():
             "區域": district,
             "校網": net_display,
             "類別": funding,
+            "年費港元": fee_hkd,
+            "學費備註": fee_note,
+            "結果公佈日期": result_date,
+            "結果備註": result_note,
             "加權總分": weighted_total(scores_std, "standard") if rankable else "",
             "搬屋總分": weighted_total(scores_rel, "relocate") if move_ok else "",
             "留現址總分": weighted_total(scores_stay, "stay") if stay_ok else "",
