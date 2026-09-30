@@ -2056,9 +2056,10 @@
 
 .math-box__label {
   display: block;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 0.45rem;
-  color: var(--ink-soft);
+  color: var(--ink);
+  font-size: 1rem;
 }
 
 .math-display {
@@ -2068,17 +2069,22 @@
   justify-content: center;
   padding: 0.7rem 1rem;
   border-radius: 18px;
-  border: 2px solid rgba(27, 58, 75, 0.15);
+  border: 3px solid rgba(27, 58, 75, 0.18);
   background: white;
-  font-size: clamp(1.6rem, 6vw, 2rem);
+  font-size: clamp(1.8rem, 7vw, 2.2rem);
   font-weight: 800;
   letter-spacing: 0.04em;
   margin-bottom: 0.75rem;
 }
 
+.math-display.is-empty {
+  border-style: dashed;
+  background: rgba(255, 253, 247, 0.9);
+}
+
 .math-display__placeholder {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.8rem;
+  font-weight: 800;
   color: var(--ink-soft);
   letter-spacing: 0;
 }
@@ -2118,8 +2124,24 @@
 }
 
 .numpad__key--go {
-  background: var(--accent, #1b6b8a);
+  background: var(--mint, #3d9b6a);
   color: white;
+}
+
+.numpad--dial .numpad__key:last-child {
+  grid-column: 2;
+}
+
+.numpad-actions {
+  display: grid;
+  grid-template-columns: minmax(4.5rem, 1fr) minmax(0, 2fr);
+  gap: 0.55rem;
+  margin-top: 0.55rem;
+}
+
+.numpad__key--submit {
+  min-height: 3.2rem;
+  font-size: 1.7rem;
 }
 
 .session__method--clock,
@@ -2948,6 +2970,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .numpad__key {
+    transition: none;
+  }
+
+  .kid-help__backdrop,
   .mascot,
   .mascot-static,
   .mascot-buddy,
@@ -3559,29 +3586,58 @@ button.picture-strip__item--choice {
 }
 
 .math-dots {
+  --math-dot-size: 1.45rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
-  margin: 0.35rem 0 0.85rem;
+  gap: 0.45rem 0.55rem;
+  margin: 0.4rem 0 0.7rem;
+  padding: 0.45rem 0.4rem;
+}
+
+.math-dots__term {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
 }
 
 .math-dots__op {
+  flex: 0 0 auto;
   font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 800;
   color: var(--ink);
+  line-height: 1;
+  min-width: 1.4em;
+  text-align: center;
 }
 
 .math-place {
   display: flex;
   flex-wrap: wrap;
+  flex: 0 0 auto;
+  width: max-content;
+  max-width: 100%;
   align-items: flex-end;
+  justify-content: center;
   gap: 0.35rem;
-  padding: 0.45rem;
-  background: #ffffffcc;
-  border-radius: 16px;
+  padding: 0.5rem 0.6rem;
+  background: #fff;
+  border-radius: 18px;
+  border: 2px solid rgba(27, 58, 75, 0.1);
+}
+
+.math-place--take {
+  border-style: dashed;
+  border-color: rgba(192, 74, 48, 0.45);
+  background: #fff6f2;
+}
+
+.math-place--take .math-ones__bit {
+  background: #f0a090;
 }
 
 .math-ten {
@@ -3594,15 +3650,15 @@ button.picture-strip__item--choice {
 
 .math-ones {
   display: grid;
-  grid-template-columns: repeat(5, 12px);
-  gap: 5px;
+  gap: 0.38rem;
 }
 
 .math-ones__bit {
-  width: 12px;
-  height: 12px;
+  width: var(--math-dot-size);
+  height: var(--math-dot-size);
   border-radius: 50%;
   background: #f5c84c;
+  box-shadow: inset 0 -0.22em rgba(138, 106, 18, 0.28);
 }
 
 .math-ones--apple .math-ones__bit {
@@ -3616,6 +3672,10 @@ button.picture-strip__item--choice {
 
 .math-ones--kid .math-ones__bit {
   background: #79aa82;
+}
+
+.math-ones--star .math-ones__bit {
+  background: #f5c84c;
 }
 
 .math-num-tile {
@@ -3690,11 +3750,63 @@ button.picture-strip__item--choice {
   padding: 0;
 }
 
+.session__q-block {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'q tools'
+    'en tools';
+  align-items: start;
+  column-gap: 0.4rem;
+  row-gap: 0.15rem;
+}
+
+.session__q-block .session__q {
+  grid-area: q;
+  margin: 0;
+}
+
+.session__q-block .session__q-en {
+  grid-area: en;
+  margin-top: 0;
+}
+
+.session__q-block .session__tools {
+  grid-area: tools;
+  margin-top: 0;
+  flex-direction: column;
+  align-items: stretch;
+}
+
 .session__tools {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
   margin-top: 0.55rem;
+}
+
+.session__tools--quiet .session__actions {
+  margin: 0;
+}
+
+.session__tools--quiet .pill-btn,
+.session__tools--quiet .kid-help__btn {
+  min-height: 40px;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.88rem;
+}
+
+.session__tools--quiet .kid-help {
+  margin: 0;
+}
+
+.session__footer--quiet {
+  justify-content: space-between;
+}
+
+.session__footer-help {
+  min-width: 2.8rem;
+  opacity: 0.72;
 }
 
 .session__tools > .session__actions,
@@ -3929,42 +4041,59 @@ button.picture-strip__item--choice {
     flex-direction: column;
   }
 
-  .session__stem .math-dots {
+  .session--kind-math .session__q,
+  .session--kind-clock .session__q,
+  .session--kind-money .session__q {
+    font-size: clamp(1.28rem, 6.2vw, 1.7rem);
+    font-weight: 800;
+  }
+
+  .session--kind-math .session__stem,
+  .session--kind-clock .session__stem,
+  .session--kind-money .session__stem {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .session--kind-math .session__response,
+  .session--kind-clock .session__response,
+  .session--kind-money .session__response {
     flex: 1 1 auto;
-    min-height: 8rem;
-    margin: 0.25rem 0 0;
-    align-content: center;
-    transform: none;
+    max-height: none;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .session__stem .math-dots {
+    flex: 0 0 auto;
+    min-height: 0;
+    margin: 0.2rem 0 0.15rem;
+    --math-dot-size: 1.65rem;
   }
 
   .session__stem .math-ones {
-    grid-template-columns: repeat(5, 28px);
-    gap: 8px;
-  }
-
-  .session__stem .math-ones__bit {
-    width: 28px;
-    height: 28px;
+    gap: 0.4rem;
   }
 
   .session__stem .math-ten {
-    width: 28px;
-    height: 88px;
+    width: 22px;
+    height: 68px;
   }
 
   .session__stem .math-place {
-    padding: 0.55rem 0.65rem;
+    padding: 0.45rem 0.55rem;
   }
 
   .session__stem .math-dots__op {
-    font-size: 2.2rem;
+    font-size: 1.85rem;
   }
 
   .session__stem .math-blank,
   .session__stem .math-dots--tiles .math-num-tile {
-    min-width: 3.2rem;
-    min-height: 3.2rem;
-    font-size: 1.7rem;
+    min-width: 2.7rem;
+    min-height: 2.7rem;
+    font-size: 1.45rem;
   }
 
   .session__stem .hint-pic-wrap {
@@ -4165,9 +4294,8 @@ button.picture-strip__item--choice {
   }
 
   .math-dots {
-    margin: 0.15rem 0 0.35rem;
-    transform: scale(0.86);
-    transform-origin: center;
+    margin: 0.15rem 0 0.3rem;
+    --math-dot-size: 1.5rem;
   }
 
   .kid-help__btn {
@@ -4233,18 +4361,32 @@ button.picture-strip__item--choice {
 
   .math-box__label {
     margin-bottom: 0.25rem;
-    font-size: 0.85rem;
+    font-size: 0.92rem;
   }
 
   .math-display {
-    min-height: 2.5rem;
+    min-height: 2.7rem;
     margin-bottom: 0.4rem;
     padding: 0.35rem 0.6rem;
-    font-size: 1.35rem;
+    font-size: 1.55rem;
+  }
+
+  .math-display__placeholder {
+    font-size: 1.45rem;
   }
 
   .numpad {
     gap: 0.35rem;
+  }
+
+  .numpad-actions {
+    gap: 0.35rem;
+    margin-top: 0.4rem;
+  }
+
+  .numpad__key--submit {
+    min-height: 2.85rem;
+    font-size: 1.45rem;
   }
 
   .numpad__key {
@@ -4550,6 +4692,12 @@ button.picture-strip__item--choice {
   .session__q {
     font-size: 1.02rem;
     line-height: 1.22;
+  }
+
+  .session--kind-math .session__q,
+  .session--kind-clock .session__q,
+  .session--kind-money .session__q {
+    font-size: 1.32rem;
   }
 
   .session__q-en {

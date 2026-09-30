@@ -440,11 +440,11 @@ function defaultKidLine(kind: ActivityKind): { kidLine: string; moreLine: string
     case 'choice':
       return { kidLine: '睇圖，再揀一個。', moreLine: '聽晒選項，慢慢揀。' }
     case 'math':
-      return { kidLine: '數圖上嘅點／積木。', moreLine: '十個就係一條橙色。' }
+      return { kidLine: '數完啲點，撳下面數字，再撳 ✓。', moreLine: '十粒係一條橙色柱。由左數到右。' }
     case 'clock':
-      return { kidLine: '短針係幾點，長針係幾分。', moreLine: '長針指 6 = 30 分。' }
+      return { kidLine: '望鐘，撳數字，再撳 ✓。', moreLine: '短針係幾點，長針係幾分。長針指 6 = 30 分。' }
     case 'money':
-      return { kidLine: '撳硬幣做記號，一舊一舊數。', moreLine: '先數銀紙／大銀，再數細幣。' }
+      return { kidLine: '撳硬幣做記號，再撳數字同 ✓。', moreLine: '先數銀紙／大銀，再數細幣。' }
     case 'reorder':
       return { kidLine: '拖第一個字去上面，再拖下一個。', moreLine: '句子通常由「我／小明／首先」開頭。' }
     case 'sort':

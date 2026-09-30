@@ -31,9 +31,11 @@ import { ReorderBoard } from './ReorderBoard'
 import { SortBoard } from './SortBoard'
 import { HintPicture } from './HintPicture'
 import { MathDots } from './MathDots'
+import { AnswerPad } from './AnswerPad'
 import { KidHelp } from './KidHelp'
 import { resolveTeachHint } from '../lib/teachHint'
 import { resolveMascotPresence } from '../lib/mascotPresence'
+import { CLOCK_DIGIT_KEYS, mathDigitKeys } from '../lib/mathPad'
 import { TangramBoard } from './TangramBoard'
 import { SimonGame } from './SimonGame'
 import { BuildBoard } from './BuildBoard'
@@ -51,13 +53,22 @@ type Props = {
   celebrate?: boolean
 }
 
-const MATH_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '/'] as const
-const CLOCK_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', ':', '0', '00'] as const
 const MONEY_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '✓'] as const
 
 function mediaSrc(path: string) {
   const base = import.meta.env.BASE_URL || '/'
   return `${base}${path.replace(/^\//, '')}`
+}
+
+function startIndexFor(items: Activity[]) {
+  try {
+    const q = new URLSearchParams(window.location.search).get('q')
+    if (!q) return 0
+    const i = items.findIndex((a) => a.id === q)
+    return i >= 0 ? i : 0
+  } catch {
+    return 0
+  }
 }
 
 
@@ -71,7 +82,7 @@ export function PracticeSession({
   onBack,
   celebrate = false,
 }: Props) {
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(() => startIndexFor(items))
   const [showSample, setShowSample] = useState(false)
   const [justStar, setJustStar] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
@@ -520,6 +531,16 @@ export function PracticeSession({
     else setMoneyJiao((p) => `${p}${key}`)
   }
 
+  const isPadKind = item.kind === 'math' || item.kind === 'clock' || item.kind === 'money'
+  const waitingOnPad = isPadKind && !done && !canProceed()
+
+  const backspaceMath = () => {
+    if (mathResult === 'ok') return
+    playSfx('tap')
+    setMathResult(null)
+    setMathInput((prev) => prev.slice(0, -1))
+  }
+
   const handlePrimary = () => {
     unlockAudio()
     playSfx('tap')
@@ -720,10 +741,11 @@ export function PracticeSession({
             </div>
           ) : (
             <>
+              <div className={isPadKind ? 'session__q-block' : undefined}>
               <h2 className="session__q">{item.promptZh}</h2>
               {item.promptEn && <p className="session__q-en">{item.promptEn}</p>}
 
-              <div className="session__tools">
+              <div className={`session__tools ${isPadKind ? 'session__tools--quiet' : ''}`}>
                 <div className="session__actions">
                   <button
                     type="button"
@@ -753,6 +775,7 @@ export function PracticeSession({
                     (!!item.hintImage && !artHidden && !item.hideArt) ||
                     (!!item.pictureStrip && !artHidden && !item.hideArt)
                   }
+                  hideMath={!!teach.math && item.calendarDay == null && !item.hintImage && !item.pictureStrip}
                   onToggle={() => {
                     unlockAudio()
                     playSfx('flip')
@@ -776,6 +799,7 @@ export function PracticeSession({
                   }}
                 />
                 )}
+              </div>
               </div>
             </>
           )}
@@ -1105,45 +1129,18 @@ export function PracticeSession({
           )}
 
           {item.kind === 'clock' && (
-            <div className="math-box">
-              <p className="math-box__label">睇鐘 · 撳數字（7:30）</p>
-              <div className="math-display" aria-live="polite">
-                {mathInput || <span className="math-display__placeholder">__:__</span>}
-              </div>
-              <div className="numpad" role="group" aria-label="時間鍵盤">
-                {CLOCK_KEYS.map((key) => (
-                  <button
-                    key={key}
-                    type="button"
-                    className="numpad__key"
-                    disabled={mathResult === 'ok'}
-                    onClick={() => appendMathKey(key)}
-                  >
-                    {key}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  className="numpad__key numpad__key--wide"
-                  disabled={mathResult === 'ok' || !mathInput}
-                  onClick={() => {
-                    playSfx('tap')
-                    setMathResult(null)
-                    setMathInput((prev) => prev.slice(0, -1))
-                  }}
-                >
-                  ⌫
-                </button>
-                <button
-                  type="button"
-                  className="numpad__key numpad__key--wide numpad__key--go"
-                  disabled={mathResult === 'ok' || !mathInput}
-                  onClick={submitClock}
-                  aria-label="檢查"
-                >
-                  {KID.check}
-                </button>
-              </div>
+            <>
+              <AnswerPad
+                label="撳數字，再撳 ✓"
+                value={mathInput}
+                placeholder="__:__"
+                keys={CLOCK_DIGIT_KEYS}
+                locked={mathResult === 'ok'}
+                padLabel="時間鍵盤"
+                onAppend={appendMathKey}
+                onBackspace={backspaceMath}
+                onSubmit={submitClock}
+              />
               {(coachMsg || mathResult === 'ok') && (
                 <p className={`math-feedback ${mathResult === 'ok' ? 'is-ok' : 'is-no'}`}>
                   {mathResult === 'ok' ? '答對啦！好努力！' : coachMsg}
@@ -1167,12 +1164,12 @@ export function PracticeSession({
               {revealAnswer && mathResult !== 'ok' && item.answer && (
                 <p className="sample__tip">參考答案：{item.answer}</p>
               )}
-            </div>
+            </>
           )}
 
           {item.kind === 'money' && (
             <div className="math-box">
-              <p className="math-box__label">先撳 $ 或 ¢，再用數字</p>
+              <p className="math-box__label">先撳 $ 或 ¢，撳數字，再撳 ✓</p>
               <div className="money-fields">
                 <button
                   type="button"
@@ -1253,45 +1250,18 @@ export function PracticeSession({
           )}
 
           {item.kind === 'math' && (
-            <div className="math-box">
-              <p className="math-box__label">撳數字</p>
-              <div className="math-display" aria-live="polite">
-                {mathInput || <span className="math-display__placeholder">答案會顯示喺度</span>}
-              </div>
-              <div className="numpad" role="group" aria-label="數字鍵盤">
-                {MATH_KEYS.map((key) => (
-                  <button
-                    key={key}
-                    type="button"
-                    className="numpad__key"
-                    disabled={mathResult === 'ok'}
-                    onClick={() => appendMathKey(key)}
-                  >
-                    {key}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  className="numpad__key numpad__key--wide"
-                  disabled={mathResult === 'ok' || !mathInput}
-                  onClick={() => {
-                    playSfx('tap')
-                    setMathResult(null)
-                    setMathInput((prev) => prev.slice(0, -1))
-                  }}
-                >
-                  ⌫
-                </button>
-                <button
-                  type="button"
-                  className="numpad__key numpad__key--wide numpad__key--go"
-                  disabled={mathResult === 'ok' || !mathInput}
-                  onClick={submitMath}
-                  aria-label="檢查"
-                >
-                  {KID.check}
-                </button>
-              </div>
+            <>
+              <AnswerPad
+                label="撳數字，再撳 ✓"
+                value={mathInput}
+                placeholder="?"
+                keys={mathDigitKeys(item)}
+                locked={mathResult === 'ok'}
+                padLabel="數字鍵盤"
+                onAppend={appendMathKey}
+                onBackspace={backspaceMath}
+                onSubmit={submitMath}
+              />
               {(coachMsg || mathResult === 'ok') && (
                 <p className={`math-feedback ${mathResult === 'ok' ? 'is-ok' : 'is-no'}`}>
                   {mathResult === 'ok' ? '答對啦！好努力！' : coachMsg}
@@ -1315,7 +1285,7 @@ export function PracticeSession({
               {revealAnswer && mathResult !== 'ok' && item.answer && (
                 <p className="sample__tip">參考答案：{item.answer}</p>
               )}
-            </div>
+            </>
           )}
 
           {item.kind === 'sort' && item.sortItems && item.buckets && (
@@ -1523,7 +1493,7 @@ export function PracticeSession({
         </div>
       </div>
 
-      <footer className="session__footer">
+      <footer className={`session__footer ${waitingOnPad ? 'session__footer--quiet' : ''}`}>
         <button
           type="button"
           className="ghost-btn"
@@ -1540,7 +1510,7 @@ export function PracticeSession({
         </button>
         <button
           type="button"
-          className="primary-btn primary-btn--wide"
+          className={waitingOnPad ? 'ghost-btn session__footer-help' : 'primary-btn primary-btn--wide'}
           onClick={handlePrimary}
           aria-label={
             done
