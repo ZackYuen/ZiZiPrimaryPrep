@@ -34,12 +34,22 @@ function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
+const LIMB = {
+  arm: 'zizi-limb-arm.png',
+  hand: 'zizi-limb-hand.png',
+  foot: 'zizi-limb-foot.png',
+}
+
+function limbSrc(file: string) {
+  return `${import.meta.env.BASE_URL}characters/${file}`
+}
+
 function PaperLimb({ side }: { side: 'l' | 'r' }) {
   return (
     <span className={`mascot-figure__arm mascot-figure__arm--${side}`} aria-hidden>
-      <span className="mascot-figure__upper" />
+      <img className="mascot-figure__upper" src={limbSrc(LIMB.arm)} alt="" draggable={false} />
       <span className="mascot-figure__forearm">
-        <span className="mascot-figure__hand" />
+        <img className="mascot-figure__hand" src={limbSrc(LIMB.hand)} alt="" draggable={false} />
       </span>
     </span>
   )
@@ -65,8 +75,20 @@ function MascotPuppet({
     <span className={`mascot-figure mascot-figure--${mood}`}>
       <span className="mascot-figure__shadow" aria-hidden />
       <span className="mascot-figure__hop" key={hopKey}>
-        <span className="mascot-figure__leg mascot-figure__leg--l" aria-hidden />
-        <span className="mascot-figure__leg mascot-figure__leg--r" aria-hidden />
+        <img
+          className="mascot-figure__leg mascot-figure__leg--l"
+          src={limbSrc(LIMB.foot)}
+          alt=""
+          draggable={false}
+          aria-hidden
+        />
+        <img
+          className="mascot-figure__leg mascot-figure__leg--r"
+          src={limbSrc(LIMB.foot)}
+          alt=""
+          draggable={false}
+          aria-hidden
+        />
         <span className={`mascot-figure__body ${blink ? 'is-blink' : ''}`}>
           <img
             className={`mascot mascot--${mood}`}
