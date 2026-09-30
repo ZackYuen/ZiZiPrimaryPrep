@@ -34,19 +34,30 @@ body {
   display: block;
   border: 3px solid rgba(90, 82, 64, 0.14);
   border-radius: 30%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #fbf4e5;
   box-shadow: 0 7px 0 rgba(91, 79, 55, 0.1), 0 12px 24px rgba(52, 66, 66, 0.1);
-  mix-blend-mode: multiply;
+  mix-blend-mode: normal;
 }
 
 .hero__mascot-wrap .mascot {
   transform: rotate(-1.5deg);
 }
 
+.hero__mascot-wrap .mascot-buddy .mascot {
+  transform: none;
+}
+
 .mock-cta__art .mascot {
   border-color: rgba(255, 255, 255, 0.35);
   border-radius: 20px;
   mix-blend-mode: normal;
+}
+
+.session__mascot.mascot,
+.session__mascot .mascot {
+  border-width: 2px;
+  border-radius: 28%;
 }
 
 .module-card,
@@ -193,7 +204,14 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .mascot,
+  .mascot-buddy,
+  .mascot-buddy__face,
+  .mascot-buddy__bubble,
   .day-glyph {
     animation: none;
+  }
+
+  .mascot-buddy__face.is-blink {
+    transform: none;
   }
 }

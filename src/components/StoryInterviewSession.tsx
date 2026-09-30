@@ -13,6 +13,8 @@ import { Confetti } from './Confetti'
 import { SoundToggle } from './SoundToggle'
 import { StoryFrameArt } from './StoryFrameArt'
 import { StoryOrderBoard } from './StoryOrderBoard'
+import { Mascot } from './Mascot'
+import { resolveMascotPresence } from '../lib/mascotPresence'
 
 type Props = {
   completed: Record<string, boolean>
@@ -90,6 +92,11 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
   }
 
   const done = story ? Boolean(completed[story.id]) : false
+  const mascot = resolveMascotPresence({
+    cheering: justStar || ordered,
+    encourage: showWrong && !ordered,
+    looking: phase === 'play' && !ordered,
+  })
 
   return (
     <section className="story-interview">
@@ -97,6 +104,14 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
         <button type="button" className="ghost-btn" onClick={goBack} aria-label="返回">
           ←
         </button>
+        <Mascot
+          mood={mascot.mood}
+          reason={mascot.reason}
+          size={76}
+          interactive
+          bubbleAlign="side"
+          className="session__mascot"
+        />
         <div className="story-interview__heading">
           <h1>iPad 看圖講故事</h1>
           <p>

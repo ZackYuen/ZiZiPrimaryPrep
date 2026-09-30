@@ -227,6 +227,15 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'evg-animal-day': 'zoo',
   'evg-bridge-talk': 'share',
   'evg-morning': 'daily',
+  'jando-name-zh': 'intro',
+  'jando-name-en': 'intro',
+  'jando-word-pick': 'eat',
+  'jando-m1': 'plus',
+  'jando-m2': 'minus',
+  'jando-m3': 'plus',
+  'jando-m4': 'minus',
+  'jando-m5': 'mix',
+  'jando-teams-3': 'mix',
 }
 
 const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
@@ -240,7 +249,7 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
   },
   'd1-zh-like': {
     kidLine: '講一樣你鍾意嘅嘢，再講「因為」。',
-    moreLine: '例如：我鍾意藍色，因為天空是藍色的。',
+    moreLine: '例如：我鍾意藍色，因為天係藍色。',
   },
   'd1-zh-family': {
     kidLine: '講你同家人一齊做過咩開心嘅事。',
@@ -303,7 +312,7 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
     moreLine: '今日我好開心，因為媽媽送禮物俾我。',
   },
   'd4-solve': {
-    kidLine: '有人搶玩具：先講感受，再請輪流玩，唔好打人。',
+    kidLine: '有人搶玩具：先講感受，再叫佢哋輪流玩，唔好打人。',
     moreLine: '我會話：我唔開心。我哋一齊輪流玩得唔得？',
   },
   'd4-sort': {
@@ -405,6 +414,22 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
   'evg-match': {
     kidLine: '英文拖去中文：name 係名字。',
     moreLine: 'egg 雞蛋、broccoli 西蘭花、ear 耳朵。',
+  },
+  'jando-read-zh': {
+    kidLine: '望住圖，逐個讀出嚟。',
+    moreLine: '蘋果、眼睛、老師、朋友、恐龍、書包。',
+  },
+  'jando-read-en': {
+    kidLine: '望住圖，用英文逐個讀。',
+    moreLine: 'apple, cat, red, school, bag.',
+  },
+  'jando-name-zh': {
+    kidLine: '大聲講：我叫袁碩孜。',
+    moreLine: '望住前面，笑住講自己個名。',
+  },
+  'spcc-read': {
+    kidLine: '望住圖，中文同英文都讀。',
+    moreLine: '眼睛、蘋果、疲累、橋樑。mouth, green, purple, children.',
   },
 }
 
@@ -509,8 +534,8 @@ function parseExplicitChain(prompt: string): MathModel | undefined {
 
 function opFromSpan(text: string): MathOp | undefined {
   if (/小時後|小時之後/.test(text)) return '+'
-  if (/用去|借走|減|少了|吃了|拿走|還剩|剩多少/.test(text)) return '-'
-  if (/再給|又來|再來|放入|再放|加[了上]|和|共有|一共|再來了/.test(text)) return '+'
+  if (/用去|用咗|借走|減|少了|少咗|吃了|食咗|拿走|還剩|仲剩|剩多少|剩幾多/.test(text)) return '-'
+  if (/再給|再俾|又來|又嚟|再來|再嚟|放入|再放|加[了上]|和|同|共有|一共|再來了/.test(text)) return '+'
   if (/倍/.test(text)) return '×'
   if (/平均/.test(text)) return '÷'
   return undefined
@@ -523,7 +548,7 @@ export function parseSequence(prompt: string): MathModel | undefined {
 }
 
 function parseCompare(prompt: string): MathModel | undefined {
-  if (!/誰比較多|哪[班個]比較多/.test(prompt)) return undefined
+  if (!/誰比較多|邊個多|哪[班個]比較多|邊班多/.test(prompt)) return undefined
   const hits = wholeInts(prompt)
   if (hits.length < 2) return undefined
   return modelOf(prompt, [
@@ -533,7 +558,7 @@ function parseCompare(prompt: string): MathModel | undefined {
 }
 
 function parseNumberList(prompt: string): MathModel | undefined {
-  if (!/____|＿＿|＿+|空格|下一個|少了邊一個|中間係|唔屬於同一組|不屬於/.test(prompt)) return undefined
+  if (!/____|＿＿|＿+|空格|下一個|少了邊一個|少咗邊一個|中間係|唔屬於同一組|唔同組|不屬於/.test(prompt)) return undefined
   const tokens: MathPiece[] = []
   const re = /(\d{1,3})|(____|＿+)/g
   let m: RegExpExecArray | null
@@ -556,7 +581,7 @@ function parseNumberList(prompt: string): MathModel | undefined {
 function parseStory(prompt: string): MathModel | undefined {
   if (/\d+\.\d+/.test(prompt)) return undefined
   if (/月/.test(prompt) && /日/.test(prompt)) return undefined
-  if (/一個數|這個數/.test(prompt)) return undefined
+  if (/一個數|這個數|呢個數/.test(prompt)) return undefined
 
   const hits = wholeInts(prompt)
   if (hits.length === 0) return undefined
@@ -596,7 +621,7 @@ function parseStory(prompt: string): MathModel | undefined {
     ])
   }
 
-  if (/共/.test(prompt) && /幾個/.test(prompt) && hits.length === 2 && !/再來|又來|再給|小時/.test(prompt)) {
+  if (/共/.test(prompt) && /幾個/.test(prompt) && hits.length === 2 && !/再來|又來|再給|再俾|又嚟|再嚟|小時/.test(prompt)) {
     return modelOf(prompt, [
       { kind: 'count', n: hits[0].n },
       { kind: 'op', op: '-' },
@@ -648,7 +673,7 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (ID_VISUAL[item.id]) return ID_VISUAL[item.id]
   if (item.scene && SCENE_VISUAL[item.scene]) return SCENE_VISUAL[item.scene]!
   if (item.kind === 'clock' || item.clock) return 'clock'
-  if (item.kind === 'money' || item.coins || /錢包|硬幣|幾多元/.test(`${item.promptZh}`)) return 'coins'
+  if (item.kind === 'money' || item.coins || /錢包|銀包|硬幣|幾多元/.test(`${item.promptZh}`)) return 'coins'
   if (item.kind === 'sort') return 'sort'
   if (item.kind === 'reorder') return 'reorder'
   if (item.kind === 'prompt') return 'move'
@@ -657,6 +682,12 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (item.kind === 'build') return 'move'
   if (item.kind === 'memory') return 'zoo'
   if (item.calendarDay) return 'weekend'
+  if (item.kind === 'math') {
+    if (mathHasMinus(math) && !mathHasPlus(math)) return 'minus'
+    if (mathHasPlus(math) && !mathHasMinus(math)) return 'plus'
+    return 'mix'
+  }
+  if (item.readAloud || /讀呢啲詞|跟住讀/.test(item.promptZh)) return 'talk'
   const p = `${item.promptZh} ${item.promptEn || ''} ${item.cue || ''}`
   if (/policeman|police|警察/.test(p)) return 'policeman'
   if (/firefighter|消防/.test(p)) return 'firefighter'
@@ -680,12 +711,7 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (/angry|嬲|憤怒|搶/.test(p)) return 'grab'
   if (/happy|開心|興奮/.test(p)) return 'happy'
   if (/job|工作|老師/.test(p)) return 'job'
-  if (item.kind === 'math') {
-    if (mathHasMinus(math) && !mathHasPlus(math)) return 'minus'
-    if (mathHasPlus(math) && !mathHasMinus(math)) return 'plus'
-    return 'mix'
-  }
-  if (/誰比較多|哪班比較多|多多少|比較多/.test(p)) return 'mix'
+  if (/誰比較多|邊個多|哪班比較多|邊班多|多多少|多幾多|比較多/.test(p)) return 'mix'
   if (item.kind === 'speak') return 'talk'
   return 'story'
 }

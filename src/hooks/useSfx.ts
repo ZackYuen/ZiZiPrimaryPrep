@@ -1,4 +1,4 @@
-type SfxName = 'tap' | 'correct' | 'wrong' | 'star' | 'whoosh' | 'celebrate' | 'flip'
+type SfxName = 'tap' | 'correct' | 'wrong' | 'star' | 'whoosh' | 'celebrate' | 'finale' | 'flip'
 
 let ctx: AudioContext | null = null
 let muted = false
@@ -105,6 +105,20 @@ export function playSfx(name: SfxName) {
         tone(c, f, t + i * 0.09, 0.22, i % 2 ? 'triangle' : 'sine', 0.07)
       })
       break
+    case 'finale': {
+      // A longer, unmistakable chapter-ending fanfare: bass hit, rising run,
+      // then a bright major chord. Kept synthetic so it works offline.
+      tone(c, 130.81, t, 0.45, 'triangle', 0.1)
+      tone(c, 196, t + 0.03, 0.38, 'sine', 0.07)
+      ;[392, 523.25, 659.25, 783.99, 1046.5, 1318.51].forEach((f, i) => {
+        tone(c, f, t + 0.18 + i * 0.12, 0.28, i % 2 ? 'triangle' : 'sine', 0.085)
+      })
+      ;[523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+        tone(c, f, t + 1.05, 0.85, i % 2 ? 'triangle' : 'sine', 0.075)
+      })
+      tone(c, 1567.98, t + 1.35, 0.55, 'sine', 0.055)
+      break
+    }
   }
 }
 

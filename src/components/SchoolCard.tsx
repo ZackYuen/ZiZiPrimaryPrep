@@ -40,6 +40,19 @@ function SchoolGlyph({ id }: { id: SchoolPlan['id'] }) {
       </svg>
     )
   }
+  if (id === 'jando') {
+    return (
+      <svg className="day-glyph" viewBox="0 0 64 64" aria-hidden>
+        <rect width="64" height="64" rx="18" fill="#B8D46A" />
+        <rect x="20" y="16" width="24" height="32" rx="12" fill="#7CB342" />
+        <circle cx="27" cy="24" r="2.2" fill="#1B3A16" />
+        <circle cx="37" cy="24" r="2.2" fill="#1B3A16" />
+        <path d="M26 30 Q32 35 38 30" fill="none" stroke="#1B3A16" strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="32" cy="38" r="2" fill="#2E4A1A" />
+        <circle cx="32" cy="43" r="2" fill="#2E4A1A" />
+      </svg>
+    )
+  }
   return (
     <svg className="day-glyph" viewBox="0 0 64 64" aria-hidden>
       <rect width="64" height="64" rx="18" fill="#F5C84C" />

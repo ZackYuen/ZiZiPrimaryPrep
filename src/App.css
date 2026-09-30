@@ -261,10 +261,17 @@
 }
 
 .hero__mascot-wrap {
+  position: relative;
+  z-index: 2;
   display: flex;
   justify-content: center;
   margin: 0.35rem 0 0.15rem;
   animation: rise-in 0.7s ease 0.05s both;
+}
+
+.hero__mascot-wrap .mascot-buddy--bubble-side .mascot-buddy__bubble {
+  left: calc(100% + 6px);
+  min-width: max-content;
 }
 
 .hero__name {
@@ -1108,10 +1115,13 @@
 }
 
 .session__top {
+  position: relative;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  overflow: visible;
 }
 
 .session__progress {
@@ -1129,6 +1139,12 @@
   font-family: var(--font-display);
   color: var(--ink);
   font-size: 1rem;
+}
+
+.session__mascot {
+  flex-shrink: 0;
+  width: 76px;
+  height: 76px;
 }
 
 .session__track {
@@ -2529,12 +2545,121 @@
 }
 
 .mascot--cheer {
-  animation: mascot-cheer 0.55s ease;
+  animation: mascot-cheer 0.55s ease, mascot-bounce 2.2s ease-in-out 0.55s infinite;
 }
 
 .mascot__arm {
   transform-origin: 128px 90px;
   animation: wave-arm 0.9s ease-in-out infinite;
+}
+
+.mascot-buddy {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  animation: mascot-bounce 2.8s ease-in-out infinite;
+}
+
+.mascot-buddy--wave {
+  animation-duration: 2.2s;
+}
+
+.mascot-buddy--cheer,
+.mascot-buddy.is-pop {
+  animation: mascot-cheer 0.55s ease, mascot-bounce 2.2s ease-in-out 0.55s infinite;
+}
+
+.mascot-buddy .mascot {
+  width: 100%;
+  height: 100%;
+  animation: none;
+}
+
+.mascot-buddy__face {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 80%;
+}
+
+.mascot-buddy--wave .mascot-buddy__face {
+  animation: mascot-wave-tilt 5.6s ease-in-out infinite;
+}
+
+.mascot-buddy__face.is-blink {
+  transform: scaleY(0.92);
+}
+
+.mascot-buddy__bubble {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 4px);
+  z-index: 8;
+  transform: translateX(-50%);
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: #fffdf7;
+  border: 2px solid rgba(90, 82, 64, 0.16);
+  box-shadow: 0 4px 0 rgba(91, 79, 55, 0.08);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: mascot-bubble-in 0.22s ease;
+}
+
+.mascot-buddy--bubble-end .mascot-buddy__bubble {
+  left: auto;
+  right: 0;
+  top: calc(100% + 2px);
+  transform: none;
+  animation-name: mascot-bubble-in-end;
+}
+
+.mascot-buddy--bubble-side .mascot-buddy__bubble {
+  left: calc(100% + 10px);
+  top: 50%;
+  right: auto;
+  transform: translateY(-50%);
+  animation-name: mascot-bubble-in-side;
+}
+
+.mascot-buddy--bubble-side .mascot-buddy__bubble::before {
+  left: 2px;
+  top: 50%;
+  margin: -4px 0 0 0;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.mascot-buddy__bubble::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  background: #fffdf7;
+  border-left: 2px solid rgba(90, 82, 64, 0.16);
+  border-top: 2px solid rgba(90, 82, 64, 0.16);
+  transform: rotate(45deg);
+}
+
+.mascot-buddy--bubble-end .mascot-buddy__bubble::before {
+  left: 18px;
+  margin-left: 0;
 }
 
 @keyframes mascot-bounce {
@@ -2559,6 +2684,56 @@
   }
 }
 
+@keyframes mascot-wave-tilt {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0deg);
+  }
+  78% {
+    transform: rotate(-8deg);
+  }
+  86% {
+    transform: rotate(7deg);
+  }
+  94% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes mascot-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes mascot-bubble-in-end {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mascot-bubble-in-side {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-6px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0) scale(1);
+  }
+}
+
 @keyframes wave-arm {
   0%,
   100% {
@@ -2566,6 +2741,19 @@
   }
   50% {
     transform: rotate(-18deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot,
+  .mascot-buddy,
+  .mascot-buddy__face,
+  .mascot-buddy__bubble {
+    animation: none;
+  }
+
+  .mascot-buddy__face.is-blink {
+    transform: none;
   }
 }
 
@@ -2652,6 +2840,227 @@
   top: -12px;
   border-radius: 3px;
   animation: confetti-fall 1.3s ease-in forwards;
+}
+
+.confetti--grand {
+  z-index: 102;
+}
+
+.confetti--grand .confetti__piece {
+  top: -28px;
+  animation-duration: 2.65s;
+  box-shadow: 0 2px 0 rgba(27, 58, 75, 0.12);
+}
+
+.chapter-finale {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 1rem;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.96) 0 12%, transparent 42%),
+    linear-gradient(145deg, #7ec8e3 0%, #ffe08a 46%, #ff9b7a 100%);
+  animation: chapter-finale-in 0.28s ease-out both;
+}
+
+.chapter-finale__rays {
+  position: absolute;
+  width: min(160vw, 950px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0.55;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 0.88) 0deg 9deg,
+    transparent 9deg 20deg
+  );
+  animation: chapter-rays 7s linear infinite;
+}
+
+.chapter-finale__card {
+  position: relative;
+  z-index: 103;
+  width: min(92vw, 430px);
+  padding: 1.15rem 1rem 1.3rem;
+  border: 5px solid #fff;
+  border-radius: 38px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 22px 0 rgba(138, 106, 18, 0.16),
+    0 28px 70px rgba(27, 58, 75, 0.28);
+  text-align: center;
+  animation: chapter-card-pop 0.75s cubic-bezier(0.2, 1.55, 0.45, 1) both;
+}
+
+.chapter-finale__kicker {
+  margin: 0;
+  color: #c45c26;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 6vw, 2rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  animation: chapter-kicker 0.65s ease 0.55s both;
+}
+
+.chapter-finale__mascot {
+  display: block;
+  width: min(46vw, 190px);
+  height: auto;
+  margin: -0.15rem auto -0.35rem;
+  filter: drop-shadow(0 12px 0 rgba(27, 58, 75, 0.1));
+  animation: chapter-mascot-jump 0.75s ease 0.35s both;
+}
+
+.chapter-finale__card h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 10vw, 3.2rem);
+  line-height: 1.05;
+  text-shadow: 0 5px 0 rgba(245, 200, 76, 0.4);
+}
+
+.chapter-finale__card > p:last-of-type {
+  margin: 0.5rem 0 0;
+  color: var(--ink-soft);
+  font-size: clamp(1rem, 4vw, 1.25rem);
+  font-weight: 800;
+}
+
+.chapter-finale__trophy {
+  position: absolute;
+  right: -0.55rem;
+  bottom: -0.7rem;
+  display: grid;
+  place-items: center;
+  width: 4.2rem;
+  height: 4.2rem;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  background: #f5c84c;
+  color: #8a6a12;
+  font-size: 2.5rem;
+  box-shadow: 0 8px 0 rgba(138, 106, 18, 0.24);
+  animation: chapter-trophy 0.7s cubic-bezier(0.2, 1.7, 0.4, 1) 1.05s both;
+}
+
+.chapter-finale__stars {
+  position: absolute;
+  z-index: 104;
+  inset: 0;
+  pointer-events: none;
+}
+
+.chapter-finale__stars span {
+  position: absolute;
+  color: #fff;
+  font-size: clamp(2.6rem, 12vw, 5.4rem);
+  text-shadow: 0 7px 0 rgba(138, 106, 18, 0.2);
+  animation: chapter-star-pop 0.65s cubic-bezier(0.2, 1.8, 0.4, 1) both;
+}
+
+.chapter-finale__stars span:nth-child(1) {
+  top: 10%;
+  left: 8%;
+  transform: rotate(-18deg);
+  animation-delay: 0.5s;
+}
+
+.chapter-finale__stars span:nth-child(2) {
+  top: 8%;
+  right: 8%;
+  transform: rotate(20deg);
+  animation-delay: 0.72s;
+}
+
+.chapter-finale__stars span:nth-child(3) {
+  left: 12%;
+  bottom: 9%;
+  transform: rotate(12deg);
+  animation-delay: 0.94s;
+}
+
+@keyframes chapter-finale-in {
+  from {
+    opacity: 0;
+    filter: saturate(0.6);
+  }
+  to {
+    opacity: 1;
+    filter: saturate(1);
+  }
+}
+
+@keyframes chapter-rays {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes chapter-card-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.25) rotate(-8deg);
+  }
+  72% {
+    opacity: 1;
+    transform: scale(1.08) rotate(2deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes chapter-mascot-jump {
+  from {
+    opacity: 0;
+    transform: translateY(90px) scale(0.65) rotate(-10deg);
+  }
+  62% {
+    opacity: 1;
+    transform: translateY(-18px) scale(1.1) rotate(6deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0);
+  }
+}
+
+@keyframes chapter-kicker {
+  from {
+    opacity: 0;
+    transform: scale(2.2) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes chapter-trophy {
+  from {
+    opacity: 0;
+    scale: 0;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes chapter-star-pop {
+  from {
+    opacity: 0;
+    scale: 0;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
 }
 
 @keyframes confetti-fall {
@@ -3174,6 +3583,44 @@ button.picture-strip__item--choice {
 
 .speak-box--compact > .sample {
   grid-column: 1 / -1;
+}
+
+.speak-box--read,
+.speak-box--solo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.7rem;
+}
+
+.speak-box__done {
+  min-height: 3.4rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.speak-box__done.is-done,
+.speak-box__done:disabled {
+  opacity: 0.45;
+  filter: saturate(0.75);
+  cursor: default;
+}
+
+.speak-box__more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.speak-box__more .pill-btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.listen-panel--optional {
+  padding: 0.55rem;
 }
 
 @media (max-width: 720px) {
@@ -3706,7 +4153,8 @@ button.picture-strip__item--choice {
     font-size: 1.45rem;
   }
 
-  .hero__mascot-wrap .mascot {
+  .hero__mascot-wrap .mascot,
+  .hero__mascot-wrap .mascot-buddy {
     width: 88px !important;
     height: 88px !important;
   }
@@ -3971,6 +4419,17 @@ button.picture-strip__item--choice {
 
   .speak-box--compact .listen-panel {
     padding: 0.4rem;
+  }
+
+  .speak-box--read,
+  .speak-box--solo {
+    margin-top: 0.32rem;
+    gap: 0.45rem;
+  }
+
+  .speak-box__done {
+    min-height: 3rem;
+    font-size: 1.12rem;
   }
 
   .analog-clock {

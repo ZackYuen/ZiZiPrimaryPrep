@@ -212,7 +212,7 @@ export default function App() {
       <header className="hero">
         <p className="hero__brand">碩孜升小面試</p>
         <div className="hero__mascot-wrap">
-          <Mascot mood="wave" size={150} />
+          <Mascot mood="wave" size={150} interactive bubbleAlign="side" />
         </div>
         <h1 className="hero__name">{CHILD.nameShort}</h1>
         <p className="hero__figure">
@@ -262,7 +262,7 @@ export default function App() {
         </button>
 
         <h2 className="section-label">學校專項</h2>
-        <p className="section-lead">本週四校：聽故事 · 揀圖 · 心算 · 記憶</p>
+        <p className="section-lead">學校專項：聽指令 · 認讀 · 心算 · 小組遊戲</p>
         <div className="module-grid">
           {schoolPlans.map((school, i) => (
             <SchoolCard
