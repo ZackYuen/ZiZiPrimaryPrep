@@ -248,7 +248,7 @@ export default function App() {
       <main className="home-main">
         <button type="button" className="mock-cta" onClick={() => go({ name: 'mock' })}>
           <span className="mock-cta__art" aria-hidden>
-            <Mascot mood="cheer" size={64} />
+            <Mascot mood="happy" size={64} />
           </span>
           <span className="mock-cta__text">
             <span className="mock-cta__label">★ 面試</span>

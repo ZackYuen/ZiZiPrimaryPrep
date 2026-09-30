@@ -156,7 +156,10 @@ export function Mascot({
 
   if (!interactive) {
     return (
-      <span className={`mascot-static mascot-static--${mood} ${className}`.trim()}>
+      <span
+        className={`mascot-static mascot-static--${mood} ${className}`.trim()}
+        style={{ width: size, height: size }}
+      >
         <MascotPose
           mood={mood}
           size={size}
