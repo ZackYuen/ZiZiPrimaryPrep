@@ -208,6 +208,7 @@ body {
   .mascot-static,
   .mascot-buddy,
   .mascot-figure__hop,
+  .mascot-figure__pose,
   .mascot-figure__shadow,
   .mascot-figure__body,
   .mascot-figure__arm,
@@ -229,6 +230,7 @@ body {
   }
 
   .mascot-figure__hop,
+  .mascot-figure__pose,
   .mascot-figure__body,
   .mascot-figure__body.is-blink,
   .mascot-buddy:active .mascot-figure__hop {

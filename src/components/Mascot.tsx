@@ -75,32 +75,34 @@ function MascotPuppet({
     <span className={`mascot-figure mascot-figure--${mood}`}>
       <span className="mascot-figure__shadow" aria-hidden />
       <span className="mascot-figure__hop" key={hopKey}>
-        <img
-          className="mascot-figure__leg mascot-figure__leg--l"
-          src={limbSrc(LIMB.foot)}
-          alt=""
-          draggable={false}
-          aria-hidden
-        />
-        <img
-          className="mascot-figure__leg mascot-figure__leg--r"
-          src={limbSrc(LIMB.foot)}
-          alt=""
-          draggable={false}
-          aria-hidden
-        />
-        <span className={`mascot-figure__body ${blink ? 'is-blink' : ''}`}>
+        <span className="mascot-figure__pose">
           <img
-            className={`mascot mascot--${mood}`}
-            width={size}
-            height={size}
-            src={art}
-            alt={alt}
+            className="mascot-figure__leg mascot-figure__leg--l"
+            src={limbSrc(LIMB.foot)}
+            alt=""
             draggable={false}
+            aria-hidden
           />
+          <img
+            className="mascot-figure__leg mascot-figure__leg--r"
+            src={limbSrc(LIMB.foot)}
+            alt=""
+            draggable={false}
+            aria-hidden
+          />
+          <span className={`mascot-figure__body ${blink ? 'is-blink' : ''}`}>
+            <img
+              className={`mascot mascot--${mood}`}
+              width={size}
+              height={size}
+              src={art}
+              alt={alt}
+              draggable={false}
+            />
+          </span>
+          <PaperLimb side="l" />
+          <PaperLimb side="r" />
         </span>
-        <PaperLimb side="l" />
-        <PaperLimb side="r" />
       </span>
     </span>
   )
