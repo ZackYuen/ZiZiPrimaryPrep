@@ -2728,13 +2728,21 @@
   overflow: visible;
 }
 
+.mascot-buddy.is-pop .mascot-figure__plate {
+  box-shadow:
+    0 0 0 7px rgba(245, 200, 76, 0.38),
+    0 3px 0 rgba(36, 62, 74, 0.1);
+}
+
 .mascot-buddy__spark {
   position: absolute;
   opacity: 0;
   color: #f5c84c;
-  font-size: 0.78em;
+  font-size: 1.35rem;
   line-height: 1;
-  text-shadow: 0 1px 0 rgba(138, 106, 18, 0.28);
+  text-shadow:
+    0 1px 0 rgba(138, 106, 18, 0.28),
+    0 0 10px rgba(255, 232, 138, 0.85);
   transform: scale(0.35);
 }
 
@@ -2746,13 +2754,13 @@
 .mascot-buddy__spark--b {
   top: -2%;
   right: 8%;
-  font-size: 0.95em;
+  font-size: 1.55rem;
 }
 
 .mascot-buddy__spark--c {
   top: 28%;
   right: -4%;
-  font-size: 0.7em;
+  font-size: 1.2rem;
 }
 
 .mascot-buddy--cheer .mascot-buddy__spark,
@@ -2932,13 +2940,89 @@
     opacity: 0;
     transform: translate3d(0, 4px, 0) scale(0.35) rotate(-12deg);
   }
-  40% {
+  22% {
     opacity: 1;
-    transform: translate3d(-2px, -6px, 0) scale(1.05) rotate(8deg);
+    transform: translate3d(-2px, -8px, 0) scale(1.2) rotate(8deg);
   }
-  70% {
-    opacity: 0.85;
-    transform: translate3d(3px, -10px, 0) scale(0.9) rotate(-6deg);
+  55% {
+    opacity: 1;
+    transform: translate3d(3px, -12px, 0) scale(1.05) rotate(-6deg);
+  }
+  82% {
+    opacity: 0.35;
+    transform: translate3d(1px, -4px, 0) scale(0.7) rotate(4deg);
+  }
+}
+
+/* English-class ZiziFX.burst / ring — mascot tap VFX, portaled to body. */
+.mascot-tap-fx {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.mascot-tap-fx__ring {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border: 4px solid rgba(245, 200, 76, 0.95);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: mascot-tap-ring 0.52s ease-out forwards;
+}
+
+.mascot-tap-fx__bit {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: mascot-tap-bit 0.7s ease-out forwards;
+}
+
+.mascot-tap-fx__bit--spark,
+.mascot-tap-fx__bit--star {
+  width: 1.55rem;
+  height: 1.55rem;
+  margin: -0.78rem 0 0 -0.78rem;
+  background: transparent;
+  font-size: 1.4rem;
+  line-height: 1;
+  text-shadow:
+    0 1px 0 rgba(138, 106, 18, 0.32),
+    0 0 8px rgba(255, 232, 138, 0.9);
+}
+
+@keyframes mascot-tap-bit {
+  0% {
+    opacity: 1;
+    transform: scale(0.7);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.2);
+  }
+}
+
+@keyframes mascot-tap-ring {
+  0% {
+    opacity: 1;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(6);
   }
 }
 
@@ -3005,6 +3089,9 @@
   .mascot-buddy__spark,
   .mascot-buddy--cheer .mascot-buddy__spark,
   .mascot-buddy.is-pop .mascot-buddy__spark,
+  .mascot-tap-fx,
+  .mascot-tap-fx__bit,
+  .mascot-tap-fx__ring,
   .mascot-buddy__think span,
   .mascot-buddy__bubble,
   .chapter-finale__mascot,
@@ -3020,6 +3107,9 @@
   }
 
   .mascot-buddy__spark,
+  .mascot-tap-fx,
+  .mascot-tap-fx__bit,
+  .mascot-tap-fx__ring,
   .chapter-finale__mascot.mascot-static--cheer::before,
   .chapter-finale__mascot.mascot-static--cheer::after,
   .mascot-buddy__think {

@@ -1,4 +1,13 @@
-type SfxName = 'tap' | 'correct' | 'wrong' | 'star' | 'whoosh' | 'celebrate' | 'finale' | 'flip'
+type SfxName =
+  | 'tap'
+  | 'pop'
+  | 'correct'
+  | 'wrong'
+  | 'star'
+  | 'whoosh'
+  | 'celebrate'
+  | 'finale'
+  | 'flip'
 
 let ctx: AudioContext | null = null
 let muted = false
@@ -66,6 +75,12 @@ export function playSfx(name: SfxName) {
   switch (name) {
     case 'tap':
       tone(c, 520, t, 0.06, 'triangle', 0.05)
+      break
+    case 'pop':
+      // English-class sparkFx "pop": short playful twinkle for mascot tap.
+      tone(c, 988, t, 0.07, 'triangle', 0.08)
+      tone(c, 1318.51, t + 0.05, 0.1, 'sine', 0.07)
+      tone(c, 1760, t + 0.11, 0.16, 'sine', 0.055)
       break
     case 'flip':
       tone(c, 380, t, 0.08, 'sine', 0.04)
