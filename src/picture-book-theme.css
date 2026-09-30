@@ -207,39 +207,31 @@ body {
   .mascot,
   .mascot-static,
   .mascot-buddy,
-  .mascot-buddy--happy .mascot-buddy__motion,
-  .mascot-buddy--wave .mascot-buddy__motion,
-  .mascot-buddy--think .mascot-buddy__motion,
-  .mascot-buddy--cheer .mascot-buddy__motion,
-  .mascot-buddy.is-pop .mascot-buddy__motion,
-  .mascot-buddy:active .mascot-buddy__motion,
-  .mascot-buddy__face,
+  .mascot-figure__hop,
+  .mascot-figure__shadow,
+  .mascot-figure__body,
+  .mascot-figure__arm,
+  .mascot-figure__forearm,
+  .mascot-figure__leg,
+  .mascot-figure--cheer .mascot-figure__hop,
+  .mascot-buddy.is-pop .mascot-figure__hop,
+  .mascot-buddy:active .mascot-figure__hop,
   .mascot-buddy__spark,
   .mascot-buddy--cheer .mascot-buddy__spark,
   .mascot-buddy.is-pop .mascot-buddy__spark,
   .mascot-buddy__think span,
   .mascot-buddy__bubble,
   .chapter-finale__mascot,
-  .chapter-finale__mascot .mascot--cheer,
   .chapter-finale__mascot.mascot-static--cheer::before,
   .chapter-finale__mascot.mascot-static--cheer::after,
   .day-glyph {
     animation: none;
   }
 
-  .mascot,
-  .mascot--happy,
-  .mascot--wave,
-  .mascot--think,
-  .mascot--cheer,
-  .mascot-buddy__motion,
-  .mascot-buddy--happy .mascot-buddy__motion,
-  .mascot-buddy--wave .mascot-buddy__motion,
-  .mascot-buddy--think .mascot-buddy__motion,
-  .mascot-buddy--cheer .mascot-buddy__motion,
-  .mascot-buddy.is-pop .mascot-buddy__motion,
-  .mascot-buddy__face.is-blink,
-  .mascot-buddy:active .mascot-buddy__motion {
+  .mascot-figure__hop,
+  .mascot-figure__body,
+  .mascot-figure__body.is-blink,
+  .mascot-buddy:active .mascot-figure__hop {
     transform: none;
   }
 

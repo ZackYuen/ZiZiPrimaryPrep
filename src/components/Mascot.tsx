@@ -34,6 +34,56 @@ function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
+function PaperLimb({ side }: { side: 'l' | 'r' }) {
+  return (
+    <span className={`mascot-figure__arm mascot-figure__arm--${side}`} aria-hidden>
+      <span className="mascot-figure__upper" />
+      <span className="mascot-figure__forearm">
+        <span className="mascot-figure__hand" />
+      </span>
+    </span>
+  )
+}
+
+/** Layered paper puppet: illustrated body + independent arms/legs/hop. */
+function MascotPuppet({
+  mood,
+  size,
+  art,
+  alt,
+  blink,
+  hopKey,
+}: {
+  mood: MascotMood
+  size: number
+  art: string
+  alt: string
+  blink?: boolean
+  hopKey?: number | string
+}) {
+  return (
+    <span className={`mascot-figure mascot-figure--${mood}`}>
+      <span className="mascot-figure__shadow" aria-hidden />
+      <span className="mascot-figure__hop" key={hopKey}>
+        <span className="mascot-figure__leg mascot-figure__leg--l" aria-hidden />
+        <span className="mascot-figure__leg mascot-figure__leg--r" aria-hidden />
+        <span className={`mascot-figure__body ${blink ? 'is-blink' : ''}`}>
+          <img
+            className={`mascot mascot--${mood}`}
+            width={size}
+            height={size}
+            src={art}
+            alt={alt}
+            draggable={false}
+          />
+        </span>
+        <PaperLimb side="l" />
+        <PaperLimb side="r" />
+      </span>
+    </span>
+  )
+}
+
 /** Illustrated lime-green paper buddy representing 孜孜 / Seth. */
 export function Mascot({
   mood = 'happy',
@@ -53,6 +103,7 @@ export function Mascot({
   const shownMood: MascotMood =
     burst === 'tap' ? 'cheer' : burst === 'idle' && mood !== 'cheer' ? 'wave' : mood
   const popped = burst === 'tap'
+  const art = `${import.meta.env.BASE_URL}characters/${MOOD_ART[shownMood]}`
 
   const clearHide = () => {
     if (hideRef.current != null) {
@@ -109,28 +160,14 @@ export function Mascot({
     return () => window.clearInterval(id)
   }, [interactive])
 
-  const art = `${import.meta.env.BASE_URL}characters/${MOOD_ART[shownMood]}`
-  const face = (
-    <img
-      className={`mascot mascot--${shownMood}`}
-      width={size}
-      height={size}
-      src={art}
-      alt=""
-      draggable={false}
-    />
-  )
-
   if (!interactive) {
     return (
       <span className={`mascot-static mascot-static--${mood} ${className}`.trim()}>
-        <img
-          className={`mascot mascot--${mood}`}
-          width={size}
-          height={size}
-          src={`${import.meta.env.BASE_URL}characters/${MOOD_ART[mood]}`}
+        <MascotPuppet
+          mood={mood}
+          size={size}
+          art={`${import.meta.env.BASE_URL}characters/${MOOD_ART[mood]}`}
           alt="孜孜的綠色手工小伙伴"
-          draggable={false}
         />
       </span>
     )
@@ -156,14 +193,19 @@ export function Mascot({
         <span className="mascot-buddy__spark mascot-buddy__spark--b">★</span>
         <span className="mascot-buddy__spark mascot-buddy__spark--c">✦</span>
       </span>
-      <span className="mascot-buddy__motion" key={`${shownMood}-${motionKey}`}>
-        <span className="mascot-buddy__think" aria-hidden>
-          <span />
-          <span />
-          <span />
-        </span>
-        <span className={`mascot-buddy__face ${blink ? 'is-blink' : ''}`}>{face}</span>
+      <span className="mascot-buddy__think" aria-hidden>
+        <span />
+        <span />
+        <span />
       </span>
+      <MascotPuppet
+        mood={shownMood}
+        size={size}
+        art={art}
+        alt=""
+        blink={blink}
+        hopKey={`${shownMood}-${motionKey}`}
+      />
       {bubble && (
         <span className="mascot-buddy__bubble" role="status" aria-live="polite">
           {bubble}
