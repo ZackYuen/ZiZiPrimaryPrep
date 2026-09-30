@@ -1,23 +1,30 @@
 import { useState, type ReactNode } from 'react'
 import { DayCard } from './components/DayCard'
+import { SchoolCard } from './components/SchoolCard'
 import { PracticeSession } from './components/PracticeSession'
 import { ParentGuide } from './components/ParentGuide'
 import { VocabSession } from './components/VocabSession'
+import { StoryInterviewSession } from './components/StoryInterviewSession'
 import { Mascot } from './components/Mascot'
 import { SoundToggle } from './components/SoundToggle'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { CHILD, days, getDay, mockInterview, type DayId } from './data/content'
+import { getSchool, schoolPlans, type SchoolId } from './data/schoolWeek'
+import { storyInterviews } from './data/storyInterview'
 import { useProgress } from './hooks/useProgress'
 import { useBackgroundMusic } from './hooks/useBackgroundMusic'
 import { playSfx, unlockAudio } from './hooks/useSfx'
 import { ensureBgm, setBgmMood, startBgm } from './lib/bgm'
 import './App.css'
+import './picture-book-theme.css'
 
 type View =
   | { name: 'home' }
   | { name: 'day'; id: DayId }
+  | { name: 'school'; id: SchoolId }
   | { name: 'mock' }
   | { name: 'vocab' }
+  | { name: 'story' }
   | { name: 'parent' }
 
 function dayNumber(id: DayId): number {
@@ -30,10 +37,12 @@ export default function App() {
   const { progress, markDone, reset } = useProgress()
 
   const bgmPlace =
-    view.name === 'day'
+    view.name === 'day' || view.name === 'school'
       ? 'day'
       : view.name === 'mock'
         ? 'mock'
+        : view.name === 'story'
+          ? 'mock'
         : view.name === 'vocab'
           ? 'vocab'
           : view.name === 'parent'
@@ -100,6 +109,17 @@ export default function App() {
     )
   }
 
+  if (view.name === 'story') {
+    return shell(
+      false,
+      <StoryInterviewSession
+        completed={progress.completed}
+        onMarkDone={markDone}
+        onBack={() => go({ name: 'home' })}
+      />,
+    )
+  }
+
   if (view.name === 'mock') {
     return shell(
       false,
@@ -112,6 +132,33 @@ export default function App() {
         onMarkDone={markDone}
         onBack={() => go({ name: 'home' })}
         celebrate
+      />,
+    )
+  }
+
+  if (view.name === 'school') {
+    const school = getSchool(view.id)
+    if (!school) {
+      return shell(
+        false,
+        <>
+          <button type="button" className="ghost-btn" onClick={() => go({ name: 'home' })}>
+            ← 返回
+          </button>
+          <p>找不到這所學校的練習。</p>
+        </>,
+      )
+    }
+    return shell(
+      false,
+      <PracticeSession
+        title={school.title}
+        accent={school.accent}
+        items={school.activities}
+        moduleKey={school.id}
+        completed={progress.completed}
+        onMarkDone={markDone}
+        onBack={() => go({ name: 'home' })}
       />,
     )
   }
@@ -165,7 +212,7 @@ export default function App() {
       <header className="hero">
         <p className="hero__brand">碩孜升小面試</p>
         <div className="hero__mascot-wrap">
-          <Mascot mood="wave" size={150} />
+          <Mascot mood="wave" size={150} interactive bubbleAlign="side" />
         </div>
         <h1 className="hero__name">{CHILD.nameShort}</h1>
         <p className="hero__figure">
@@ -200,6 +247,34 @@ export default function App() {
             <span className="vocab-cta__sub">時間 · 人物 · 動作 · 地點（中英）</span>
           </span>
         </button>
+
+        <button type="button" className="story-cta" onClick={() => go({ name: 'story' })}>
+          <span className="story-cta__badge" aria-hidden>
+            <i>1</i><i>2</i><i>3</i>
+          </span>
+          <span className="story-cta__text">
+            <span className="story-cta__label">▣ 看圖講故事</span>
+            <span className="story-cta__sub">拖圖入四格 · 排好先後再講故事</span>
+          </span>
+          <span className="story-cta__progress">
+            {storyInterviews.filter((story) => progress.completed[story.id]).length}/{storyInterviews.length} ★
+          </span>
+        </button>
+
+        <h2 className="section-label">學校專項</h2>
+        <p className="section-lead">學校專項：聽指令 · 認讀 · 心算 · 小組遊戲</p>
+        <div className="module-grid">
+          {schoolPlans.map((school, i) => (
+            <SchoolCard
+              key={school.id}
+              school={school}
+              doneCount={school.activities.filter((a) => progress.completed[a.id]).length}
+              total={school.activities.length}
+              delay={80 + i * 50}
+              onOpen={() => go({ name: 'school', id: school.id })}
+            />
+          ))}
+        </div>
 
         <h2 className="section-label">Day</h2>
         <div className="module-grid">

@@ -37,7 +37,7 @@ export function ChapterCelebration({ show, title, onDone }: Props) {
       </div>
       <div className="chapter-finale__card">
         <p className="chapter-finale__kicker">SUPER!</p>
-        <Mascot mood="cheer" size={190} className="chapter-finale__mascot" />
+        <Mascot mood="cheer" reason="cheer" size={190} className="chapter-finale__mascot" />
         <h2>完成一章！</h2>
         <p>{title}</p>
         <div className="chapter-finale__trophy" aria-hidden>

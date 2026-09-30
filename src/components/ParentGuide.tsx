@@ -1,4 +1,6 @@
 import { coreAbilities, levels, parentQuotes, parentTips } from '../data/content'
+import { schoolPlans } from '../data/schoolWeek'
+import { VoiceSettingsPanel } from './VoiceSettingsPanel'
 
 type Props = {
   stars: number
@@ -18,8 +20,10 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
 
       <h2 className="parent__title">家長指引</h2>
       <p className="parent__lead">
-        內容來自《名校模擬面試》第一週字詞表與 Day 1–6。目標不是全部做對，而是建立勇氣、表達與不放棄。
+        內容來自《名校模擬面試》第一週字詞表、Day 1–6，以及本週《K3 學校專項每週練習》（蔡繼有、聖保羅書院小學、王錦輝、播道），另加家中整理嘅真道書院小組遊戲／基礎練習。目標不是全部做對，而是建立勇氣、表達與不放棄。
       </p>
+
+      <VoiceSettingsPanel />
 
       <h3 className="parent__h3">三個核心能力</h3>
       <div className="parent__list">
@@ -65,13 +69,13 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <article className="parent__item">
           <h3>唔會一次錯就揭曉</h3>
           <p>
-            選擇題／數學：答錯會出圖同淺提示，唔會即刻揭曉答案。再錯可以撳「?」睇答案。答啱先有星星；睇完提示都可以去下一題。
+            選擇題／數學：答錯會出圖同淺提示，唔會即刻揭曉答案。再錯可以撳「?」睇答案。答啱會自動去下一題；睇完提示都可以撳箭咀跳過。
           </p>
         </article>
         <article className="parent__item">
           <h3>五歲唔使打字</h3>
           <p>
-            中英文題：碩孜大聲講。分類／排句：拖詞。數學：大數字鍵盤。
+            中英文題：碩孜大聲講。分類／排句：拖詞。看圖講故事：拖圖入四格排次序，再睇圖講。數學：大數字鍵盤。
           </p>
         </article>
         <article className="parent__item">
@@ -94,6 +98,26 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         </article>
       </div>
 
+      {schoolPlans
+        .filter((s) => s.parentNote)
+        .map((s) => (
+          <div key={s.id}>
+            <h3 className="parent__h3">{s.shortName} · 家長面談</h3>
+            <div className="parent__list">
+              <article className="parent__item">
+                <h3>學校速寫</h3>
+                <p>{s.parentNote?.blurb}</p>
+              </article>
+              {s.parentNote?.talkingPoints.map((point) => (
+                <article key={point.title} className="parent__item">
+                  <h3>{point.title}</h3>
+                  <p>{point.body}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        ))}
+
       <h3 className="parent__h3">家長金句</h3>
       <div className="parent__list">
         {parentQuotes.map((q) => (
@@ -109,7 +133,10 @@ export function ParentGuide({ stars, onReset, onBack }: Props) {
         <p>
           已設定為 <strong>袁碩孜（Seth Yuen）</strong>、藍田靈糧幼稚園。喜好／志願答案仍可按碩孜真實情況改寫。
         </p>
-        <p>PDF 原稿在倉庫根目錄。Level 4 唔係必須完成——敢嘗試已經值得讚！</p>
+        <p>
+          主頁「學校專項」跟本週五校練習：Simon Says、砌派對／砌橋、七巧板遊戲、記憶翻牌，以及真道小組遊戲（老師說、踮腳走、凍住、學動物、傳豆袋）。節日同地方題撳圖就得，再講原因。
+        </p>
+        <p>教材 PDF 原稿在倉庫根目錄。真道題型由家中筆記改寫成原創練習，商業補習社 PDF 不會入倉。Level 4 唔係必須完成——敢嘗試已經值得讚！</p>
       </div>
 
       <button

@@ -19,11 +19,37 @@ export type HintVisualId =
   | 'sad'
   | 'angry'
   | 'feelings'
+  | 'gift'
+  | 'lost-toy'
+  | 'grab'
+  | 'firefighter'
+  | 'bike'
+  | 'bike-fall'
+  | 'doctor'
+  | 'nurse'
+  | 'cook'
+  | 'daily'
+  | 'play-fun'
+  | 'balloon'
+  | 'pencil-case'
+  | 'birthday'
+  | 'family-hobbies'
   | 'zoo'
   | 'job'
   | 'policeman'
+  | 'police-help'
   | 'uniform'
   | 'football'
+  | 'driver'
+  | 'postman'
+  | 'actor'
+  | 'writer'
+  | 'lawyer'
+  | 'toilet'
+  | 'mtr'
+  | 'bus-stop'
+  | 'sweep'
+  | 'sing'
   | 'clock'
   | 'coins'
   | 'like-blue'
@@ -39,11 +65,18 @@ export type HintVisualId =
   | 'minus'
   | 'story'
 
+export type MathOp = '+' | '-' | '×' | '÷' | '='
+
+export type MathPiece =
+  | { kind: 'count'; n: number }
+  | { kind: 'num'; n: number | string; blank?: boolean }
+  | { kind: 'op'; op: MathOp }
+  | { kind: 'blank' }
+  | { kind: 'groups'; groups: number; each: number }
+
 export type MathModel = {
-  left: number
-  right?: number
-  op?: '+' | '-'
   icon: 'dot' | 'apple' | 'book' | 'kid' | 'star'
+  pieces: MathPiece[]
 }
 
 export type TeachHint = {
@@ -72,14 +105,13 @@ const SCENE_VISUAL: Partial<Record<SceneId, HintVisualId>> = {
 
 const ID_VISUAL: Record<string, HintVisualId> = {
   'd1-v': 'talk',
-  'd2-v': 'run',
-  'd3-v': 'talk',
+  'd2-v': 'daily',
+  'd3-v': 'play-fun',
   'd3-share': 'share',
   'd4-vocab': 'feelings',
   'd5-fam': 'family',
   'd5-story1': 'share',
   'd5-story2': 'vase',
-  'd6-dad': 'family',
   'd1-zh-basic': 'intro',
   'd1-zh-like': 'like-blue',
   'd1-zh-family': 'family',
@@ -97,28 +129,113 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'd3-r2': 'reorder',
   'd3-r3': 'reorder',
   'd3-r4': 'reorder',
-  'd3-en-q': 'share',
+  'd3-en-q': 'bike',
+  'd3-m1a': 'mix',
+  'd3-m3b': 'mix',
   day4: 'feelings',
-  'd4-emo1': 'sad',
-  'd4-emo1b': 'angry',
-  'd4-emo2': 'happy',
-  'd4-solve': 'share',
+  'd4-emo1': 'gift',
+  'd4-emo1b': 'lost-toy',
+  'd4-emo2': 'gift',
+  'd4-solve': 'grab',
   'd4-sort': 'sort',
   'd4-syn': 'happy',
   'd4-ben': 'zoo',
-  'd4-leo': 'sad',
-  'd4-lily': 'feelings',
-  'd4-sam': 'feelings',
+  'd4-leo': 'balloon',
+  'd4-lily': 'pencil-case',
+  'd4-sam': 'birthday',
   'd4-week': 'weekend',
   day5: 'family',
   'd5-job': 'job',
-  'd5-hobby': 'happy',
-  'd6-ming': 'story',
-  'd6-ming2': 'talk',
+  'd5-hobby': 'family-hobbies',
+  'd5-purse-most': 'coins',
+  'd5-purse-least': 'coins',
+  'd6-dad': 'firefighter',
+  'd6-ming': 'bike-fall',
+  'd6-ming2': 'bike-fall',
   'd6-en1': 'policeman',
   'd6-en2': 'uniform',
   'd6-en3': 'football',
-  'd6-en4': 'policeman',
+  'd6-en4': 'police-help',
+  'd6-r2': 'mix',
+  'd6-r3a': 'mix',
+  'cky-simon': 'move',
+  'cky-simon-chain': 'move',
+  'cky-amy-listen': 'birthday',
+  'cky-amy-1': 'birthday',
+  'cky-amy-2': 'gift',
+  'cky-amy-3': 'birthday',
+  'cky-amy-4': 'birthday',
+  'cky-amy-5': 'birthday',
+  'cky-amy-help': 'share',
+  'cky-party-draw': 'birthday',
+  'cky-party-gift': 'gift',
+  'cky-mon-listen': 'zoo',
+  'cky-mon-1': 'zoo',
+  'cky-mon-2': 'zoo',
+  'cky-mon-3': 'zoo',
+  'cky-mon-4': 'zoo',
+  'cky-mon-5': 'share',
+  'cky-mon-next': 'zoo',
+  'spcc-name': 'intro',
+  'spcc-name-mean': 'intro',
+  'spcc-job': 'teacher',
+  'spcc-umbrella': 'park',
+  'spcc-bridge-look': 'park',
+  'spcc-bridge-shape': 'park',
+  'spcc-bridge-blocks': 'park',
+  'spcc-read': 'talk',
+  'spcc-story5': 'family',
+  'spcc-snacks': 'eat',
+  'spcc-parents': 'family-hobbies',
+  'spcc-holiday': 'park',
+  'spcc-transport': 'mtr',
+  'wkf-fest': 'play-fun',
+  'wkf-fest-en': 'play-fun',
+  'wkf-place': 'book',
+  'wkf-place-why': 'book',
+  'wkf-place-cmp': 'park',
+  'wkf-tan-play': 'sort',
+  'wkf-tan-7': 'sort',
+  'wkf-tan-tri': 'sort',
+  'wkf-tan-sq': 'sort',
+  'wkf-tan-boat': 'sort',
+  'wkf-mall-listen': 'lost-toy',
+  'wkf-mall-1': 'gift',
+  'wkf-mall-2': 'play-fun',
+  'wkf-mall-3': 'lost-toy',
+  'wkf-mall-4': 'police-help',
+  'wkf-mall-5': 'police-help',
+  'wkf-mall-phone': 'talk',
+  'evg-puppy-listen': 'park',
+  'evg-puppy-1': 'park',
+  'evg-puppy-2': 'park',
+  'evg-puppy-3': 'family',
+  'evg-puppy-4': 'police-help',
+  'evg-puppy-5': 'police-help',
+  'evg-puppy-retell': 'story',
+  'evg-order': 'story',
+  'evg-order-ask': 'police-help',
+  'evg-match': 'sort',
+  'evg-lunch-listen': 'eat',
+  'evg-lunch-1': 'eat',
+  'evg-lunch-2': 'teacher',
+  'evg-lunch-3': 'eat',
+  'evg-lunch-4': 'sweep',
+  'evg-read-zh': 'eat',
+  'evg-mem-look': 'zoo',
+  'evg-guess': 'zoo',
+  'evg-animal-day': 'zoo',
+  'evg-bridge-talk': 'share',
+  'evg-morning': 'daily',
+  'jando-name-zh': 'intro',
+  'jando-name-en': 'intro',
+  'jando-word-pick': 'eat',
+  'jando-m1': 'plus',
+  'jando-m2': 'minus',
+  'jando-m3': 'plus',
+  'jando-m4': 'minus',
+  'jando-m5': 'mix',
+  'jando-teams-3': 'mix',
 }
 
 const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
@@ -132,7 +249,7 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
   },
   'd1-zh-like': {
     kidLine: '講一樣你鍾意嘅嘢，再講「因為」。',
-    moreLine: '例如：我鍾意藍色，因為天空是藍色的。',
+    moreLine: '例如：我鍾意藍色，因為天係藍色。',
   },
   'd1-zh-family': {
     kidLine: '講你同家人一齊做過咩開心嘅事。',
@@ -183,15 +300,19 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
     moreLine: 'I share my toys with my friends.',
   },
   'd4-emo1': {
-    kidLine: '唔見玩具會點？多數係傷心。',
-    moreLine: '開心／興奮係笑；傷心係喊。',
+    kidLine: '收到禮物會點？多數係開心。',
+    moreLine: '開心會笑；傷心先會喊。',
+  },
+  'd4-emo1b': {
+    kidLine: '唔見最鍾意嘅玩具會點？多數係傷心。',
+    moreLine: '搵唔到心愛嘅嘢，會喊、會唔開心。',
   },
   'd4-emo2': {
     kidLine: '講：今日我好____，因為____。',
     moreLine: '今日我好開心，因為媽媽送禮物俾我。',
   },
   'd4-solve': {
-    kidLine: '有人搶玩具：先講感受，再請輪流玩，唔好打人。',
+    kidLine: '有人搶玩具：先講感受，再叫佢哋輪流玩，唔好打人。',
     moreLine: '我會話：我唔開心。我哋一齊輪流玩得唔得？',
   },
   'd4-sort': {
@@ -202,6 +323,18 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
     kidLine: 'Ben 去邊？圖係動物園。',
     moreLine: 'He is going to the zoo.',
   },
+  'd4-leo': {
+    kidLine: 'Leo 想要紅氣球，但收到藍氣球，之後送給 Tim。',
+    moreLine: '最後佢覺得Proud，因為肯分享。',
+  },
+  'd4-lily': {
+    kidLine: 'Lily 嬲因為弟弟整爛筆盒，佢深呼吸數到十。',
+    moreLine: '嬲嘅時候可以深呼吸，等自己冷靜。',
+  },
+  'd4-sam': {
+    kidLine: '跟住生日故事講心情：蛋糕、藍裇、遙控車、落雨、室內賽道。',
+    moreLine: '有興奮、失望、擔心、開心。',
+  },
   'd5-job': {
     kidLine: '講爸爸／媽媽做咩工作。',
     moreLine: '例如：我爸爸係老師，佢教小朋友。',
@@ -209,6 +342,94 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
   'd6-dad': {
     kidLine: '講一件同爸爸媽媽有關嘅事。',
     moreLine: '可以講一齊去邊、一齊食咩。',
+  },
+  'cky-simon': {
+    kidLine: '聽到 Simon says 先撳「做」。冇聽到就撳「企定」。',
+    moreLine: '拍手兩下、轉一圈：冇 Simon says 就企定。',
+  },
+  'cky-simon-chain': {
+    kidLine: '跟次序：先摸鼻，再拍手，最後指門。',
+    moreLine: '鼻 → 拍手 → 門。',
+  },
+  'cky-party-draw': {
+    kidLine: '拖壽星、朋友、蛋糕、禮物同有趣嘢去派對。',
+    moreLine: '六樣都放好就得。',
+  },
+  'spcc-bridge-look': {
+    kidLine: '拖橋面、護欄同三角形支柱去河上面。',
+    moreLine: '兩邊都要有護欄同支柱。',
+  },
+  'spcc-bridge-shape': {
+    kidLine: '撳兩塊黃色三角形支柱。',
+    moreLine: '三角形支柱令橋企得穩。',
+  },
+  'spcc-bridge-blocks': {
+    kidLine: '先撳支柱，再橋面，最後護欄。',
+    moreLine: '橋要先企得穩，先至可以行。',
+  },
+  'wkf-tan-play': {
+    kidLine: '拖色塊去上面同一個形狀，砌大三角形。',
+    moreLine: '對住顏色同形狀放。',
+  },
+  'wkf-tan-7': {
+    kidLine: '撳晒七塊先至得。',
+    moreLine: '兩大、一中、兩細、一方、一斜，合共七塊。',
+  },
+  'wkf-tan-tri': {
+    kidLine: '只撳三角形。正方形同斜塊唔好撳。',
+    moreLine: '有五塊三角形。',
+  },
+  'wkf-tan-sq': {
+    kidLine: '撳兩塊最細嘅三角形。',
+    moreLine: '兩塊細三角形合埋就係正方形。',
+  },
+  'wkf-tan-boat': {
+    kidLine: '拖色塊去船形空位。',
+    moreLine: '上面係帆，下面係船身。',
+  },
+  'evg-mem-look': {
+    kidLine: '翻兩張，配對動物同佢攞住嘅嘢。',
+    moreLine: '企鵝有藍波，大象有綠傘，兔子有紅蘿蔔。',
+  },
+  'cky-amy-3': {
+    kidLine: 'Ben 着雨衣，唔係因為天花板漏水。',
+    moreLine: '因為派對可能去花園，佢想準備好。',
+  },
+  'wkf-fest': {
+    kidLine: '三個節日都得。揀一個你最想去嘅。',
+    moreLine: '揀完要講因為，同埋喺度會做咩。',
+  },
+  'wkf-place': {
+    kidLine: '三個地方都得。揀一個你最想去嘅。',
+    moreLine: '圖書館睇書、科學館撳掣、郊野公園跑步。',
+  },
+  'wkf-mall-5': {
+    kidLine: '唔好乱跑，唔好跟陌生人。',
+    moreLine: '留喺玩具店門口，搵着制服嘅職員。',
+  },
+  'evg-order': {
+    kidLine: '先落雨，再發現小狗，抹乾，最後主人返嚟。',
+    moreLine: '拖字去上面：B → D → A → C。',
+  },
+  'evg-match': {
+    kidLine: '英文拖去中文：name 係名字。',
+    moreLine: 'egg 雞蛋、broccoli 西蘭花、ear 耳朵。',
+  },
+  'jando-read-zh': {
+    kidLine: '望住圖，逐個讀出嚟。',
+    moreLine: '蘋果、眼睛、老師、朋友、恐龍、書包。',
+  },
+  'jando-read-en': {
+    kidLine: '望住圖，用英文逐個讀。',
+    moreLine: 'apple, cat, red, school, bag.',
+  },
+  'jando-name-zh': {
+    kidLine: '大聲講：我叫袁碩孜。',
+    moreLine: '望住前面，笑住講自己個名。',
+  },
+  'spcc-read': {
+    kidLine: '望住圖，中文同英文都讀。',
+    moreLine: '眼睛、蘋果、疲累、橋樑。mouth, green, purple, children.',
   },
 }
 
@@ -230,6 +451,14 @@ function defaultKidLine(kind: ActivityKind): { kidLine: string; moreLine: string
       return { kidLine: '拖去 ＋ 或者 －。', moreLine: '笑面去 ＋，喊面去 －。' }
     case 'prompt':
       return { kidLine: '睇圖，同爸爸媽媽一齊做。', moreLine: '做完就撳 ✓。' }
+    case 'tangram':
+      return { kidLine: '拖色塊去同一個形狀。', moreLine: '兩塊細三角形可以砌成正方形。' }
+    case 'simon':
+      return { kidLine: '聽到 Simon says 先撳「做」。冇聽到就撳「企定」。', moreLine: '拍手、轉圈如果冇 Simon says，唔好郁。' }
+    case 'build':
+      return { kidLine: '拖零件去圖上嘅空位。', moreLine: '橋要先砌三角形支柱先穩。' }
+    case 'memory':
+      return { kidLine: '翻兩張，搵同一對。', moreLine: '企鵝配藍波，大象配綠傘。' }
     default:
       return { kidLine: '睇圖再試。', moreLine: '試完唔識可以再撳 ?' }
   }
@@ -237,51 +466,234 @@ function defaultKidLine(kind: ActivityKind): { kidLine: string; moreLine: string
 
 function iconForPrompt(prompt: string): MathModel['icon'] {
   if (/書/.test(prompt)) return 'book'
-  if (/糖|蘋果|橙|粒/.test(prompt)) return 'apple'
+  if (/糖|蘋果|橙|粒|積木/.test(prompt)) return 'apple'
   if (/小朋友|人/.test(prompt)) return 'kid'
   if (/星/.test(prompt)) return 'star'
   return 'dot'
 }
 
-export function parseMathModel(prompt: string): MathModel | undefined {
-  const add = prompt.match(/(\d{1,3})\s*[＋+]\s*(\d{1,3})/)
-  if (add) {
-    return { left: Number(add[1]), right: Number(add[2]), op: '+', icon: iconForPrompt(prompt) }
+const OP_ONLY = /^[＋+－−\-–]$/
+
+function prevChar(text: string, i: number) {
+  return i > 0 ? text[i - 1] : ''
+}
+
+function nextChar(text: string, i: number) {
+  return i < text.length ? text[i] : ''
+}
+
+function isDigitOrDot(ch: string) {
+  return ch === '.' || (ch >= '0' && ch <= '9')
+}
+
+type IntHit = { n: number; start: number; end: number }
+
+function wholeInts(prompt: string): IntHit[] {
+  const hits: IntHit[] = []
+  const re = /\d{1,3}/g
+  let m: RegExpExecArray | null
+  while ((m = re.exec(prompt))) {
+    const start = m.index
+    const end = start + m[0].length
+    if (isDigitOrDot(prevChar(prompt, start)) || isDigitOrDot(nextChar(prompt, end))) continue
+    hits.push({ n: Number(m[0]), start, end })
   }
-  const sub = prompt.match(/(\d{1,3})\s*[－−\-–]\s*(\d{1,3})/)
-  if (sub) {
-    return { left: Number(sub[1]), right: Number(sub[2]), op: '-', icon: iconForPrompt(prompt) }
-  }
-  const nums = [...prompt.matchAll(/(\d{1,3})/g)].map((m) => Number(m[1])).filter((n) => n > 0 && n <= 99)
-  if (nums.length >= 2) {
-    const op: '+' | '-' = /再給|又來|再來|加|共|一共|多/.test(prompt) && !/借走|剩|減|少/.test(prompt) ? '+' : '-'
-    if (/借走|剩|減|少了|吃了/.test(prompt)) {
-      return { left: nums[0], right: nums[1], op: '-', icon: iconForPrompt(prompt) }
+  return hits
+}
+
+function opGlyph(ch: string): MathOp {
+  if (/[＋+]/.test(ch)) return '+'
+  if (/[×xX]/.test(ch)) return '×'
+  if (/[÷]/.test(ch)) return '÷'
+  return '-'
+}
+
+function modelOf(prompt: string, pieces: MathPiece[]): MathModel {
+  return { icon: iconForPrompt(prompt), pieces }
+}
+
+function parseExplicitChain(prompt: string): MathModel | undefined {
+  const hits = wholeInts(prompt)
+  if (hits.length < 2) return undefined
+  let best: MathPiece[] | undefined
+  for (let i = 0; i < hits.length - 1; i++) {
+    const pieces: MathPiece[] = [{ kind: 'count', n: hits[i].n }]
+    let j = i
+    while (j < hits.length - 1) {
+      const span = prompt.slice(hits[j].end, hits[j + 1].start).trim()
+      if (!OP_ONLY.test(span)) break
+      pieces.push({ kind: 'op', op: opGlyph(span) })
+      pieces.push({ kind: 'count', n: hits[j + 1].n })
+      j += 1
     }
-    if (/再給|又來|再來|加|共有|一共/.test(prompt)) {
-      return { left: nums[0], right: nums[1], op: '+', icon: iconForPrompt(prompt) }
-    }
-    if (op && nums[0] <= 40 && nums[1] <= 40) {
-      return { left: nums[0], right: nums[1], op, icon: iconForPrompt(prompt) }
-    }
+    if (pieces.length >= 3 && (!best || pieces.length > best.length)) best = pieces
   }
-  if (nums.length === 1 && nums[0] <= 20) {
-    return { left: nums[0], icon: iconForPrompt(prompt) }
-  }
+  if (!best) return undefined
+  return modelOf(prompt, best)
+}
+
+function opFromSpan(text: string): MathOp | undefined {
+  if (/小時後|小時之後/.test(text)) return '+'
+  if (/用去|用咗|借走|減|少了|少咗|吃了|食咗|拿走|還剩|仲剩|剩多少|剩幾多/.test(text)) return '-'
+  if (/再給|再俾|又來|又嚟|再來|再嚟|放入|再放|加[了上]|和|同|共有|一共|再來了/.test(text)) return '+'
+  if (/倍/.test(text)) return '×'
+  if (/平均/.test(text)) return '÷'
   return undefined
+}
+
+export function parseSequence(prompt: string): MathModel | undefined {
+  const listed = parseNumberList(prompt)
+  if (listed) return listed
+  return parseCompare(prompt)
+}
+
+function parseCompare(prompt: string): MathModel | undefined {
+  if (!/誰比較多|邊個多|哪[班個]比較多|邊班多/.test(prompt)) return undefined
+  const hits = wholeInts(prompt)
+  if (hits.length < 2) return undefined
+  return modelOf(prompt, [
+    { kind: 'count', n: hits[0].n },
+    { kind: 'count', n: hits[1].n },
+  ])
+}
+
+function parseNumberList(prompt: string): MathModel | undefined {
+  if (!/____|＿＿|＿+|空格|下一個|少了邊一個|少咗邊一個|中間係|唔屬於同一組|唔同組|不屬於/.test(prompt)) return undefined
+  const tokens: MathPiece[] = []
+  const re = /(\d{1,3})|(____|＿+)/g
+  let m: RegExpExecArray | null
+  let sawBlank = false
+  while ((m = re.exec(prompt))) {
+    if (m[1]) tokens.push({ kind: 'num', n: Number(m[1]) })
+    else {
+      sawBlank = true
+      tokens.push({ kind: 'blank' })
+    }
+  }
+  if (tokens.length < 3) return undefined
+  if (/唔屬於|不屬於/.test(prompt) && !sawBlank) {
+    return modelOf(prompt, tokens)
+  }
+  if (!sawBlank && /下一個/.test(prompt)) tokens.push({ kind: 'blank' })
+  return modelOf(prompt, tokens)
+}
+
+function parseStory(prompt: string): MathModel | undefined {
+  if (/\d+\.\d+/.test(prompt)) return undefined
+  if (/月/.test(prompt) && /日/.test(prompt)) return undefined
+  if (/一個數|這個數|呢個數/.test(prompt)) return undefined
+
+  const hits = wholeInts(prompt)
+  if (hits.length === 0) return undefined
+
+  if (/倍/.test(prompt) && hits.length >= 2) {
+    const each = hits[0].n
+    const groups = hits[1].n
+    if (each <= 20 && groups <= 8) {
+      return modelOf(prompt, [{ kind: 'groups', groups, each }])
+    }
+  }
+
+  if (/平均/.test(prompt) && hits.length >= 2) {
+    const people = hits[0].n
+    const total = hits[1].n
+    if (people > 0 && total % people === 0 && total <= 40) {
+      return modelOf(prompt, [{ kind: 'groups', groups: people, each: total / people }])
+    }
+  }
+
+  if (/找回|找續/.test(prompt) && hits.length >= 2) {
+    const paid = hits[hits.length - 1].n
+    const costs = hits.slice(0, -1).map((h) => h.n)
+    const pieces: MathPiece[] = [{ kind: 'count', n: paid }]
+    costs.forEach((n) => {
+      pieces.push({ kind: 'op', op: '-' })
+      pieces.push({ kind: 'count', n })
+    })
+    return modelOf(prompt, pieces)
+  }
+
+  if (/多多少|多幾多/.test(prompt) && hits.length >= 2) {
+    return modelOf(prompt, [
+      { kind: 'count', n: hits[0].n },
+      { kind: 'op', op: '-' },
+      { kind: 'count', n: hits[1].n },
+    ])
+  }
+
+  if (/共/.test(prompt) && /幾個/.test(prompt) && hits.length === 2 && !/再來|又來|再給|再俾|又嚟|再嚟|小時/.test(prompt)) {
+    return modelOf(prompt, [
+      { kind: 'count', n: hits[0].n },
+      { kind: 'op', op: '-' },
+      { kind: 'count', n: hits[1].n },
+    ])
+  }
+
+  if (hits.length === 1) {
+    if (hits[0].n > 20) return undefined
+    return modelOf(prompt, [{ kind: 'count', n: hits[0].n }])
+  }
+
+  const pieces: MathPiece[] = [{ kind: 'count', n: hits[0].n }]
+  for (let i = 1; i < hits.length; i++) {
+    const span = prompt.slice(hits[i - 1].end, hits[i].start)
+    const after = prompt.slice(hits[i].end)
+    const op = opFromSpan(span) || opFromSpan(after)
+    if (!op || op === '×' || op === '÷') return undefined
+    pieces.push({ kind: 'op', op })
+    pieces.push({ kind: 'count', n: hits[i].n })
+  }
+  return modelOf(prompt, pieces)
+}
+
+/** Count-dots / number tiles that match the question. Skip if it would mislead. */
+export function parseMathModel(prompt: string): MathModel | undefined {
+  const sequence = parseSequence(prompt)
+  if (sequence) return sequence
+  const chain = parseExplicitChain(prompt)
+  if (chain) {
+    if (/找回|找續/.test(prompt)) {
+      const story = parseStory(prompt)
+      if (story) return story
+    }
+    return chain
+  }
+  return parseStory(prompt)
+}
+
+export function mathHasMinus(math?: MathModel): boolean {
+  return !!math?.pieces.some((p) => p.kind === 'op' && p.op === '-')
+}
+
+export function mathHasPlus(math?: MathModel): boolean {
+  return !!math?.pieces.some((p) => p.kind === 'op' && p.op === '+')
 }
 
 function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (ID_VISUAL[item.id]) return ID_VISUAL[item.id]
   if (item.scene && SCENE_VISUAL[item.scene]) return SCENE_VISUAL[item.scene]!
   if (item.kind === 'clock' || item.clock) return 'clock'
-  if (item.kind === 'money' || item.coins) return 'coins'
+  if (item.kind === 'money' || item.coins || /錢包|銀包|硬幣|幾多元/.test(`${item.promptZh}`)) return 'coins'
   if (item.kind === 'sort') return 'sort'
   if (item.kind === 'reorder') return 'reorder'
   if (item.kind === 'prompt') return 'move'
+  if (item.kind === 'tangram') return 'mix'
+  if (item.kind === 'simon') return 'play-fun'
+  if (item.kind === 'build') return 'move'
+  if (item.kind === 'memory') return 'zoo'
   if (item.calendarDay) return 'weekend'
+  if (item.kind === 'math') {
+    if (mathHasMinus(math) && !mathHasPlus(math)) return 'minus'
+    if (mathHasPlus(math) && !mathHasMinus(math)) return 'plus'
+    return 'mix'
+  }
+  if (item.readAloud || /讀呢啲詞|跟住讀/.test(item.promptZh)) return 'talk'
   const p = `${item.promptZh} ${item.promptEn || ''} ${item.cue || ''}`
   if (/policeman|police|警察/.test(p)) return 'policeman'
+  if (/firefighter|消防/.test(p)) return 'firefighter'
+  if (/doctor|醫生|護士|醫院/.test(p)) return 'doctor'
+  if (/cycle|bicycle|單車|騎車/.test(p)) return 'bike'
+  if (/cook|煮嘢|煮/.test(p)) return 'cook'
   if (/uniform|制服/.test(p)) return 'uniform'
   if (/football|zoo|elephant|monkey|動物/.test(p)) return /football|park/.test(p) ? 'football' : 'zoo'
   if (/self-introduction|Say your name|我叫袁|我叫碩/.test(p)) return 'intro'
@@ -289,34 +701,66 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (/school|kindergarten|老師|幼稚園|課室/.test(p)) return 'school'
   if (/family|家人|爸爸|媽媽/.test(p)) return 'family'
   if (/park|公園|跑步/.test(p)) return 'park'
-  if (/share|分享|輪流/.test(p)) return 'share'
+  if (/balloon|氣球/.test(p)) return 'balloon'
+  if (/pencil case|筆盒|筆袋/.test(p)) return 'pencil-case'
+  if (/遙控車|藍裇|生日故事/.test(p)) return 'birthday'
+  if (/share|分享|輪流/.test(p) && !/搶/.test(p)) return 'share'
+  if (/禮物|gift|present/.test(p)) return 'gift'
+  if (/唔見.*玩具|lost.*toy/.test(p)) return 'lost-toy'
   if (/sad|傷心|哭/.test(p)) return 'sad'
-  if (/angry|嬲|憤怒|搶/.test(p)) return 'angry'
+  if (/angry|嬲|憤怒|搶/.test(p)) return 'grab'
   if (/happy|開心|興奮/.test(p)) return 'happy'
   if (/job|工作|老師/.test(p)) return 'job'
-  if (item.kind === 'math') {
-    if (math?.op === '-') return 'minus'
-    if (math?.op === '+') return 'plus'
-    return 'mix'
-  }
+  if (/誰比較多|邊個多|哪班比較多|邊班多|多多少|多幾多|比較多/.test(p)) return 'mix'
   if (item.kind === 'speak') return 'talk'
   return 'story'
 }
 
 export function vocabVisual(catId: string, zh: string): HintVisualId {
   if (catId === 'family') return 'family'
-  if (catId === 'jobs') return 'job'
+  if (catId === 'jobs') {
+    if (/老師/.test(zh)) return 'teacher'
+    if (/同學/.test(zh)) return 'school'
+    if (/護士/.test(zh)) return 'nurse'
+    if (/醫生/.test(zh)) return 'doctor'
+    if (/消防/.test(zh)) return 'firefighter'
+    if (/警察/.test(zh)) return 'policeman'
+    if (/廚師/.test(zh)) return 'cook'
+    if (/司機/.test(zh)) return 'driver'
+    if (/郵差/.test(zh)) return 'postman'
+    if (/演員/.test(zh)) return 'actor'
+    if (/作家/.test(zh)) return 'writer'
+    if (/律師/.test(zh)) return 'lawyer'
+    return 'job'
+  }
   if (catId === 'actions') {
     if (/吃/.test(zh)) return 'eat'
     if (/喝/.test(zh)) return 'drink'
     if (/跑|踏/.test(zh)) return 'run'
-    if (/哭/.test(zh)) return 'sad'
-    if (/說話|叫|唱/.test(zh)) return 'talk'
-    return 'move'
+    if (/舞蹈/.test(zh)) return 'play-fun'
+    if (/跳/.test(zh)) return 'happy'
+    if (/單車/.test(zh)) return 'bike'
+    if (/哭|跌倒/.test(zh)) return 'sad'
+    if (/打|拉|推/.test(zh)) return 'grab'
+    if (/抱/.test(zh)) return 'family'
+    if (/唱/.test(zh)) return 'sing'
+    if (/掃/.test(zh)) return 'sweep'
+    if (/說話|叫|拍手/.test(zh)) return 'talk'
+    return 'daily'
   }
   if (catId === 'places') {
-    if (/學|校|園/.test(zh)) return 'school'
-    return 'park'
+    if (/家/.test(zh)) return 'family'
+    if (/公園/.test(zh)) return 'park'
+    if (/學|校|教室/.test(zh)) return 'school'
+    if (/消防/.test(zh)) return 'firefighter'
+    if (/醫院/.test(zh)) return 'doctor'
+    if (/餐廳/.test(zh)) return 'eat'
+    if (/圖書館/.test(zh)) return 'book'
+    if (/超市|市場/.test(zh)) return 'coins'
+    if (/洗手|廁/.test(zh)) return 'toilet'
+    if (/地鐵/.test(zh)) return 'mtr'
+    if (/巴士/.test(zh)) return 'bus-stop'
+    return 'talk'
   }
   if (/吃|食|飯/.test(zh)) return 'eat'
   if (catId === 'times-of-day') {
@@ -328,9 +772,11 @@ export function vocabVisual(catId: string, zh: string): HintVisualId {
 }
 export function resolveTeachHint(item: Activity): TeachHint {
   const math =
-    item.kind === 'math' || item.kind === 'clock' || item.kind === 'money'
+    item.kind === 'math'
       ? parseMathModel(item.promptZh)
-      : undefined
+      : item.kind === 'choice'
+        ? parseSequence(item.promptZh)
+        : undefined
   const visual = inferVisual(item, math)
   const copy = ID_KID[item.id] || defaultKidLine(item.kind)
   let moreLine = copy.moreLine
@@ -341,6 +787,6 @@ export function resolveTeachHint(item: Activity): TeachHint {
     visual,
     kidLine: copy.kidLine,
     moreLine,
-    math: item.kind === 'math' ? math : undefined,
+    math: item.kind === 'math' || item.kind === 'choice' ? math : undefined,
   }
 }

@@ -9,9 +9,10 @@ import {
   checkClock,
   checkMath,
   checkMoney,
+  isReadAloud,
   type Activity,
-  type DayId,
 } from '../data/content'
+import type { ModuleKey } from '../hooks/useProgress'
 import { looksEnglish, useSpeech } from '../hooks/useSpeech'
 import { useSpeechRecognition, type ListenLang } from '../hooks/useSpeechRecognition'
 import { softSpeakFeedback } from '../lib/softSpeakFeedback'
@@ -32,14 +33,20 @@ import { HintPicture } from './HintPicture'
 import { MathDots } from './MathDots'
 import { KidHelp } from './KidHelp'
 import { resolveTeachHint } from '../lib/teachHint'
+import { resolveMascotPresence } from '../lib/mascotPresence'
+import { TangramBoard } from './TangramBoard'
+import { SimonGame } from './SimonGame'
+import { BuildBoard } from './BuildBoard'
+import { MemoryMatch } from './MemoryMatch'
+import { Mascot } from './Mascot'
 
 type Props = {
   title: string
   accent: string
   items: Activity[]
-  moduleKey: DayId | 'mock' | 'vocab'
+  moduleKey: ModuleKey
   completed: Record<string, boolean>
-  onMarkDone: (itemId: string, moduleKey: DayId | 'mock' | 'vocab') => void
+  onMarkDone: (itemId: string, moduleKey: ModuleKey) => void
   onBack: () => void
   celebrate?: boolean
 }
@@ -47,6 +54,11 @@ type Props = {
 const MATH_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '/'] as const
 const CLOCK_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', ':', '0', '00'] as const
 const MONEY_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '✓'] as const
+
+function mediaSrc(path: string) {
+  const base = import.meta.env.BASE_URL || '/'
+  return `${base}${path.replace(/^\//, '')}`
+}
 
 
 export function PracticeSession({
@@ -102,9 +114,15 @@ export function PracticeSession({
   const [spokenText, setSpokenText] = useState('')
   const [composeActive, setComposeActive] = useState(false)
   const dictationRef = useRef<HTMLTextAreaElement | null>(null)
+  const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const advancingRef = useRef(false)
+  const [artHidden, setArtHidden] = useState(false)
+  const [lookLeft, setLookLeft] = useState<number | null>(null)
+  const [gameSolved, setGameSolved] = useState(false)
 
   const item = items[index]
   const isStoryFocus = item.id === 'd1-en-story'
+  const readAloud = isReadAloud(item)
   const isLast = index >= items.length - 1
   const done = completed[item.id]
   const solvedChoice = picked !== null && !!item.choices?.[picked]?.correct
@@ -119,12 +137,19 @@ export function PracticeSession({
     return item.sortItems.every((s) => !!sortPlacement[s.text])
   }, [item, sortPlacement])
 
-  const mascotMood =
-    justStar || mathResult === 'ok' || solvedChoice || (sortChecked && sortCorrect)
-      ? 'cheer'
-      : mathResult === 'no' || wrongAttempts > 0 || (sortChecked && !sortCorrect)
-        ? 'think'
-        : 'happy'
+  const mascot = resolveMascotPresence({
+    cheering:
+      chapterComplete ||
+      justStar ||
+      mathResult === 'ok' ||
+      solvedChoice ||
+      (sortChecked && sortCorrect) ||
+      gameSolved,
+    encourage: mathResult === 'no' || wrongAttempts > 0 || (sortChecked && !sortCorrect),
+    listening: listening || listenBusy,
+    looking: lookLeft != null && lookLeft > 0,
+  })
+  const mascotMood = mascot.mood
 
   useEffect(() => {
     if (listening || listenBusy) {
@@ -177,6 +202,14 @@ export function PracticeSession({
     setHelpOpen(false)
     setHelpStep(1)
     setHelped(false)
+    advancingRef.current = false
+    if (advanceTimerRef.current != null) {
+      clearTimeout(advanceTimerRef.current)
+      advanceTimerRef.current = null
+    }
+    setArtHidden(!!_activity.hideArt)
+    setLookLeft(_activity.lookSeconds ?? null)
+    setGameSolved(false)
     if (_activity.kind === 'reorder' && _activity.fragments) {
       const shuffled = [..._activity.fragments].sort(() => Math.random() - 0.5)
       setPool(shuffled)
@@ -196,6 +229,24 @@ export function PracticeSession({
     resetInteraction(item)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item.id])
+
+  useEffect(() => {
+    if (!item.lookSeconds || item.hideArt) return
+    setArtHidden(false)
+    setLookLeft(item.lookSeconds)
+    const started = Date.now()
+    const id = window.setInterval(() => {
+      const left = item.lookSeconds! - Math.floor((Date.now() - started) / 1000)
+      if (left <= 0) {
+        setLookLeft(0)
+        setArtHidden(true)
+        window.clearInterval(id)
+      } else {
+        setLookLeft(left)
+      }
+    }, 250)
+    return () => window.clearInterval(id)
+  }, [item.id, item.lookSeconds, item.hideArt])
 
   useEffect(() => {
     if (justStar) {
@@ -253,13 +304,12 @@ export function PracticeSession({
     )
   }, [item, spokenText, listenLang])
 
-  useEffect(() => {
-    if (reorderCorrect && !done) {
-      playSfx('correct')
-    }
-  }, [reorderCorrect, done])
-
   const goNext = () => {
+    advancingRef.current = false
+    if (advanceTimerRef.current != null) {
+      clearTimeout(advanceTimerRef.current)
+      advanceTimerRef.current = null
+    }
     stop()
     stopListening()
     if (isLast) {
@@ -277,10 +327,44 @@ export function PracticeSession({
       onMarkDone(item.id, moduleKey)
       setJustStar(true)
     }
-    if (autoNext || celebrate || isLast) {
-      setTimeout(goNext, done ? 0 : 550)
-    }
+    if (!(autoNext || celebrate || isLast)) return
+    if (advancingRef.current) return
+    advancingRef.current = true
+    if (advanceTimerRef.current != null) clearTimeout(advanceTimerRef.current)
+    advanceTimerRef.current = setTimeout(() => {
+      advanceTimerRef.current = null
+      goNext()
+    }, done ? 0 : 800)
   }
+
+  const noteGameWrong = () => {
+    setHelped(true)
+    setWrongAttempts((n) => n + 1)
+    setCoachMsg('再試一次！')
+  }
+
+  const solveGame = () => {
+    if (gameSolved) return
+    setGameSolved(true)
+    setCoachMsg('完成啦！好叻！')
+    playSfx('correct')
+    awardAndMaybeNext(true)
+  }
+
+  useEffect(() => {
+    if (reorderCorrect && !done && !advancingRef.current) {
+      playSfx('correct')
+      setCoachMsg(item.pictureStrip ? '次序啱啦！好叻！' : '句子正確！好叻！')
+      awardAndMaybeNext(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reorderCorrect, done, item.id])
+
+  useEffect(() => {
+    return () => {
+      if (advanceTimerRef.current != null) clearTimeout(advanceTimerRef.current)
+    }
+  }, [])
 
   const isSolved = (): boolean => {
     if (item.kind === 'choice') return solvedChoice
@@ -293,17 +377,62 @@ export function PracticeSession({
       if (!item.fields?.length) return true
       return item.fields.every((f) => checkedFields[f])
     }
-    // speak: star when parent/kid taps「我講完啦」(marks done)
+    if (
+      item.kind === 'tangram' ||
+      item.kind === 'simon' ||
+      item.kind === 'build' ||
+      item.kind === 'memory'
+    ) {
+      return gameSolved
+    }
+    // speak / read-aloud: next or ★ 讀完／講完 marks done — mic is optional
+    if (item.kind === 'speak') return true
     return done
   }
 
   const teach = useMemo(() => resolveTeachHint(item), [item])
+
+  const playQuestion = () => {
+    unlockAudio()
+    const longStory = !!(item.listenToSample && item.sampleEn && item.sampleEn.length > 160)
+    if (longStory) {
+      speak(item.promptZh, looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK')
+      return
+    }
+    if (item.promptEn) {
+      const englishText = item.listenToSample && item.sampleEn ? item.sampleEn : item.promptEn
+      speakQueue(
+        [item.promptZh, englishText],
+        looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK',
+      )
+      return
+    }
+    speak(item.promptZh, looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK')
+  }
+
+  useEffect(() => {
+    if (item.kind !== 'speak') return
+    const timer = window.setTimeout(() => {
+      playQuestion()
+    }, 400)
+    return () => window.clearTimeout(timer)
+    // Replay only when the question changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [item.id])
 
   const canProceed = (): boolean => {
     if (done) return true
     if (isSolved() || revealAnswer || helped) return true
     if (item.kind === 'speak') return showSample || !!spokenText.trim()
     if (item.kind === 'prompt') return isSolved()
+    if (
+      item.kind === 'tangram' ||
+      item.kind === 'simon' ||
+      item.kind === 'build' ||
+      item.kind === 'memory'
+    ) {
+      return isSolved()
+    }
     return false
   }
 
@@ -327,10 +456,7 @@ export function PracticeSession({
     setMathResult('ok')
     setCoachMsg('答對啦！好努力！')
     playSfx('correct')
-    if (!done) {
-      onMarkDone(item.id, moduleKey)
-      setJustStar(true)
-    }
+    awardAndMaybeNext(true)
   }
 
   const submitMath = () => {
@@ -397,6 +523,10 @@ export function PracticeSession({
   const handlePrimary = () => {
     unlockAudio()
     playSfx('tap')
+    if (advancingRef.current) {
+      goNext()
+      return
+    }
     if (!done && !canProceed()) {
       setHelped(true)
       setHelpOpen(true)
@@ -437,6 +567,14 @@ export function PracticeSession({
         >
           {KID.back}
         </button>
+        <Mascot
+          mood={mascot.mood}
+          reason={mascot.reason}
+          size={76}
+          interactive
+          bubbleAlign="side"
+          className="session__mascot"
+        />
         <div className="session__progress">
           <span className="session__title">{title}</span>
           <span>
@@ -451,6 +589,7 @@ export function PracticeSession({
 
       <div className={`session__layout ${isStoryFocus ? 'session__layout--story' : ''}`}>
         <div className={`session__card ${isStoryFocus ? 'session__card--story' : ''}`} key={item.id}>
+          <div className="session__stem">
           <div className="session__badges">
             {(item.section || item.cue) && (
               <p className="session__cue">
@@ -461,13 +600,98 @@ export function PracticeSession({
           </div>
 
           {item.scene && <SceneArt scene={item.scene} alt={item.promptZh} />}
-          {!isStoryFocus && !item.scene && !item.clock && !item.coins && item.calendarDay == null && !(item.kind === 'math' && teach.math) && (
+          {!artHidden && !item.hideArt && item.pictureStrip && item.pictureStrip.length > 0 && (
+            <div className={`picture-strip picture-strip--${item.pictureStrip.length}`}>
+              {item.pictureStrip.map((pic, picIndex) => {
+                const choice = item.kind === 'choice' ? item.choices?.[picIndex] : undefined
+                const selected = picked === picIndex
+                const triedWrong = wrongPicks.includes(picIndex)
+                const showCorrect = (solvedChoice || revealAnswer) && !!choice?.correct
+                const lockedChoice = solvedChoice || revealAnswer
+                const clickable = !!choice && item.kind === 'choice'
+                const body = (
+                  <>
+                    <img src={mediaSrc(pic.src)} alt="" width={240} height={180} />
+                    <span className="picture-strip__caption">{pic.label}</span>
+                  </>
+                )
+                if (!clickable) {
+                  return (
+                    <figure key={pic.src} className="picture-strip__item">
+                      <img src={mediaSrc(pic.src)} alt="" width={240} height={180} />
+                      <figcaption>{pic.label}</figcaption>
+                    </figure>
+                  )
+                }
+                return (
+                  <button
+                    key={pic.src}
+                    type="button"
+                    className={[
+                      'picture-strip__item',
+                      'picture-strip__item--choice',
+                      selected && choice.correct ? 'is-selected' : '',
+                      showCorrect ? 'is-correct' : '',
+                      triedWrong && !choice.correct ? 'is-wrong' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    disabled={lockedChoice || triedWrong}
+                    onClick={() => {
+                      unlockAudio()
+                      if (lockedChoice || triedWrong) return
+                      if (choice.correct) {
+                        setPicked(picIndex)
+                        setCoachMsg('答對啦！你好努力！')
+                        playSfx('correct')
+                        awardAndMaybeNext(true)
+                      } else {
+                        playSfx('wrong')
+                        setWrongPicks((prev) => (prev.includes(picIndex) ? prev : [...prev, picIndex]))
+                        registerWrong()
+                        setPicked(null)
+                      }
+                    }}
+                  >
+                    {body}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+          {!artHidden && !item.hideArt && item.hintImage && (
+            <div className="hint-pic-wrap">
+              <img
+                className="hint-pic hint-pic--picture-book"
+                src={mediaSrc(item.hintImage)}
+                alt=""
+                width={260}
+                height={195}
+              />
+            </div>
+          )}
+          {item.lookSeconds != null && lookLeft != null && (
+            <p className={`look-timer ${artHidden ? 'look-timer--done' : ''}`} aria-live="polite">
+              {artHidden ? '時間到，圖收起咗' : `仲有 ${lookLeft} 秒`}
+            </p>
+          )}
+          {!isStoryFocus &&
+            !item.scene &&
+            !item.clock &&
+            !item.coins &&
+            item.calendarDay == null &&
+            !(teach.math && !item.hintImage && !item.pictureStrip) &&
+            !item.hintImage &&
+            !item.pictureStrip &&
+            !item.hideArt &&
+            !artHidden &&
+            item.kind !== 'tangram' &&
+            item.kind !== 'simon' &&
+            item.kind !== 'build' &&
+            item.kind !== 'memory' && (
             <div className="hint-pic-wrap">
               <HintPicture visual={teach.visual} />
             </div>
-          )}
-          {item.kind === 'math' && teach.math && item.calendarDay == null && (
-            <MathDots model={teach.math} />
           )}
           {item.clock && <AnalogClock hour={item.clock.hour} minute={item.clock.minute} />}
           {item.coins && item.purseOwner && <CoinPurse owner={item.purseOwner} coins={item.coins} />}
@@ -505,34 +729,29 @@ export function PracticeSession({
                     type="button"
                     className="pill-btn"
                     onClick={() => {
-                      unlockAudio()
                       playSfx('tap')
-                      if (item.promptEn) {
-                        const englishText =
-                          item.listenToSample && item.sampleEn ? item.sampleEn : item.promptEn
-                        speakQueue(
-                          [item.promptZh, englishText],
-                          looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK',
-                        )
-                      } else {
-                        speak(item.promptZh, looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK')
-                      }
+                      playQuestion()
                     }}
                     aria-label="聽題目"
                   >
                     {KID.listen} 聽題
                   </button>
                 </div>
+                {!readAloud && (
                 <KidHelp
                   hint={teach}
                   open={helpOpen}
                   step={helpStep}
                   hideArt={
-                    !item.scene &&
-                    !item.clock &&
-                    !item.coins &&
-                    item.calendarDay == null &&
-                    !(item.kind === 'math' && teach.math)
+                    !!teach.math ||
+                    (!item.scene &&
+                      !item.clock &&
+                      !item.coins &&
+                      item.calendarDay == null &&
+                      !item.hintImage &&
+                      !item.pictureStrip) ||
+                    (!!item.hintImage && !artHidden && !item.hideArt) ||
+                    (!!item.pictureStrip && !artHidden && !item.hideArt)
                   }
                   onToggle={() => {
                     unlockAudio()
@@ -556,251 +775,257 @@ export function PracticeSession({
                     speak(text, 'zh-HK')
                   }}
                 />
+                )}
               </div>
             </>
           )}
+          {teach.math && item.calendarDay == null && !item.hintImage && !item.pictureStrip && (
+            <MathDots model={teach.math} />
+          )}
+          </div>
 
+          <div className="session__response">
           {item.kind === 'speak' && (
-            <div className={`speak-box ${isStoryFocus ? 'speak-box--story' : 'speak-box--compact'}`}>
-
-              <div
-                className={`listen-panel ${listening || composeActive || listenBusy ? 'is-listening' : ''} ${
-                  engine === 'google' || engine === 'safari' ? 'listen-panel--safari' : ''
-                }`}
+            <div
+              className={`speak-box ${
+                isStoryFocus ? 'speak-box--story' : readAloud ? 'speak-box--read' : 'speak-box--solo'
+              }`}
+            >
+              <button
+                type="button"
+                className={`primary-btn primary-btn--wide speak-box__done ${done ? 'is-done' : ''}`}
+                disabled={done}
+                onClick={() => {
+                  if (done) return
+                  unlockAudio()
+                  stopListening()
+                  setComposeActive(false)
+                  dictationRef.current?.blur()
+                  playSfx('correct')
+                  awardAndMaybeNext(true)
+                }}
+                aria-label={readAloud ? '讀完啦' : '講完啦'}
               >
-                {!isStoryFocus && (
-                  <div className="session__actions">
-                    <button
-                      type="button"
-                      className={`pill-btn ${listenLang === 'yue-Hant-HK' ? '' : 'pill-btn--soft'}`}
-                      disabled={listening || listenBusy}
-                      onClick={() => {
-                        playSfx('tap')
-                        setListenLang('yue-Hant-HK')
-                      }}
-                      aria-label="廣東話"
-                    >
-                      {KID.cantonese}
-                    </button>
-                    <button
-                      type="button"
-                      className={`pill-btn ${listenLang === 'en-US' ? '' : 'pill-btn--soft'}`}
-                      disabled={listening || listenBusy}
-                      onClick={() => {
-                        playSfx('tap')
-                        setListenLang('en-US')
-                      }}
-                      aria-label="English"
-                    >
-                      {KID.english}
-                    </button>
-                  </div>
-                )}
+                {readAloud ? KID.readDone : KID.speakDone}
+              </button>
 
-                {!listening && !listenBusy ? (
+              {!readAloud && !isStoryFocus && (
+                <div className="speak-box__more">
                   <button
                     type="button"
-                    className="primary-btn primary-btn--wide"
+                    className={`pill-btn ${listenLang === 'yue-Hant-HK' ? '' : 'pill-btn--soft'}`}
+                    disabled={listening || listenBusy}
                     onClick={() => {
-                      stop()
-                      setSpokenText('')
-                      setComposeActive(false)
-                      dictationRef.current?.blur()
-                      if (listenSupported) {
-                        const phrases = buildSttPhrases([
-                          item.sampleZh,
-                          item.sampleEn,
-                          item.promptZh,
-                          item.promptEn,
-                          '袁碩孜',
-                          'Seth',
-                          '藍田靈糧',
-                          '幼稚園',
-                          '多謝老師',
-                          '我鍾意',
-                          '因為',
-                          'insects',
-                          'geckos',
-                          'little bug net',
-                          'cartoon characters',
-                          'favourite colour',
-                          'yellow',
-                        ])
-                        startListening(listenLang, { phrases })
-                      } else {
-                        openKeyboardDictation()
-                      }
-                      unlockAudio()
                       playSfx('tap')
+                      setListenLang('yue-Hant-HK')
                     }}
-                    aria-label="開始錄音"
+                    aria-label="廣東話"
                   >
-                    {KID.mic}{isStoryFocus ? ' 講故事' : ''}
+                    {KID.cantonese}
                   </button>
-                ) : (
                   <button
                     type="button"
-                    className="primary-btn primary-btn--wide listen-panel__stop"
-                    disabled={listenBusy && !listening}
+                    className={`pill-btn ${listenLang === 'en-US' ? '' : 'pill-btn--soft'}`}
+                    disabled={listening || listenBusy}
                     onClick={() => {
-                      if (listenBusy && !listening) return
                       playSfx('tap')
-                      void stopListening()
-                      setComposeActive(false)
-                      dictationRef.current?.blur()
+                      setListenLang('en-US')
                     }}
-                    aria-label={listenBusy && !listening ? '轉文字中' : '停止錄音'}
+                    aria-label="English"
                   >
-                    {listenBusy && !listening ? '…' : KID.micStop}{' '}
-                    {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
+                    {KID.english}
                   </button>
-                )}
-
-                <div
-                  className={`listen-panel__compose ${
-                    composeActive || listening || listenBusy || spokenText ? 'is-active' : ''
-                  }`}
-                >
-                  <textarea
-                    id="speak-dictation"
-                    ref={dictationRef}
-                    className="listen-panel__input"
-                    value={spokenText}
-                    onChange={(e) => setSpokenText(e.target.value)}
-                    onFocus={() => setComposeActive(true)}
-                    onBlur={() => {
-                      if (!listening && !listenBusy) setComposeActive(false)
-                    }}
-                    readOnly={listening || listenBusy}
-                    lang={listenLang === 'en-US' ? 'en-US' : 'zh-Hant-HK'}
-                    inputMode="text"
-                    enterKeyHint="done"
-                    autoCapitalize="sentences"
-                    autoCorrect="on"
-                    spellCheck
-                    rows={3}
-                    placeholder=""
-                    aria-label="聽寫文字"
-                  />
-
-                  {listenError ? <p className="listen-panel__error">{listenError}</p> : null}
-                  {!listenError && statusHint && (sttBlocked || (!listening && !listenBusy)) ? (
-                    <p className="listen-panel__hint">{statusHint}</p>
-                  ) : null}
-                </div>
-
-                <button
-                  type="button"
-                  className="pill-btn listen-panel__tts"
-                  disabled={!spokenText.trim() || listening || listenBusy}
-                  onClick={() => {
-                    unlockAudio()
-                    playSfx('tap')
-                    speak(spokenText, listenLang === 'en-US' ? 'en-US' : 'zh-HK')
-                  }}
-                  aria-label={listenLang === 'en-US' ? 'Play transcript in English' : '朗讀聽寫文字'}
-                >
-                  {KID.listen}
-                </button>
-
-                {speakFeedback && (
-                  <div className="listen-panel__feedback">
-                    <p>{speakFeedback.message}</p>
-                    {speakFeedback.matched.length > 0 && (
-                      <div className="listen-panel__chips">
-                        {speakFeedback.matched.map((k) => (
-                          <span key={k} className="listen-chip listen-chip--ok">
-                            {k}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {!done ? (
-                <button
-                  type="button"
-                  className="speak-box__parent-star"
-                  onClick={() => {
-                    unlockAudio()
-                    stopListening()
-                    setComposeActive(false)
-                    dictationRef.current?.blur()
-                    playSfx('correct')
-                    onMarkDone(item.id, moduleKey)
-                    setJustStar(true)
-                  }}
-                  aria-label="爸爸媽媽確認完成"
-                >
-                  {KID.starOk}
-                </button>
-              ) : (
-                <button type="button" className="speak-box__parent-star is-done" disabled aria-label="呢題已完成">
-                  {KID.starOk}
-                </button>
-              )}
-              {!isStoryFocus && (
-                <>
-                  <div className="session__actions">
+                  {!listening && !listenBusy ? (
                     <button
                       type="button"
                       className="pill-btn pill-btn--soft"
                       onClick={() => {
-                        playSfx('flip')
-                        setShowSample((v) => !v)
+                        stop()
+                        setSpokenText('')
+                        setComposeActive(false)
+                        dictationRef.current?.blur()
+                        if (listenSupported) {
+                          const phrases = buildSttPhrases([
+                            item.sampleZh,
+                            item.sampleEn,
+                            item.promptZh,
+                            item.promptEn,
+                            '袁碩孜',
+                            'Seth',
+                            '藍田靈糧',
+                            '幼稚園',
+                            '多謝老師',
+                            '我鍾意',
+                            '因為',
+                            'insects',
+                            'geckos',
+                            'little bug net',
+                            'cartoon characters',
+                            'favourite colour',
+                            'yellow',
+                          ])
+                          startListening(listenLang, { phrases })
+                        } else {
+                          openKeyboardDictation()
+                        }
+                        unlockAudio()
+                        playSfx('tap')
                       }}
-                      aria-label={showSample ? '收起參考' : '家長睇參考'}
+                      aria-label="開始錄音"
                     >
-                      {showSample ? `${KID.parentHint} ×` : `${KID.parentHint} ?`}
+                      {KID.mic}
                     </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="pill-btn listen-panel__stop"
+                      disabled={listenBusy && !listening}
+                      onClick={() => {
+                        if (listenBusy && !listening) return
+                        playSfx('tap')
+                        void stopListening()
+                        setComposeActive(false)
+                        dictationRef.current?.blur()
+                      }}
+                      aria-label={listenBusy && !listening ? '轉文字中' : '停止錄音'}
+                    >
+                      {listenBusy && !listening ? '…' : KID.micStop}{' '}
+                      {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, '0')}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="pill-btn pill-btn--soft"
+                    onClick={() => {
+                      playSfx('flip')
+                      setShowSample((v) => !v)
+                    }}
+                    aria-label={showSample ? '收起參考' : '家長睇參考'}
+                  >
+                    {showSample ? `${KID.parentHint} ×` : `${KID.parentHint} ?`}
+                  </button>
+                </div>
+              )}
+
+              {!readAloud && (listening || composeActive || listenBusy || spokenText) && (
+                <div
+                  className={`listen-panel listen-panel--optional ${
+                    listening || composeActive || listenBusy ? 'is-listening' : ''
+                  }`}
+                >
+                  <div
+                    className={`listen-panel__compose ${
+                      composeActive || listening || listenBusy || spokenText ? 'is-active' : ''
+                    }`}
+                  >
+                    <textarea
+                      id="speak-dictation"
+                      ref={dictationRef}
+                      className="listen-panel__input"
+                      value={spokenText}
+                      onChange={(e) => setSpokenText(e.target.value)}
+                      onFocus={() => setComposeActive(true)}
+                      onBlur={() => {
+                        if (!listening && !listenBusy) setComposeActive(false)
+                      }}
+                      readOnly={listening || listenBusy}
+                      lang={listenLang === 'en-US' ? 'en-US' : 'zh-Hant-HK'}
+                      inputMode="text"
+                      enterKeyHint="done"
+                      autoCapitalize="sentences"
+                      autoCorrect="on"
+                      spellCheck
+                      rows={3}
+                      placeholder=""
+                      aria-label="聽寫文字"
+                    />
+                    {listenError ? <p className="listen-panel__error">{listenError}</p> : null}
+                    {!listenError && statusHint && (sttBlocked || (!listening && !listenBusy)) ? (
+                      <p className="listen-panel__hint">{statusHint}</p>
+                    ) : null}
                   </div>
-                  {showSample && (item.sampleZh || item.sampleEn || item.tip) && (
-                    <div className="sample">
-                      {item.sampleZh && <p className="sample__zh">{item.sampleZh}</p>}
-                      {item.sampleEn && item.sampleEn !== item.sampleZh && (
-                        <p className="sample__en">{item.sampleEn}</p>
+                  <button
+                    type="button"
+                    className="pill-btn listen-panel__tts"
+                    disabled={!spokenText.trim() || listening || listenBusy}
+                    onClick={() => {
+                      unlockAudio()
+                      playSfx('tap')
+                      speak(spokenText, listenLang === 'en-US' ? 'en-US' : 'zh-HK')
+                    }}
+                    aria-label={listenLang === 'en-US' ? 'Play transcript in English' : '朗讀聽寫文字'}
+                  >
+                    {KID.listen}
+                  </button>
+                  {speakFeedback && (
+                    <div className="listen-panel__feedback">
+                      <p>{speakFeedback.message}</p>
+                      {speakFeedback.matched.length > 0 && (
+                        <div className="listen-panel__chips">
+                          {speakFeedback.matched.map((k) => (
+                            <span key={k} className="listen-chip listen-chip--ok">
+                              {k}
+                            </span>
+                          ))}
+                        </div>
                       )}
-                      {item.tip && <p className="sample__tip">小提示：{item.tip}</p>}
-                      <div className="session__actions">
-                        {item.sampleZh && (
-                          <button
-                            type="button"
-                            className="pill-btn"
-                            onClick={() => {
-                              playSfx('tap')
-                              stopListening()
-                              speak(item.sampleZh!, looksEnglish(item.sampleZh!) ? 'en-US' : 'zh-HK')
-                            }}
-                            aria-label="聽參考"
-                          >
-                            {KID.listen}
-                          </button>
-                        )}
-                        {item.sampleEn && (
-                          <button
-                            type="button"
-                            className="pill-btn pill-btn--soft"
-                            onClick={() => {
-                              playSfx('tap')
-                              stopListening()
-                              speak(item.sampleEn!, 'en-US')
-                            }}
-                            aria-label="Listen English sample"
-                          >
-                            {KID.listenEn}
-                          </button>
-                        )}
-                      </div>
                     </div>
                   )}
-                </>
+                </div>
+              )}
+
+              {!isStoryFocus && showSample && (item.sampleZh || item.sampleEn || item.tip) && (
+                <div className="sample">
+                  {item.sampleZh && <p className="sample__zh">{item.sampleZh}</p>}
+                  {item.sampleEn && item.sampleEn !== item.sampleZh && (
+                    <p className="sample__en">{item.sampleEn}</p>
+                  )}
+                  {item.tip && <p className="sample__tip">小提示：{item.tip}</p>}
+                  <div className="session__actions">
+                    {item.sampleZh && (
+                      <button
+                        type="button"
+                        className="pill-btn"
+                        onClick={() => {
+                          playSfx('tap')
+                          stopListening()
+                          speak(item.sampleZh!, looksEnglish(item.sampleZh!) ? 'en-US' : 'zh-HK')
+                        }}
+                        aria-label="聽參考"
+                      >
+                        {KID.listen}
+                      </button>
+                    )}
+                    {item.sampleEn && (
+                      <button
+                        type="button"
+                        className="pill-btn pill-btn--soft"
+                        onClick={() => {
+                          playSfx('tap')
+                          stopListening()
+                          speak(item.sampleEn!, 'en-US')
+                        }}
+                        aria-label="Listen English sample"
+                      >
+                        {KID.listenEn}
+                      </button>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
           )}
 
-          {item.kind === 'choice' && item.choices && (
+          {item.kind === 'choice' &&
+            item.choices &&
+            item.pictureStrip &&
+            item.pictureStrip.length === item.choices.length && (
+            <div className="choice-list choice-list--pictures">
+              {coachMsg && <p className={`math-feedback ${solvedChoice ? 'is-ok' : 'is-no'}`}>{coachMsg}</p>}
+            </div>
+          )}
+
+          {item.kind === 'choice' && item.choices && !(item.pictureStrip && item.pictureStrip.length === item.choices.length) && (
             <div className="choice-list">
               {item.choices.map((c, i) => {
                 const selected = picked === i
@@ -831,10 +1056,7 @@ export function PracticeSession({
                           setPicked(i)
                           setCoachMsg('答對啦！你好努力！')
                           playSfx('correct')
-                          if (!done) {
-                            onMarkDone(item.id, moduleKey)
-                            setJustStar(true)
-                          }
+                          awardAndMaybeNext(true)
                         } else {
                           playSfx('wrong')
                           setWrongPicks((prev) => (prev.includes(i) ? prev : [...prev, i]))
@@ -1133,10 +1355,7 @@ export function PracticeSession({
                     if (sortCorrect) {
                       playSfx('correct')
                       setCoachMsg('全部分對啦！好叻！')
-                      if (!done) {
-                        onMarkDone(item.id, moduleKey)
-                        setJustStar(true)
-                      }
+                      awardAndMaybeNext(true)
                     } else {
                       playSfx('wrong')
                       registerWrong(item.tip)
@@ -1186,10 +1405,81 @@ export function PracticeSession({
               />
               {order.length > 0 && (
                 <p className={`math-feedback ${reorderCorrect ? 'is-ok' : ''}`}>
-                  {reorderCorrect ? '句子正確！好叻！' : '繼續拖一拖順序吧'}
+                  {reorderCorrect
+                    ? item.pictureStrip
+                      ? '次序啱啦！好叻！'
+                      : '句子正確！好叻！'
+                    : '繼續拖一拖順序吧'}
                 </p>
               )}
             </div>
+          )}
+
+          {item.kind === 'tangram' && item.tangram && (
+            <TangramBoard
+              mode={item.tangram.mode}
+              shape={item.tangram.shape}
+              locked={gameSolved}
+              reveal={revealAnswer}
+              onSolved={solveGame}
+              onWrong={noteGameWrong}
+            />
+          )}
+
+          {item.kind === 'simon' && item.simon && (
+            <SimonGame
+              config={item.simon}
+              locked={gameSolved}
+              reveal={revealAnswer}
+              onSolved={solveGame}
+              onWrong={noteGameWrong}
+              onSpeak={(text, lang) => speak(text, lang)}
+            />
+          )}
+
+          {item.kind === 'build' && item.build && (
+            <BuildBoard
+              scene={item.build.scene}
+              locked={gameSolved}
+              reveal={revealAnswer}
+              onSolved={solveGame}
+              onWrong={noteGameWrong}
+            />
+          )}
+
+          {item.kind === 'memory' && item.memory && (
+            <MemoryMatch
+              config={item.memory}
+              locked={gameSolved}
+              reveal={revealAnswer}
+              onSolved={solveGame}
+              onWrong={noteGameWrong}
+            />
+          )}
+
+          {(item.kind === 'tangram' ||
+            item.kind === 'simon' ||
+            item.kind === 'build' ||
+            item.kind === 'memory') && (
+            <>
+              {coachMsg && (
+                <p className={`math-feedback ${gameSolved ? 'is-ok' : 'is-no'}`}>{coachMsg}</p>
+              )}
+              {!gameSolved && !revealAnswer && wrongAttempts >= 1 && (
+                <button
+                  type="button"
+                  className="pill-btn pill-btn--soft"
+                  onClick={() => {
+                    playSfx('flip')
+                    setRevealAnswer(true)
+                    setCoachMsg('睇睇點玩，下次自己試！')
+                  }}
+                  aria-label="睇睇答案"
+                >
+                  {KID.peek}
+                </button>
+              )}
+            </>
           )}
 
           {item.kind === 'prompt' && (
@@ -1202,7 +1492,12 @@ export function PracticeSession({
                     checked={!!checkedFields[f]}
                     onChange={(e) => {
                       playSfx(e.target.checked ? 'tap' : 'flip')
-                      setCheckedFields((prev) => ({ ...prev, [f]: e.target.checked }))
+                      const next = { ...checkedFields, [f]: e.target.checked }
+                      setCheckedFields(next)
+                      const fields = item.fields ?? ['我已經試過']
+                      if (e.target.checked && fields.every((name) => next[name])) {
+                        awardAndMaybeNext(true)
+                      }
                     }}
                   />
                   <span>{f}</span>
@@ -1224,6 +1519,7 @@ export function PracticeSession({
                 </div>
               </div>
             )}
+          </div>
         </div>
       </div>
 

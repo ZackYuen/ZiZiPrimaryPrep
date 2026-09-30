@@ -9,6 +9,8 @@ import { HintPicture } from './HintPicture'
 import { vocabVisual } from '../lib/teachHint'
 import { Confetti } from './Confetti'
 import { ChapterCelebration } from './ChapterCelebration'
+import { Mascot } from './Mascot'
+import { resolveMascotPresence } from '../lib/mascotPresence'
 
 type Props = {
   completed: Record<string, boolean>
@@ -25,13 +27,21 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
   const { speak, stop } = useSpeech()
 
   useEffect(() => {
+    if (chapterComplete) {
+      setBgmMood('celebrate')
+      return
+    }
     setBgmMood(burst ? 'cheer' : 'practice')
-  }, [burst, catIndex, itemIndex])
+  }, [burst, chapterComplete, catIndex, itemIndex])
 
   const cat = vocabCategories[catIndex]
   const item = cat.items[itemIndex]
   const cardId = `vocab-${cat.id}-${itemIndex}`
   const done = completed[cardId]
+  const mascot = resolveMascotPresence({
+    cheering: burst || chapterComplete,
+    looking: flipped,
+  })
 
   const next = () => {
     stop()
@@ -86,6 +96,14 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
         >
           {KID.back}
         </button>
+        <Mascot
+          mood={mascot.mood}
+          reason={mascot.reason}
+          size={76}
+          interactive
+          bubbleAlign="side"
+          className="session__mascot"
+        />
         <div className="session__progress">
           <span className="session__title">字詞</span>
           <span>

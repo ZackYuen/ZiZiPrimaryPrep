@@ -12,6 +12,8 @@ export const KID = {
   peek: '?',
   help: '?',
   starOk: '★',
+  readDone: '★ 讀完啦',
+  speakDone: '★ 講完啦',
   mic: '●',
   micStop: '■',
   micLabel: '●',

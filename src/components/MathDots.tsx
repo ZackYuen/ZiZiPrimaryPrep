@@ -1,7 +1,15 @@
-import type { MathModel } from '../lib/teachHint'
+import type { MathModel, MathOp, MathPiece } from '../lib/teachHint'
 
 type Props = {
   model: MathModel
+}
+
+const OP_TEXT: Record<MathOp, string> = {
+  '+': '＋',
+  '-': '－',
+  '×': '×',
+  '÷': '÷',
+  '=': '＝',
 }
 
 function Ones({ n, icon }: { n: number; icon: MathModel['icon'] }) {
@@ -32,18 +40,34 @@ function TensOnes({ n, icon }: { n: number; icon: MathModel['icon'] }) {
   )
 }
 
+function PieceView({ piece, icon }: { piece: MathPiece; icon: MathModel['icon'] }) {
+  if (piece.kind === 'count') return <TensOnes n={piece.n} icon={icon} />
+  if (piece.kind === 'op') return <span className="math-dots__op">{OP_TEXT[piece.op]}</span>
+  if (piece.kind === 'blank') return <span className="math-blank">□</span>
+  if (piece.kind === 'num') {
+    return (
+      <span className={`math-num-tile ${piece.blank ? 'is-blank' : ''}`}>
+        {piece.blank ? '□' : piece.n}
+      </span>
+    )
+  }
+  return (
+    <div className="math-groups">
+      {Array.from({ length: piece.groups }, (_, g) => (
+        <TensOnes key={g} n={piece.each} icon={icon} />
+      ))}
+    </div>
+  )
+}
+
 /** Ten-rods + ones so a 5-year-old can count instead of reading the sum. */
 export function MathDots({ model }: Props) {
-  const { left, right, op, icon } = model
+  const layout = model.pieces.every((p) => p.kind === 'num' || p.kind === 'blank') ? 'tiles' : 'ops'
   return (
-    <div className="math-dots" aria-label="用圖數一數">
-      <TensOnes n={left} icon={icon} />
-      {op && right != null && (
-        <>
-          <span className="math-dots__op">{op === '+' ? '＋' : '－'}</span>
-          <TensOnes n={right} icon={icon} />
-        </>
-      )}
+    <div className={`math-dots math-dots--${layout}`} aria-label="用圖數一數">
+      {model.pieces.map((piece, i) => (
+        <PieceView key={i} piece={piece} icon={model.icon} />
+      ))}
     </div>
   )
 }

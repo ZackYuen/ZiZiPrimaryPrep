@@ -1,56 +1,157 @@
+import { useEffect, useRef, useState } from 'react'
+import { playSfx, unlockAudio } from '../hooks/useSfx'
+import {
+  pickMascotLine,
+  type MascotMood,
+  type MascotReason,
+} from '../lib/mascotPresence'
+
 type Props = {
-  mood?: 'happy' | 'cheer' | 'think' | 'wave'
+  mood?: MascotMood
   size?: number
   className?: string
+  /** Tap for a cheer + bubble. Never required to progress. */
+  interactive?: boolean
+  /** Auto-speak a short line when gameplay mood changes. */
+  reason?: MascotReason
+  bubbleAlign?: 'below' | 'end' | 'side'
 }
 
-/** Friendly SVG buddy for Seth — no emoji */
-export function Mascot({ mood = 'happy', size = 160, className = '' }: Props) {
-  const mouth =
-    mood === 'think'
-      ? 'M70 108 Q88 100 106 108'
-      : mood === 'cheer'
-        ? 'M66 100 Q88 122 110 100'
-        : 'M68 102 Q88 118 108 102'
+const MOOD_ART: Record<MascotMood, string> = {
+  happy: 'zizi-wave.png',
+  wave: 'zizi-wave.png',
+  think: 'zizi-think.png',
+  cheer: 'zizi-cheer.png',
+}
 
-  return (
-    <svg
-      className={`mascot mascot--${mood} ${className}`}
+const TAP_MS = 2600
+const IDLE_MS = 14000
+const BLINK_EVERY_MS = 5000
+const BLINK_MS = 140
+
+function prefersReducedMotion() {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+/** Illustrated lime-green paper buddy representing 孜孜 / Seth. */
+export function Mascot({
+  mood = 'happy',
+  size = 160,
+  className = '',
+  interactive = false,
+  reason,
+  bubbleAlign = 'below',
+}: Props) {
+  const [burst, setBurst] = useState<'tap' | 'idle' | null>(null)
+  const [bubble, setBubble] = useState<string | null>(null)
+  const [blink, setBlink] = useState(false)
+  const hideRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const blinkHideRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const shownMood: MascotMood =
+    burst === 'tap' ? 'cheer' : burst === 'idle' && mood !== 'cheer' ? 'wave' : mood
+
+  const clearHide = () => {
+    if (hideRef.current != null) {
+      clearTimeout(hideRef.current)
+      hideRef.current = null
+    }
+  }
+
+  const speakFor = (kind: 'tap' | 'cheer' | 'encourage' | 'idle', nextBurst: 'tap' | 'idle' | null) => {
+    clearHide()
+    setBurst(nextBurst)
+    setBubble(pickMascotLine(kind))
+    hideRef.current = setTimeout(() => {
+      setBurst(null)
+      setBubble(null)
+      hideRef.current = null
+    }, TAP_MS)
+  }
+
+  useEffect(() => () => {
+    clearHide()
+    if (blinkHideRef.current != null) clearTimeout(blinkHideRef.current)
+  }, [])
+
+  useEffect(() => {
+    if (!reason) return
+    if (reason === 'cheer') speakFor('cheer', 'tap')
+    else if (reason === 'encourage') speakFor('encourage', null)
+    // wait / listen / start: pose only — idle nudge covers long pauses
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reason])
+
+  useEffect(() => {
+    if (!interactive || prefersReducedMotion()) return
+    if (mood === 'cheer' || reason === 'cheer' || burst === 'tap') return
+    const id = window.setTimeout(() => {
+      speakFor('idle', 'idle')
+    }, IDLE_MS)
+    return () => window.clearTimeout(id)
+    // Restart the wait whenever the kid or the activity does something.
+  }, [interactive, mood, reason, burst])
+
+  useEffect(() => {
+    if (!interactive || prefersReducedMotion()) return
+    const id = window.setInterval(() => {
+      setBlink(true)
+      if (blinkHideRef.current != null) clearTimeout(blinkHideRef.current)
+      blinkHideRef.current = setTimeout(() => {
+        setBlink(false)
+        blinkHideRef.current = null
+      }, BLINK_MS)
+    }, BLINK_EVERY_MS)
+    return () => window.clearInterval(id)
+  }, [interactive])
+
+  const art = `${import.meta.env.BASE_URL}characters/${MOOD_ART[shownMood]}`
+  const face = (
+    <img
+      className={`mascot mascot--${shownMood}`}
       width={size}
       height={size}
-      viewBox="0 0 160 160"
-      aria-hidden
+      src={art}
+      alt=""
+      draggable={false}
+    />
+  )
+
+  if (!interactive) {
+    return (
+      <img
+        className={`mascot mascot--${mood} ${className}`}
+        width={size}
+        height={size}
+        src={`${import.meta.env.BASE_URL}characters/${MOOD_ART[mood]}`}
+        alt="孜孜的綠色手工小伙伴"
+        draggable={false}
+      />
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      className={`mascot-buddy mascot-buddy--${shownMood} mascot-buddy--bubble-${bubbleAlign} ${
+        burst ? 'is-pop' : ''
+      } ${blink ? 'is-blink' : ''} ${className}`}
+      style={{ width: size, height: size }}
+      aria-label="孜孜"
+      title="孜孜"
+      onClick={() => {
+        unlockAudio()
+        playSfx('tap')
+        speakFor('tap', 'tap')
+      }}
     >
-      <ellipse cx="80" cy="148" rx="46" ry="8" fill="rgba(27,58,75,0.12)" />
-      <circle cx="80" cy="78" r="52" fill="#FFE08A" />
-      <circle cx="80" cy="78" r="52" fill="url(#mascotShine)" />
-      <path d="M40 62 Q28 28 52 34 Q64 18 80 30 Q96 18 108 34 Q132 28 120 62" fill="#1B3A4B" />
-      <circle cx="62" cy="76" r="6" fill="#1B3A4B" />
-      <circle cx="98" cy="76" r="6" fill="#1B3A4B" />
-      <circle cx="64" cy="74" r="2" fill="#fff" />
-      <circle cx="100" cy="74" r="2" fill="#fff" />
-      <ellipse cx="48" cy="90" rx="8" ry="5" fill="#FF9B7A" opacity="0.7" />
-      <ellipse cx="112" cy="90" rx="8" ry="5" fill="#FF9B7A" opacity="0.7" />
-      <path d={mouth} fill="none" stroke="#1B3A4B" strokeWidth="4" strokeLinecap="round" />
-      {mood === 'wave' && (
-        <g className="mascot__arm">
-          <path d="M128 90 Q148 70 142 48" fill="none" stroke="#FFE08A" strokeWidth="12" strokeLinecap="round" />
-          <circle cx="142" cy="44" r="10" fill="#FFE08A" />
-        </g>
+      <span className={`mascot-buddy__face ${blink ? 'is-blink' : ''}`}>{face}</span>
+      {bubble && (
+        <span className="mascot-buddy__bubble" role="status" aria-live="polite">
+          {bubble}
+        </span>
       )}
-      {mood === 'cheer' && (
-        <>
-          <path d="M36 54 L42 40 L48 54" fill="none" stroke="#FF7A59" strokeWidth="3" strokeLinecap="round" />
-          <path d="M112 50 L120 36 L126 52" fill="none" stroke="#F5C84C" strokeWidth="3" strokeLinecap="round" />
-        </>
-      )}
-      <defs>
-        <radialGradient id="mascotShine" cx="35%" cy="30%" r="65%">
-          <stop offset="0%" stopColor="#FFF6C8" />
-          <stop offset="55%" stopColor="#FFE08A" />
-          <stop offset="100%" stopColor="#F5C84C" />
-        </radialGradient>
-      </defs>
-    </svg>
+    </button>
   )
 }

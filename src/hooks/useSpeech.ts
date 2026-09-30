@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { duckBgm } from '../lib/bgm'
 import { isGoogleTtsConfigured, synthesizeGoogleTts } from '../lib/googleTts'
 import { prepareSpokenText, toPlainSpoken } from '../lib/speakText'
+import { getVoiceSettings } from '../lib/voiceSettings'
 import { playMp3Bytes, stopTtsAudio, unlockAudio } from './useSfx'
 
 export type SpeakLang = 'zh-HK' | 'en-US'
@@ -342,7 +343,7 @@ export function useSpeech() {
         if (gen !== genRef.current) return
         const u = new SpeechSynthesisUtterance(toPlainSpoken(prepareSpokenText(trimmed, lang), lang) || trimmed)
         const voice = pickVoice(lang)
-        u.rate = apple ? 1 : lang === 'zh-HK' ? 0.92 : 0.95
+        u.rate = getVoiceSettings().rate
         u.pitch = 1
         if (voice) {
           const skip =
