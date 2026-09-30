@@ -1131,6 +1131,12 @@
   font-size: 1rem;
 }
 
+.session__mascot {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+
 .session__track {
   width: min(160px, 40vw);
   height: 10px;

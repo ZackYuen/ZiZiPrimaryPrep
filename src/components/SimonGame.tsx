@@ -41,10 +41,12 @@ export function SimonGame({ config, locked, reveal, onSolved, onWrong, onSpeak }
   const [wait, setWait] = useState(false)
 
   const current = rounds[round]
+  const listenHint = config.listenHint ?? '聽到 Simon says 先做'
 
   useEffect(() => {
     if (config.mode !== 'listen' || !current || locked) return
-    onSpeak?.(current.phrase, 'en-US')
+    const lang = /[\u4e00-\u9fff]/.test(current.phrase) ? 'zh-HK' : 'en-US'
+    onSpeak?.(current.phrase, lang)
     setPose('idle')
     setStill(false)
     setFlash(null)
@@ -120,7 +122,7 @@ export function SimonGame({ config, locked, reveal, onSolved, onWrong, onSpeak }
   return (
     <div className={`simon-board ${shake ? 'is-shake' : ''}`}>
       <p className="reorder__hint">
-        {current ? `${round + 1} / ${rounds.length}` : ''} · 聽到 Simon says 先做
+        {current ? `${round + 1} / ${rounds.length}` : ''} · {listenHint}
       </p>
       <div className="simon-stage">
         <KidPose action={pose} still={still} />

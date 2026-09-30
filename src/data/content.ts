@@ -39,6 +39,8 @@ export type SimonGame = {
   mode: 'listen' | 'chain'
   rounds?: SimonRound[]
   chain?: SimonAction[]
+  /** Shown above listen-mode buttons, e.g. 「聽到老師說先做」. */
+  listenHint?: string
 }
 
 export type BuildScene = 'party' | 'bridge' | 'bridge-order' | 'bridge-shape'

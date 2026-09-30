@@ -35,6 +35,7 @@ import { TangramBoard } from './TangramBoard'
 import { SimonGame } from './SimonGame'
 import { BuildBoard } from './BuildBoard'
 import { MemoryMatch } from './MemoryMatch'
+import { Mascot } from './Mascot'
 
 type Props = {
   title: string
@@ -510,6 +511,7 @@ export function PracticeSession({
         >
           {KID.back}
         </button>
+        <Mascot mood="think" size={40} className="session__mascot" />
         <div className="session__progress">
           <span className="session__title">{title}</span>
           <span>
