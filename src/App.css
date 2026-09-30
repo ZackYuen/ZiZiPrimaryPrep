@@ -266,6 +266,7 @@
   display: flex;
   justify-content: center;
   margin: 0.35rem 0 0.15rem;
+  overflow: visible;
   animation: rise-in 0.7s ease 0.05s both;
 }
 
@@ -1142,9 +1143,12 @@
 }
 
 .session__mascot {
+  position: relative;
+  z-index: 5;
   flex-shrink: 0;
   width: 76px;
   height: 76px;
+  overflow: visible;
 }
 
 .session__track {
@@ -2529,23 +2533,46 @@
   transform: none;
 }
 
-/* ---- Mascot / scenes / SFX UI ---- */
+/* ---- Mascot / scenes / SFX UI ----
+ * Motion is layered so transforms don't fight:
+ *   buddy/static shell → no looping transform
+ *   .mascot-buddy__motion / .mascot--mood → mood loops (GPU transform)
+ *   .mascot-buddy__face → blink squash
+ *   sparkles / think-dots → opacity + transform, pointer-events none
+ */
 .mascot {
   display: block;
   filter: drop-shadow(0 8px 0 rgba(27, 58, 75, 0.08));
 }
 
-.mascot--happy,
+.mascot-static {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  overflow: visible;
+  vertical-align: middle;
+}
+
+.mascot--happy {
+  transform-origin: 50% 88%;
+  animation: mascot-idle 2.15s ease-in-out infinite;
+}
+
 .mascot--think {
-  animation: mascot-bounce 2.8s ease-in-out infinite;
+  transform-origin: 50% 88%;
+  animation: mascot-think 2.55s ease-in-out infinite;
 }
 
 .mascot--wave {
-  animation: mascot-bounce 2.2s ease-in-out infinite;
+  transform-origin: 50% 90%;
+  animation: mascot-wave 1.28s ease-in-out infinite;
 }
 
 .mascot--cheer {
-  animation: mascot-cheer 0.55s ease, mascot-bounce 2.2s ease-in-out 0.55s infinite;
+  transform-origin: 50% 88%;
+  animation:
+    mascot-cheer-burst 0.7s cubic-bezier(0.22, 1.35, 0.36, 1),
+    mascot-idle 2.15s ease-in-out 0.7s infinite;
 }
 
 .mascot__arm {
@@ -2563,19 +2590,11 @@
   margin: 0;
   border: 0;
   background: transparent;
+  overflow: visible;
+  isolation: isolate;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  animation: mascot-bounce 2.8s ease-in-out infinite;
-}
-
-.mascot-buddy--wave {
-  animation-duration: 2.2s;
-}
-
-.mascot-buddy--cheer,
-.mascot-buddy.is-pop {
-  animation: mascot-cheer 0.55s ease, mascot-bounce 2.2s ease-in-out 0.55s infinite;
 }
 
 .mascot-buddy .mascot {
@@ -2584,19 +2603,155 @@
   animation: none;
 }
 
+.mascot-buddy__motion {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 88%;
+  animation: mascot-idle 2.15s ease-in-out infinite;
+}
+
+.mascot-buddy--wave .mascot-buddy__motion {
+  transform-origin: 50% 90%;
+  animation-name: mascot-wave;
+  animation-duration: 1.28s;
+}
+
+.mascot-buddy--think .mascot-buddy__motion {
+  animation-name: mascot-think;
+  animation-duration: 2.55s;
+}
+
+.mascot-buddy--cheer .mascot-buddy__motion,
+.mascot-buddy.is-pop .mascot-buddy__motion {
+  animation:
+    mascot-cheer-burst 0.7s cubic-bezier(0.22, 1.35, 0.36, 1),
+    mascot-cheer-hop 0.82s ease-in-out 0.7s infinite;
+}
+
+.mascot-buddy:active .mascot-buddy__motion {
+  animation: none;
+  transform: translate3d(0, 6px, 0) scale(1.14, 0.84);
+}
+
 .mascot-buddy__face {
   display: block;
   width: 100%;
   height: 100%;
-  transform-origin: 50% 80%;
-}
-
-.mascot-buddy--wave .mascot-buddy__face {
-  animation: mascot-wave-tilt 5.6s ease-in-out infinite;
+  transform-origin: 50% 30%;
 }
 
 .mascot-buddy__face.is-blink {
-  transform: scaleY(0.92);
+  transform: scaleY(0.78);
+}
+
+.mascot-buddy__fx {
+  position: absolute;
+  inset: -18% -12%;
+  z-index: 2;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.mascot-buddy__spark {
+  position: absolute;
+  opacity: 0;
+  color: #f5c84c;
+  font-size: 0.78em;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(138, 106, 18, 0.28);
+  transform: scale(0.35);
+}
+
+.mascot-buddy__spark--a {
+  top: 4%;
+  left: 6%;
+}
+
+.mascot-buddy__spark--b {
+  top: -2%;
+  right: 8%;
+  font-size: 0.95em;
+}
+
+.mascot-buddy__spark--c {
+  top: 28%;
+  right: -4%;
+  font-size: 0.7em;
+}
+
+.mascot-buddy--cheer .mascot-buddy__spark,
+.mascot-buddy.is-pop .mascot-buddy__spark {
+  animation: mascot-spark 0.95s ease-in-out infinite;
+}
+
+.mascot-buddy--cheer .mascot-buddy__spark--b,
+.mascot-buddy.is-pop .mascot-buddy__spark--b {
+  animation-delay: 0.18s;
+}
+
+.mascot-buddy--cheer .mascot-buddy__spark--c,
+.mascot-buddy.is-pop .mascot-buddy__spark--c {
+  animation-delay: 0.36s;
+}
+
+.chapter-finale__mascot.mascot-static--cheer::before,
+.chapter-finale__mascot.mascot-static--cheer::after {
+  position: absolute;
+  z-index: 2;
+  color: #f5c84c;
+  font-size: 0.85em;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 1px 0 rgba(138, 106, 18, 0.28);
+  animation: mascot-spark 0.95s ease-in-out infinite;
+  content: '✦';
+}
+
+.chapter-finale__mascot.mascot-static--cheer::before {
+  top: 2%;
+  left: 6%;
+}
+
+.chapter-finale__mascot.mascot-static--cheer::after {
+  top: 8%;
+  right: 4%;
+  animation-delay: 0.22s;
+  content: '★';
+}
+
+.mascot-buddy__think {
+  position: absolute;
+  top: -2%;
+  right: 4%;
+  z-index: 2;
+  display: none;
+  gap: 3px;
+  pointer-events: none;
+}
+
+.mascot-buddy--think .mascot-buddy__think {
+  display: flex;
+  align-items: flex-end;
+}
+
+.mascot-buddy__think span {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #5eb5d8;
+  box-shadow: 0 1px 0 rgba(27, 58, 75, 0.12);
+  animation: mascot-think-dot 1.15s ease-in-out infinite;
+}
+
+.mascot-buddy__think span:nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.mascot-buddy__think span:nth-child(3) {
+  animation-delay: 0.28s;
 }
 
 .mascot-buddy__bubble {
@@ -2669,6 +2824,110 @@
   }
   50% {
     transform: translateY(-6px);
+  }
+}
+
+@keyframes mascot-idle {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-2.4deg);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0) rotate(2.6deg);
+  }
+}
+
+@keyframes mascot-wave {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  18% {
+    transform: translate3d(-2px, -9px, 0) rotate(-16deg);
+  }
+  38% {
+    transform: translate3d(3px, -4px, 0) rotate(14deg);
+  }
+  58% {
+    transform: translate3d(-2px, -11px, 0) rotate(-12deg);
+  }
+  78% {
+    transform: translate3d(2px, -3px, 0) rotate(9deg);
+  }
+}
+
+@keyframes mascot-think {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-7deg) scale(1);
+  }
+  35% {
+    transform: translate3d(0, -5px, 0) rotate(-11deg) scale(1.045);
+  }
+  62% {
+    transform: translate3d(0, -2px, 0) rotate(-5deg) scale(1.02);
+  }
+}
+
+@keyframes mascot-cheer-burst {
+  0% {
+    transform: translate3d(0, 8px, 0) scale(1.12, 0.82) rotate(-8deg);
+  }
+  32% {
+    transform: translate3d(0, -22px, 0) scale(0.92, 1.12) rotate(9deg);
+  }
+  52% {
+    transform: translate3d(0, 4px, 0) scale(1.08, 0.9) rotate(-5deg);
+  }
+  74% {
+    transform: translate3d(0, -14px, 0) scale(0.96, 1.06) rotate(6deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes mascot-cheer-hop {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-4deg) scale(1);
+  }
+  40% {
+    transform: translate3d(0, -16px, 0) rotate(7deg) scale(0.94, 1.08);
+  }
+  58% {
+    transform: translate3d(0, -16px, 0) rotate(7deg) scale(0.94, 1.08);
+  }
+  78% {
+    transform: translate3d(0, 3px, 0) scale(1.08, 0.88);
+  }
+}
+
+@keyframes mascot-spark {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 4px, 0) scale(0.35) rotate(-12deg);
+  }
+  40% {
+    opacity: 1;
+    transform: translate3d(-2px, -6px, 0) scale(1.05) rotate(8deg);
+  }
+  70% {
+    opacity: 0.85;
+    transform: translate3d(3px, -10px, 0) scale(0.9) rotate(-6deg);
+  }
+}
+
+@keyframes mascot-think-dot {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translate3d(0, 3px, 0) scale(0.7);
+  }
+  45% {
+    opacity: 1;
+    transform: translate3d(0, -3px, 0) scale(1.15);
   }
 }
 
@@ -2746,14 +3005,29 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mascot,
+  .mascot-static,
+  .chapter-finale__mascot.mascot-static--cheer::before,
+  .chapter-finale__mascot.mascot-static--cheer::after,
   .mascot-buddy,
+  .mascot-buddy__motion,
   .mascot-buddy__face,
-  .mascot-buddy__bubble {
+  .mascot-buddy__spark,
+  .mascot-buddy__think span,
+  .mascot-buddy__bubble,
+  .chapter-finale__mascot {
     animation: none;
   }
 
-  .mascot-buddy__face.is-blink {
+  .mascot-buddy__face.is-blink,
+  .mascot-buddy:active .mascot-buddy__motion {
     transform: none;
+  }
+
+  .mascot-buddy__spark,
+  .chapter-finale__mascot.mascot-static--cheer::before,
+  .chapter-finale__mascot.mascot-static--cheer::after,
+  .mascot-buddy__think {
+    display: none;
   }
 }
 
@@ -2912,6 +3186,15 @@
   margin: -0.15rem auto -0.35rem;
   filter: drop-shadow(0 12px 0 rgba(27, 58, 75, 0.1));
   animation: chapter-mascot-jump 0.75s ease 0.35s both;
+}
+
+.chapter-finale__mascot .mascot {
+  width: 100%;
+  height: auto;
+}
+
+.chapter-finale__mascot .mascot--cheer {
+  animation: mascot-cheer-hop 0.82s ease-in-out 1.1s infinite;
 }
 
 .chapter-finale__card h2 {
