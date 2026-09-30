@@ -32,8 +32,26 @@ function dayNumber(id: DayId): number {
   return Number.isFinite(n) ? n : 0
 }
 
+function viewFromSearch(): View {
+  if (typeof window === 'undefined') return { name: 'home' }
+  const p = new URLSearchParams(window.location.search)
+  const school = p.get('school')
+  if (
+    school === 'cky' ||
+    school === 'spcc' ||
+    school === 'wkf' ||
+    school === 'evangel' ||
+    school === 'jando'
+  ) {
+    return { name: 'school', id: school }
+  }
+  const day = p.get('day')
+  if (day && days.some((d) => d.id === day)) return { name: 'day', id: day as DayId }
+  return { name: 'home' }
+}
+
 export default function App() {
-  const [view, setView] = useState<View>({ name: 'home' })
+  const [view, setView] = useState<View>(viewFromSearch)
   const { progress, markDone, reset } = useProgress()
 
   const bgmPlace =

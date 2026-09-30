@@ -72,6 +72,11 @@
 }
 
 @supports not (gap: 1rem) {
+  .math-dots > * + *,
+  .math-dots__term > * + *,
+  .math-ones > * + *,
+  .math-place > * + *,
+  .numpad-actions > * + *,
   .session__actions > * + *,
   .session__badges > * + *,
   .reorder__pool > * + *,
