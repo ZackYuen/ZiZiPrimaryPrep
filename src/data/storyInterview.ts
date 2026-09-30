@@ -39,8 +39,8 @@ export function shuffleStoryIds(ids: string[]): string[] {
 export const storyInterviews: StoryInterview[] = [
   {
     id: 'ipad-story-teddy',
-    title: '落雨了，啤啤熊呢？',
-    shortTitle: '雨天的啤啤熊',
+    title: '落雨喇，啤啤熊呢？',
+    shortTitle: '落雨天嘅啤啤熊',
     accent: '#1B6B8A',
     tellPrompt:
       '跟住四格圖，由首先講到最後。講清楚邊個、喺邊、發生咗咩事。講完之後答：如果你係碩孜，會點樣搵返啤啤熊？',
@@ -54,7 +54,7 @@ export const storyInterviews: StoryInterview[] = [
   },
   {
     id: 'ipad-story-plant',
-    title: '飛走了的皮球',
+    title: '飛走咗嘅皮球',
     shortTitle: '課室小意外',
     accent: '#B85C45',
     tellPrompt:
