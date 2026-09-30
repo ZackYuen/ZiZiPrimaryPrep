@@ -34,6 +34,7 @@ const MOOD_ART: Record<MascotMood, string> = {
 }
 
 const TAP_MS = 2600
+const POOF_MS = 320
 const IDLE_MS = 14000
 const BLINK_EVERY_MS = 4800
 const BLINK_MS = 170
@@ -143,20 +144,29 @@ export function Mascot({
   const [blink, setBlink] = useState(false)
   const [motionKey, setMotionKey] = useState(0)
   const [fxOrigin, setFxOrigin] = useState<BurstOrigin | null>(null)
+  const [poofing, setPoofing] = useState(false)
   const hideRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const blinkHideRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const poofRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const btnRef = useRef<HTMLButtonElement | null>(null)
 
   // Exaggerated cheer/hop only on tap (or a 'cheer' reason). Idle nudge is a
   // bubble — never auto-swap to the big wave/cheer overlay on load or pause.
   const shownMood: MascotMood = burst === 'tap' ? 'cheer' : mood
-  const popped = burst === 'tap'
+  const popped = burst === 'tap' && !poofing
   const art = poseSrc(MOOD_ART[shownMood])
 
   const clearHide = () => {
     if (hideRef.current != null) {
       clearTimeout(hideRef.current)
       hideRef.current = null
+    }
+  }
+
+  const clearPoof = () => {
+    if (poofRef.current != null) {
+      clearTimeout(poofRef.current)
+      poofRef.current = null
     }
   }
 
@@ -185,11 +195,31 @@ export function Mascot({
         s: Math.min(r.width, r.height),
       })
     }
-    speakFor('tap', 'tap')
+
+    // First tap poofs the idle figure out, then hops the cheer pose in.
+    // Later taps used to skip that exit because burst stayed 'tap' (is-pop
+    // never left, so CSS hop/poof could not restart). Replay the exit every tap.
+    if (prefersReducedMotion()) {
+      clearPoof()
+      setPoofing(false)
+      speakFor('tap', 'tap')
+      return
+    }
+
+    clearHide()
+    clearPoof()
+    setMotionKey((n) => n + 1)
+    setPoofing(true)
+    poofRef.current = setTimeout(() => {
+      setPoofing(false)
+      poofRef.current = null
+      speakFor('tap', 'tap')
+    }, POOF_MS)
   }
 
   useEffect(() => () => {
     clearHide()
+    clearPoof()
     if (blinkHideRef.current != null) clearTimeout(blinkHideRef.current)
   }, [])
 
@@ -203,14 +233,14 @@ export function Mascot({
 
   useEffect(() => {
     if (!interactive || prefersReducedMotion()) return
-    if (mood === 'cheer' || reason === 'cheer' || burst === 'tap') return
+    if (mood === 'cheer' || reason === 'cheer' || burst === 'tap' || poofing) return
     const id = window.setTimeout(() => {
       // Bubble only — do not switch to wave/cheer art unprompted.
       speakFor('idle', null)
     }, IDLE_MS)
     return () => window.clearTimeout(id)
     // Restart the wait whenever the kid or the activity does something.
-  }, [interactive, mood, reason, burst])
+  }, [interactive, mood, reason, burst, poofing])
 
   useEffect(() => {
     if (!interactive || prefersReducedMotion()) return
@@ -246,14 +276,15 @@ export function Mascot({
       ref={btnRef}
       type="button"
       className={`mascot-buddy mascot-buddy--${shownMood} mascot-buddy--bubble-${bubbleAlign} ${
-        popped ? 'is-pop' : ''
+        poofing ? 'is-poof' : popped ? 'is-pop' : ''
       } ${blink ? 'is-blink' : ''} ${className}`}
       style={{ width: size, height: size }}
       aria-label="孜孜"
       title="孜孜"
+      data-mascot-state={poofing ? 'poof' : popped ? 'pop' : 'idle'}
       onClick={fireTapDelight}
     >
-      {popped && fxOrigin ? (
+      {(poofing || popped) && fxOrigin ? (
         <MascotTapBurst key={motionKey} origin={fxOrigin} burstKey={motionKey} />
       ) : null}
       <span className="mascot-buddy__fx" aria-hidden>
@@ -267,6 +298,7 @@ export function Mascot({
         <span />
       </span>
       <MascotPose
+        key={`${shownMood}-${motionKey}`}
         mood={shownMood}
         size={size}
         art={art}
