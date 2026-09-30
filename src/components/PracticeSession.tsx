@@ -903,10 +903,7 @@ export function PracticeSession({
                       type="button"
                       className="pill-btn pill-btn--soft"
                       onClick={() => {
-                        stop()
-                        setSpokenText('')
-                        setComposeActive(false)
-                        dictationRef.current?.blur()
+                        unlockAudio()
                         if (listenSupported) {
                           const phrases = buildSttPhrases([
                             item.sampleZh,
@@ -931,7 +928,10 @@ export function PracticeSession({
                         } else {
                           openKeyboardDictation()
                         }
-                        unlockAudio()
+                        stop()
+                        setSpokenText('')
+                        setComposeActive(false)
+                        dictationRef.current?.blur()
                         playSfx('tap')
                       }}
                       aria-label="開始錄音"

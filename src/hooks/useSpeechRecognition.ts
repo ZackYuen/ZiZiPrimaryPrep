@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { isGoogleSttConfigured, recognizeWithGoogle } from '../lib/googleStt'
 import {
+  isMicPermissionError,
   kidSttFromBrowserError,
   kidSttFromThrown,
   kidSttMessage,
@@ -72,8 +73,10 @@ function langFallbacks(lang: ListenLang, apple: boolean): string[] {
 
 /**
  * When Google STT is configured (VITE_GOOGLE_SPEECH_API_KEY / VITE_GOOGLE_STT_URL):
- * always use Google — ● records PCM, ■ sends to Google (yue-Hant-HK). Never fall
- * back to iPhone/Safari webkitSpeechRecognition.
+ * always prefer Google — ● records PCM in the same tap (getUserMedia first),
+ * ■ sends to Google (yue-Hant-HK). Do not start webkitSpeechRecognition first
+ * (Safari often dies with service-not-allowed). If Web Speech still errors that
+ * way, hand off to Google PCM instead of showing 網頁聽寫唔得.
  *
  * Otherwise → browser Web Speech (Safari/Chrome) started in the ● gesture.
  */
@@ -114,7 +117,8 @@ export function useSpeechRecognition() {
   const transcriptRef = useRef('')
   const appleRef = useRef(apple)
   const requestedLangRef = useRef('yue-Hant-HK')
-  const modeRef = useRef<Mode>('webspeech')
+  const modeRef = useRef<Mode>(googleReady ? 'google' : 'webspeech')
+  const googleReadyRef = useRef(googleReady)
   const listenLangRef = useRef<ListenLang>('yue-Hant-HK')
   const pcmSessionRef = useRef<PcmCaptureSession | null>(null)
   const abortRef = useRef<AbortController | null>(null)
@@ -122,6 +126,7 @@ export function useSpeechRecognition() {
 
   appleRef.current = apple
   requestedLangRef.current = requestedLang
+  googleReadyRef.current = googleReady
 
   const clearTimers = () => {
     if (tickTimer.current) {
@@ -171,6 +176,36 @@ export function useSpeechRecognition() {
     }
     if (finalStop) recRef.current = null
     runningRef.current = false
+  }, [])
+
+  const bindGoogleCapture = useCallback((sid: number, capture: Promise<PcmCaptureSession>) => {
+    modeRef.current = 'google'
+    setEngine('google')
+    void capture
+      .then((session) => {
+        if (sid !== sessionId.current || !wantListen.current) {
+          void session.stop().catch(() => undefined)
+          return
+        }
+        pcmSessionRef.current = session
+        micOkRef.current = true
+        setSttAlive(true)
+        setLangConfirmed(true)
+        setStatusHint(kidSttMessage('listening'))
+      })
+      .catch((err) => {
+        if (sid !== sessionId.current) return
+        wantListen.current = false
+        setListening(false)
+        setSttAlive(false)
+        setSttBlocked(true)
+        const mic = isMicPermissionError(err)
+        const msg =
+          kidSttFromThrown(err, { google: true }) ||
+          kidSttMessage(mic ? 'mic-permission' : 'google-fail')
+        setError(mic ? msg : null)
+        setStatusHint(msg)
+      })
   }, [])
 
   const hardStopSession = useCallback(() => {
@@ -289,7 +324,18 @@ export function useSpeechRecognition() {
           apple: appleRef.current,
           micOk: micOkRef.current,
           restartCount: restartCount.current,
+          googleReady: googleReadyRef.current,
         })
+
+        if (mapped.handoffGoogle) {
+          hardStopStt(true)
+          setError(null)
+          setSttBlocked(false)
+          setLangConfirmed(googleReadyRef.current)
+          setStatusHint(kidSttMessage('listening'))
+          bindGoogleCapture(sid, startPcmCapture())
+          return
+        }
 
         if (mapped.retry) {
           setError(null)
@@ -318,10 +364,11 @@ export function useSpeechRecognition() {
         setSttAlive(false)
         flushInterim()
         if (!wantListen.current || !sttEnabled.current) return
+        if (modeRef.current === 'google') return
         scheduleRestart(sid)
       }
     },
-    [flushInterim, scheduleRestart],
+    [bindGoogleCapture, flushInterim, hardStopStt, scheduleRestart],
   )
 
   useEffect(() => {
@@ -409,8 +456,10 @@ export function useSpeechRecognition() {
         setSttBlocked(false)
       } catch (err) {
         if ((err as Error)?.name === 'AbortError') return
-        setError(null)
-        setStatusHint(kidSttFromThrown(err))
+        const mic = isMicPermissionError(err)
+        const msg = kidSttFromThrown(err, { google: true })
+        setError(mic ? msg : null)
+        setStatusHint(msg)
         setSttBlocked(true)
       } finally {
         setBusy(false)
@@ -430,8 +479,10 @@ export function useSpeechRecognition() {
     (lang: ListenLang = 'yue-Hant-HK', opts?: { phrases?: string[] }) => {
       listenLangRef.current = lang
       phrasesRef.current = opts?.phrases?.filter(Boolean).slice(0, 40) ?? []
-      // Always Google when configured — never iPhone/Safari built-in STT.
+      // Always Google when configured — never iPhone/Safari built-in STT first.
       const preferGoogle = googleReady
+      // First line in the tap: getUserMedia + AudioContext while the gesture is live.
+      const capturePromise = preferGoogle ? startPcmCapture() : null
 
       sessionId.current += 1
       const sid = sessionId.current
@@ -475,32 +526,9 @@ export function useSpeechRecognition() {
         }
       }, 250)
 
-      if (preferGoogle) {
-        modeRef.current = 'google'
-        setEngine('google')
+      if (capturePromise) {
         setStatusHint('')
-        // Keep gesture chain: first await should be getUserMedia.
-        void startPcmCapture()
-          .then((session) => {
-            if (sid !== sessionId.current || !wantListen.current) {
-              void session.stop().catch(() => undefined)
-              return
-            }
-            pcmSessionRef.current = session
-            micOkRef.current = true
-            setSttAlive(true)
-            setLangConfirmed(true)
-            setStatusHint(kidSttMessage('listening'))
-          })
-          .catch((err) => {
-            if (sid !== sessionId.current) return
-            wantListen.current = false
-            setListening(false)
-            setSttAlive(false)
-            setSttBlocked(true)
-            setError(null)
-            setStatusHint(kidSttFromThrown(err) || kidSttMessage('mic-permission'))
-          })
+        bindGoogleCapture(sid, capturePromise)
         return true
       }
 
@@ -558,7 +586,7 @@ export function useSpeechRecognition() {
 
       return true
     },
-    [attachHandlers, googleReady, hardStopSession, scheduleRestart, stop],
+    [attachHandlers, bindGoogleCapture, googleReady, hardStopSession, scheduleRestart, stop],
   )
 
   return {

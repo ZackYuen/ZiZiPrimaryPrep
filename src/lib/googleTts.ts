@@ -50,6 +50,7 @@ async function synthesizeOnce(opts: {
   const res = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${opts.apiKey}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    referrerPolicy: 'origin',
     body: JSON.stringify({
       input,
       voice: { languageCode: opts.languageCode, name: opts.voiceName },

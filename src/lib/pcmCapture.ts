@@ -154,34 +154,61 @@ export function splitPcmByPauses(
   return out.length ? out : [{ pcm, pauseBeforeSec: 0 }]
 }
 
+function isMicDenied(err: unknown): boolean {
+  const name = err && typeof err === 'object' && 'name' in err ? String((err as { name: unknown }).name) : ''
+  return name === 'NotAllowedError' || name === 'PermissionDeniedError' || name === 'SecurityError'
+}
+
+async function getMicStream(): Promise<MediaStream> {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    throw new Error('呢部電話唔支援錄音。')
+  }
+  const tryGet = (audio: boolean | MediaTrackConstraints) =>
+    navigator.mediaDevices.getUserMedia({ audio, video: false })
+
+  // Do not require channelCount:1 — iOS Safari often throws OverconstrainedError.
+  try {
+    return await tryGet({
+      echoCancellation: true,
+      noiseSuppression: false,
+      autoGainControl: true,
+    })
+  } catch (err) {
+    if (isMicDenied(err)) throw err
+    return await tryGet(true)
+  }
+}
+
 /**
  * Must be called from a user gesture on iOS so getUserMedia + AudioContext unlock.
+ * Create AudioContext before the first await so Safari still counts this tap.
  */
 export async function startPcmCapture(): Promise<PcmCaptureSession> {
   if (!navigator.mediaDevices?.getUserMedia) {
     throw new Error('呢部電話唔支援錄音。')
   }
 
-  // Prefer clean voice for STT: light AGC, avoid heavy noise gates that smear
-  // Cantonese tones. Echo cancel still helps on speakerphone.
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      echoCancellation: true,
-      noiseSuppression: false,
-      autoGainControl: true,
-      channelCount: 1,
-    },
-    video: false,
-  })
+  const AudioCtx =
+    window.AudioContext ||
+    (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
 
-  const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-  const ctx = new AudioCtx()
-  if (ctx.state === 'suspended') {
-    await ctx.resume()
+  let ctx: AudioContext | null = null
+  try {
+    ctx = new AudioCtx()
+    if (ctx.state === 'suspended') void ctx.resume()
+  } catch {
+    ctx = null
   }
 
-  const source = ctx.createMediaStreamSource(stream)
-  const processor = ctx.createScriptProcessor(4096, 1, 1)
+  const stream = await getMicStream()
+
+  const audioCtx = ctx ?? new AudioCtx()
+  if (audioCtx.state === 'suspended') {
+    await audioCtx.resume()
+  }
+
+  const source = audioCtx.createMediaStreamSource(stream)
+  const processor = audioCtx.createScriptProcessor(4096, 1, 1)
   const chunks: Float32Array[] = []
   let total = 0
 
@@ -194,11 +221,11 @@ export async function startPcmCapture(): Promise<PcmCaptureSession> {
   }
 
   // ScriptProcessor needs a destination to run.
-  const mute = ctx.createGain()
+  const mute = audioCtx.createGain()
   mute.gain.value = 0
   source.connect(processor)
   processor.connect(mute)
-  mute.connect(ctx.destination)
+  mute.connect(audioCtx.destination)
 
   return {
     stop: async () => {
@@ -214,8 +241,8 @@ export async function startPcmCapture(): Promise<PcmCaptureSession> {
         /* ignore */
       }
       stream.getTracks().forEach((t) => t.stop())
-      const inRate = ctx.sampleRate
-      await ctx.close().catch(() => undefined)
+      const inRate = audioCtx.sampleRate
+      await audioCtx.close().catch(() => undefined)
 
       const merged = new Float32Array(total)
       let offset = 0
