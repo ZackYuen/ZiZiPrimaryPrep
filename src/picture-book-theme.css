@@ -34,7 +34,8 @@ body {
   display: block;
   border: 3px solid rgba(90, 82, 64, 0.14);
   border-radius: 30%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #fbf4e5;
   box-shadow: 0 7px 0 rgba(91, 79, 55, 0.1), 0 12px 24px rgba(52, 66, 66, 0.1);
   mix-blend-mode: normal;
 }
@@ -47,6 +48,11 @@ body {
   border-color: rgba(255, 255, 255, 0.35);
   border-radius: 20px;
   mix-blend-mode: normal;
+}
+
+.session__mascot.mascot {
+  border-width: 2px;
+  border-radius: 28%;
 }
 
 .module-card,

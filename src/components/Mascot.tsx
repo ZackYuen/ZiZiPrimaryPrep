@@ -5,13 +5,13 @@ type Props = {
 }
 
 const MOOD_ART: Record<NonNullable<Props['mood']>, string> = {
-  happy: 'zizi-wave.jpg',
-  wave: 'zizi-wave.jpg',
-  think: 'zizi-think.jpg',
-  cheer: 'zizi-cheer.jpg',
+  happy: 'zizi-wave.png',
+  wave: 'zizi-wave.png',
+  think: 'zizi-think.png',
+  cheer: 'zizi-cheer.png',
 }
 
-/** Handmade lime-green clay/paper buddy representing 孜孜 / Seth. */
+/** Illustrated lime-green paper buddy representing 孜孜 / Seth. */
 export function Mascot({ mood = 'happy', size = 160, className = '' }: Props) {
   return (
     <img
