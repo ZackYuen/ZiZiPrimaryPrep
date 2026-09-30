@@ -90,7 +90,7 @@ export function softSpeakFeedback(
     return {
       matched,
       missing,
-      message: '電話未必聽得準童聲——唔緊要，請爸爸媽媽判斷。',
+      message: '電話未必聽得準童聲。\n唔緊要，請爸爸媽媽判斷。',
     }
   }
 

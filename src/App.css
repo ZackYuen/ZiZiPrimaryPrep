@@ -1628,6 +1628,7 @@
 }
 
 .listen-panel__feedback {
+  flex: 0 0 auto;
   padding: 0.65rem 0.75rem;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.8);
@@ -1637,6 +1638,8 @@
   margin: 0;
   font-weight: 700;
   line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .listen-panel__chips {
@@ -2726,7 +2729,25 @@
   animation: mascot-hop 0.62s cubic-bezier(0.22, 1.35, 0.36, 1) infinite;
 }
 
-.mascot-buddy:active .mascot {
+/* Replayable tap exit: squash then shrink so idle/cheer can poof more than once. */
+.mascot-buddy.is-poof .mascot-figure--happy .mascot,
+.mascot-buddy.is-poof .mascot-figure--wave .mascot,
+.mascot-buddy.is-poof .mascot-figure--think .mascot,
+.mascot-buddy.is-poof .mascot-figure--cheer .mascot,
+.mascot-buddy.is-poof .mascot {
+  animation: none;
+}
+
+.mascot-buddy.is-poof .mascot-figure {
+  animation: mascot-poof-exit 0.32s ease-in forwards;
+  transform-origin: 50% 80%;
+}
+
+.mascot-buddy.is-poof .mascot-figure__plate {
+  opacity: 0.35;
+}
+
+.mascot-buddy:active:not(.is-poof) .mascot {
   animation: none;
   transform: translateY(8%) scale(1.16, 0.78);
 }
@@ -2813,17 +2834,20 @@
 }
 
 .mascot-buddy--cheer .mascot-buddy__spark,
-.mascot-buddy.is-pop .mascot-buddy__spark {
+.mascot-buddy.is-pop .mascot-buddy__spark,
+.mascot-buddy.is-poof .mascot-buddy__spark {
   animation: mascot-spark 0.95s ease-in-out infinite;
 }
 
 .mascot-buddy--cheer .mascot-buddy__spark--b,
-.mascot-buddy.is-pop .mascot-buddy__spark--b {
+.mascot-buddy.is-pop .mascot-buddy__spark--b,
+.mascot-buddy.is-poof .mascot-buddy__spark--b {
   animation-delay: 0.18s;
 }
 
 .mascot-buddy--cheer .mascot-buddy__spark--c,
-.mascot-buddy.is-pop .mascot-buddy__spark--c {
+.mascot-buddy.is-pop .mascot-buddy__spark--c,
+.mascot-buddy.is-poof .mascot-buddy__spark--c {
   animation-delay: 0.36s;
 }
 
@@ -2964,6 +2988,23 @@
   }
   74% {
     transform: translateY(10%) rotate(4deg) scale(1.16, 0.76);
+  }
+}
+
+@keyframes mascot-poof-exit {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+    filter: none;
+  }
+  38% {
+    transform: translateY(10%) rotate(-8deg) scale(1.18, 0.72);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(18%) rotate(22deg) scale(0.08);
+    opacity: 0;
+    filter: blur(1px);
   }
 }
 
@@ -3135,9 +3176,12 @@
   .mascot-figure--cheer .mascot,
   .mascot-buddy.is-pop .mascot,
   .mascot-buddy:active .mascot,
+  .mascot-buddy.is-poof .mascot,
+  .mascot-buddy.is-poof .mascot-figure,
   .mascot-buddy__spark,
   .mascot-buddy--cheer .mascot-buddy__spark,
   .mascot-buddy.is-pop .mascot-buddy__spark,
+  .mascot-buddy.is-poof .mascot-buddy__spark,
   .mascot-tap-fx,
   .mascot-tap-fx__bit,
   .mascot-tap-fx__ring,
@@ -4157,7 +4201,7 @@ button.picture-strip__item--choice {
     min-height: 0;
     overflow: hidden;
     padding-top: max(1.45rem, env(safe-area-inset-top, 0px));
-    padding-bottom: max(0.3rem, env(safe-area-inset-bottom, 0px));
+    padding-bottom: max(0.55rem, env(safe-area-inset-bottom, 0px));
     padding-left: max(0.55rem, env(safe-area-inset-left, 0px));
     padding-right: max(0.55rem, env(safe-area-inset-right, 0px));
   }
@@ -4168,6 +4212,7 @@ button.picture-strip__item--choice {
     flex: 1 1 auto;
     min-height: 0;
     gap: 0.4rem;
+    overflow: hidden;
   }
 
   .session--practice .session__layout {
@@ -4175,6 +4220,7 @@ button.picture-strip__item--choice {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    overflow: hidden;
   }
 
   .session--practice .session__card {
@@ -4184,8 +4230,11 @@ button.picture-strip__item--choice {
     justify-content: flex-start;
     gap: 0.4rem;
     min-height: 0;
-    overflow: hidden;
-    padding: 0.55rem 0.65rem 0.45rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 0.55rem 0.65rem 0.85rem;
   }
 
   /*
@@ -4220,6 +4269,23 @@ button.picture-strip__item--choice {
   .session--practice .session__card--fill-stem .session__response {
     flex: 0 1 auto;
     max-height: 48%;
+  }
+
+  /*
+   * Speak/question with art: keep ★ 講完啦 + 粵/EN + answer + parent tip in
+   * flow. fill-stem still lets the picture take leftover height when it fits;
+   * if the column overflows, the card (not the page) scrolls so the tip is
+   * reachable on SE-sized / PWA viewports.
+   */
+  .session--kind-speak.session--practice .session__card--fill-stem .session__stem {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .session--kind-speak.session--practice .session__card--fill-stem .session__response {
+    flex: 0 0 auto;
+    max-height: none;
+    overflow: visible;
   }
 
   .session--kind-speak .speak-box,
@@ -4308,6 +4374,10 @@ button.picture-strip__item--choice {
     justify-content: center;
     align-items: center;
     min-height: 10rem;
+  }
+
+  .session--kind-speak .session__stem .hint-pic-wrap {
+    min-height: 7.5rem;
   }
 
   .session__stem .hint-pic-wrap .hint-pic {
@@ -4906,7 +4976,7 @@ button.picture-strip__item--choice {
   }
 
   .session--practice .session__card {
-    padding: 0.42rem 0.5rem 0.32rem;
+    padding: 0.42rem 0.5rem 0.75rem;
     border-radius: 18px;
     border-width: 2px;
   }
@@ -4950,6 +5020,10 @@ button.picture-strip__item--choice {
 
   .session__stem .hint-pic-wrap {
     min-height: 12rem;
+  }
+
+  .session--kind-speak .session__stem .hint-pic-wrap {
+    min-height: 8rem;
   }
 
   .session__stem .hint-pic-wrap .hint-pic {
@@ -5047,6 +5121,15 @@ button.picture-strip__item--choice {
   .listen-status__hint,
   .listen-status__error {
     font-size: 0.88rem;
+  }
+
+  .listen-panel__feedback {
+    padding: 0.45rem 0.55rem;
+  }
+
+  .listen-panel__feedback p {
+    font-size: 0.88rem;
+    line-height: 1.35;
   }
 
   .speak-box__done {
