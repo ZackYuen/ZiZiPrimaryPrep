@@ -2539,9 +2539,8 @@
  * Layered paper puppet so kids see limbs + hop, not a whole-PNG twist:
  *   .mascot-figure__shadow → stays on the ground, scales on jump
  *   .mascot-figure__hop    → vertical travel + squash-stretch
- *   .mascot-figure__arm    → illustrated origami tube (shoulder rotate)
- *   .mascot-figure__forearm→ origami pad hand (elbow rotate)
- *   .mascot-figure__leg    → folded-paper foot (same green paper as the PNG)
+ *   .mascot-figure__arm    → English-class chunky mitten (shoulder rotate)
+ *   .mascot-figure__leg    → short paper foot stub at the body corner
  *   .mascot-figure__body   → blink squash; readable think tilt
  */
 .mascot {
@@ -2677,126 +2676,78 @@
 .mascot-figure__leg {
   position: absolute;
   pointer-events: none;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 0 rgba(27, 58, 75, 0.1));
 }
 
 .mascot-figure__arm {
   /*
-   * Pivot = inner-top of the box at the illustrated shoulder
-   * (wave/think PNG ~25.5%/73.5% x, ~39% y). Tube is object-positioned
-   * to that corner so the paper meets the body, not the cream frame.
+   * English-class pattern: short chunky mitten growing from the
+   * top corners of the rectangular body (not a long lantern tube).
+   * Origin = top-center of the sprite = illustrated shoulder.
    */
-  top: 38.5%;
-  width: 16%;
-  height: 42%;
+  top: 32%;
+  width: 28%;
+  height: 32%;
   z-index: 3;
 }
 
 .mascot-figure__arm--l {
-  left: 9.5%;
-  transform-origin: 100% 0%;
-  transform: rotate(-18deg);
+  left: 6%;
+  transform-origin: 50% 8%;
+  transform: rotate(-26deg);
 }
 
 .mascot-figure__arm--r {
-  left: 73.5%;
+  left: 66%;
   right: auto;
-  transform-origin: 0% 0%;
-  transform: rotate(16deg);
-}
-
-.mascot-figure__upper,
-.mascot-figure__hand,
-.mascot-figure__leg {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  pointer-events: none;
-  filter: drop-shadow(0 3px 0 rgba(27, 58, 75, 0.1));
-}
-
-.mascot-figure__upper {
-  height: 70%;
-  object-fit: contain;
-  object-position: top center;
-}
-
-.mascot-figure__arm--l .mascot-figure__upper {
-  object-position: right top;
-}
-
-.mascot-figure__arm--r .mascot-figure__upper {
-  object-position: left top;
-}
-
-.mascot-figure__forearm {
-  display: block;
-  width: 78%;
-  margin: -14% auto 0;
   transform-origin: 50% 8%;
-  transform: rotate(10deg);
-}
-
-.mascot-figure__arm--l .mascot-figure__forearm {
-  margin-left: 0;
-  margin-right: auto;
-  transform: rotate(-10deg);
-}
-
-.mascot-figure__arm--r .mascot-figure__forearm {
-  margin-left: auto;
-  margin-right: 0;
-}
-
-.mascot-figure__hand {
-  width: 100%;
+  transform: rotate(26deg) scaleX(-1);
 }
 
 .mascot-figure__leg {
-  top: 81%;
+  top: 76%;
   bottom: auto;
   z-index: 3;
-  width: 15%;
-  transform-origin: 50% 8%;
+  width: 22%;
+  transform-origin: 50% 10%;
 }
 
 .mascot-figure__leg--l {
-  left: 21%;
-  transform: rotate(-8deg) scaleX(-1);
+  left: 12%;
+  transform: rotate(-8deg);
 }
 
 .mascot-figure__leg--r {
-  left: 45%;
+  left: 52%;
   right: auto;
-  transform: rotate(8deg);
+  transform: rotate(10deg) scaleX(-1);
 }
 
-/* Cheer PNG sits higher in the frame — retarget joints to that silhouette. */
+/* Cheer PNG sits a little higher — keep the same corner attach. */
 .mascot-figure--cheer .mascot-figure__arm {
-  top: 36.5%;
-  width: 15%;
-  height: 38%;
+  top: 33%;
 }
 
 .mascot-figure--cheer .mascot-figure__arm--l {
-  left: 12%;
+  left: 10%;
 }
 
 .mascot-figure--cheer .mascot-figure__arm--r {
-  left: 68%;
+  left: 64%;
 }
 
 .mascot-figure--cheer .mascot-figure__leg {
-  top: 70%;
-  width: 14%;
+  top: 68%;
 }
 
 .mascot-figure--cheer .mascot-figure__leg--l {
-  left: 30%;
+  left: 18%;
 }
 
 .mascot-figure--cheer .mascot-figure__leg--r {
-  left: 48%;
+  left: 50%;
 }
 
 .mascot-figure--happy .mascot-figure__arm--l,
@@ -2825,10 +2776,6 @@
 
 .mascot-figure--wave .mascot-figure__arm--r {
   animation: mascot-arm-wave 0.72s ease-in-out infinite;
-}
-
-.mascot-figure--wave .mascot-figure__arm--r .mascot-figure__forearm {
-  animation: mascot-forearm-wave 0.72s ease-in-out infinite;
 }
 
 .mascot-figure--think .mascot-figure__hop {
@@ -2867,12 +2814,6 @@
 .mascot-figure--cheer .mascot-figure__arm--r,
 .mascot-buddy.is-pop .mascot-figure__arm--r {
   animation: mascot-arm-cheer-r 0.7s ease-in-out infinite;
-}
-
-.mascot-figure--cheer .mascot-figure__arm--l .mascot-figure__forearm,
-.mascot-figure--cheer .mascot-figure__arm--r .mascot-figure__forearm,
-.mascot-buddy.is-pop .mascot-figure__forearm {
-  animation: mascot-forearm-cheer 0.7s ease-in-out infinite;
 }
 
 .mascot-figure--cheer .mascot-figure__leg--l,
@@ -3096,82 +3037,66 @@
 @keyframes mascot-arm-idle-l {
   0%,
   100% {
-    transform: rotate(-18deg);
+    transform: rotate(-26deg);
   }
   50% {
-    transform: rotate(-26deg);
+    transform: rotate(-34deg);
   }
 }
 
 @keyframes mascot-arm-idle-r {
   0%,
   100% {
-    transform: rotate(16deg);
+    transform: rotate(26deg) scaleX(-1);
   }
   50% {
-    transform: rotate(24deg);
+    transform: rotate(34deg) scaleX(-1);
   }
 }
 
 @keyframes mascot-leg-idle-l {
   0%,
   100% {
-    transform: rotate(-8deg) scaleX(-1);
+    transform: rotate(-8deg);
   }
   50% {
-    transform: rotate(-3deg) scaleX(-1);
+    transform: rotate(-3deg);
   }
 }
 
 @keyframes mascot-leg-idle-r {
   0%,
   100% {
-    transform: rotate(8deg);
+    transform: rotate(10deg) scaleX(-1);
   }
   50% {
-    transform: rotate(3deg);
+    transform: rotate(4deg) scaleX(-1);
   }
 }
 
 @keyframes mascot-arm-wave {
   0%,
   100% {
-    transform: rotate(-28deg);
+    transform: rotate(18deg) scaleX(-1);
   }
   22% {
-    transform: rotate(-158deg);
+    transform: rotate(-175deg) scaleX(-1);
   }
   44% {
-    transform: rotate(-48deg);
+    transform: rotate(-28deg) scaleX(-1);
   }
   68% {
-    transform: rotate(-172deg);
-  }
-}
-
-@keyframes mascot-forearm-wave {
-  0%,
-  100% {
-    transform: rotate(22deg);
-  }
-  22% {
-    transform: rotate(48deg);
-  }
-  44% {
-    transform: rotate(12deg);
-  }
-  68% {
-    transform: rotate(58deg);
+    transform: rotate(-188deg) scaleX(-1);
   }
 }
 
 @keyframes mascot-arm-think {
   0%,
   100% {
-    transform: rotate(38deg);
+    transform: rotate(48deg) scaleX(-1);
   }
   50% {
-    transform: rotate(52deg);
+    transform: rotate(62deg) scaleX(-1);
   }
 }
 
@@ -3215,77 +3140,64 @@
 @keyframes mascot-arm-cheer-l {
   0%,
   100% {
-    transform: rotate(-18deg);
+    transform: rotate(-26deg);
   }
   22% {
-    transform: rotate(148deg);
+    transform: rotate(150deg);
   }
   48% {
-    transform: rotate(128deg);
+    transform: rotate(132deg);
   }
   70% {
-    transform: rotate(-8deg);
+    transform: rotate(-12deg);
   }
 }
 
 @keyframes mascot-arm-cheer-r {
   0%,
   100% {
-    transform: rotate(16deg);
+    transform: rotate(26deg) scaleX(-1);
   }
   22% {
-    transform: rotate(-148deg);
+    transform: rotate(-150deg) scaleX(-1);
   }
   48% {
-    transform: rotate(-128deg);
+    transform: rotate(-132deg) scaleX(-1);
   }
   70% {
-    transform: rotate(18deg);
-  }
-}
-
-@keyframes mascot-forearm-cheer {
-  0%,
-  100% {
-    transform: rotate(8deg);
-  }
-  30% {
-    transform: rotate(-12deg);
-  }
-  70% {
-    transform: rotate(16deg);
+    transform: rotate(16deg) scaleX(-1);
   }
 }
 
 @keyframes mascot-leg-cheer-l {
   0%,
   100% {
-    transform: rotate(-6deg) scaleX(-1) scaleY(0.72);
+    transform: rotate(-6deg) scaleY(0.78);
   }
   22% {
-    transform: rotate(-28deg) scaleX(-1) scaleY(0.55);
+    transform: rotate(-22deg) scaleY(0.58);
   }
   48% {
-    transform: rotate(-12deg) scaleX(-1) scaleY(1.05);
+    transform: rotate(-8deg) scaleY(1.04);
   }
   70% {
-    transform: rotate(-18deg) scaleX(-1) scaleY(0.7);
+    transform: rotate(-14deg) scaleY(0.72);
   }
 }
 
 @keyframes mascot-leg-cheer-r {
   0%,
   100% {
-    transform: rotate(6deg) scaleY(0.72);
+    transform: rotate(6deg) scaleX(-1) scaleY(0.78);
   }
   22% {
-    transform: rotate(28deg) scaleY(0.55);
+    transform: rotate(22deg) scaleX(-1) scaleY(0.58);
   }
   48% {
-    transform: rotate(12deg) scaleY(1.05);
+    transform: rotate(8deg) scaleX(-1) scaleY(1.04);
   }
   70% {
-    transform: rotate(18deg) scaleY(0.7);
+    transform: rotate(14deg) scaleX(-1) scaleY(0.72);
   }
 }
 
@@ -3414,23 +3326,19 @@
   }
 
   .mascot-figure__arm--l {
-    transform: rotate(-18deg);
+    transform: rotate(-26deg);
   }
 
   .mascot-figure__arm--r {
-    transform: rotate(16deg);
-  }
-
-  .mascot-figure__forearm {
-    transform: rotate(14deg);
+    transform: rotate(26deg) scaleX(-1);
   }
 
   .mascot-figure__leg--l {
-    transform: rotate(-8deg) scaleX(-1);
+    transform: rotate(-8deg);
   }
 
   .mascot-figure__leg--r {
-    transform: rotate(8deg);
+    transform: rotate(10deg) scaleX(-1);
   }
 
   .mascot-buddy__spark,

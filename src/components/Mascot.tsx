@@ -36,7 +36,6 @@ function prefersReducedMotion() {
 
 const LIMB = {
   arm: 'zizi-limb-arm.png',
-  hand: 'zizi-limb-hand.png',
   foot: 'zizi-limb-foot.png',
 }
 
@@ -44,14 +43,16 @@ function limbSrc(file: string) {
   return `${import.meta.env.BASE_URL}characters/${file}`
 }
 
+/** One-piece paper arm (chunky mitten, English-class cheer). */
 function PaperLimb({ side }: { side: 'l' | 'r' }) {
   return (
-    <span className={`mascot-figure__arm mascot-figure__arm--${side}`} aria-hidden>
-      <img className="mascot-figure__upper" src={limbSrc(LIMB.arm)} alt="" draggable={false} />
-      <span className="mascot-figure__forearm">
-        <img className="mascot-figure__hand" src={limbSrc(LIMB.hand)} alt="" draggable={false} />
-      </span>
-    </span>
+    <img
+      className={`mascot-figure__arm mascot-figure__arm--${side}`}
+      src={limbSrc(LIMB.arm)}
+      alt=""
+      draggable={false}
+      aria-hidden
+    />
   )
 }
 
