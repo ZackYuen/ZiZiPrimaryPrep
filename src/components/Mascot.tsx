@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { createPortal } from 'react-dom'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
 import {
   pickMascotLine,
@@ -36,6 +37,58 @@ const TAP_MS = 2600
 const IDLE_MS = 14000
 const BLINK_EVERY_MS = 4800
 const BLINK_MS = 170
+
+type BurstOrigin = { x: number; y: number; s: number }
+
+/** English-class ZiziFX.burst directions — local sparkle, not full-page confetti. */
+const TAP_BURST = [
+  { dx: -0.52, dy: -0.78, kind: 'spark', color: '#F5C84C', delay: 0 },
+  { dx: 0.48, dy: -0.74, kind: 'star', color: '#FF7A59', delay: 0.02 },
+  { dx: -0.78, dy: -0.22, kind: 'dot', color: '#6BCB8B', delay: 0.04 },
+  { dx: 0.8, dy: -0.18, kind: 'dot', color: '#7EC8E3', delay: 0.03 },
+  { dx: -0.62, dy: 0.42, kind: 'spark', color: '#FFE08A', delay: 0.06 },
+  { dx: 0.64, dy: 0.4, kind: 'star', color: '#FF9B7A', delay: 0.05 },
+  { dx: -0.12, dy: -0.92, kind: 'dot', color: '#F5C84C', delay: 0.01 },
+  { dx: 0.16, dy: -0.88, kind: 'spark', color: '#6BCB8B', delay: 0.07 },
+  { dx: -0.88, dy: 0.12, kind: 'dot', color: '#FF7A59', delay: 0.08 },
+  { dx: 0.9, dy: 0.08, kind: 'dot', color: '#7EC8E3', delay: 0.04 },
+  { dx: -0.38, dy: 0.62, kind: 'star', color: '#F5C84C', delay: 0.09 },
+  { dx: 0.4, dy: 0.66, kind: 'spark', color: '#FF9B7A', delay: 0.1 },
+] as const
+
+function MascotTapBurst({ origin, burstKey }: { origin: BurstOrigin; burstKey: number }) {
+  if (typeof document === 'undefined') return null
+  const reach = Math.max(52, origin.s * 0.7)
+  return createPortal(
+    <span className="mascot-tap-fx" aria-hidden>
+      <span
+        className="mascot-tap-fx__ring"
+        style={{ left: origin.x, top: origin.y }}
+      />
+      {TAP_BURST.map((bit, i) => {
+        const style = {
+          left: origin.x,
+          top: origin.y,
+          background: bit.kind === 'dot' ? bit.color : 'transparent',
+          color: bit.color,
+          animationDelay: `${bit.delay}s`,
+          '--dx': `${bit.dx * reach}px`,
+          '--dy': `${bit.dy * reach}px`,
+        } as CSSProperties
+        return (
+          <span
+            key={`${burstKey}-${i}`}
+            className={`mascot-tap-fx__bit mascot-tap-fx__bit--${bit.kind}`}
+            style={style}
+          >
+            {bit.kind === 'spark' ? '✦' : bit.kind === 'star' ? '★' : ''}
+          </span>
+        )
+      })}
+    </span>,
+    document.body,
+  )
+}
 
 function prefersReducedMotion() {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
@@ -89,8 +142,10 @@ export function Mascot({
   const [bubble, setBubble] = useState<string | null>(null)
   const [blink, setBlink] = useState(false)
   const [motionKey, setMotionKey] = useState(0)
+  const [fxOrigin, setFxOrigin] = useState<BurstOrigin | null>(null)
   const hideRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const blinkHideRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const btnRef = useRef<HTMLButtonElement | null>(null)
 
   // Exaggerated cheer/hop only on tap (or a 'cheer' reason). Idle nudge is a
   // bubble — never auto-swap to the big wave/cheer overlay on load or pause.
@@ -113,8 +168,24 @@ export function Mascot({
     hideRef.current = setTimeout(() => {
       setBurst(null)
       setBubble(null)
+      setFxOrigin(null)
       hideRef.current = null
     }, TAP_MS)
+  }
+
+  const fireTapDelight = () => {
+    unlockAudio()
+    playSfx('pop')
+    const el = btnRef.current
+    if (el && !prefersReducedMotion()) {
+      const r = el.getBoundingClientRect()
+      setFxOrigin({
+        x: r.left + r.width / 2,
+        y: r.top + r.height * 0.4,
+        s: Math.min(r.width, r.height),
+      })
+    }
+    speakFor('tap', 'tap')
   }
 
   useEffect(() => () => {
@@ -172,6 +243,7 @@ export function Mascot({
 
   return (
     <button
+      ref={btnRef}
       type="button"
       className={`mascot-buddy mascot-buddy--${shownMood} mascot-buddy--bubble-${bubbleAlign} ${
         popped ? 'is-pop' : ''
@@ -179,12 +251,11 @@ export function Mascot({
       style={{ width: size, height: size }}
       aria-label="孜孜"
       title="孜孜"
-      onClick={() => {
-        unlockAudio()
-        playSfx('tap')
-        speakFor('tap', 'tap')
-      }}
+      onClick={fireTapDelight}
     >
+      {popped && fxOrigin ? (
+        <MascotTapBurst key={motionKey} origin={fxOrigin} burstKey={motionKey} />
+      ) : null}
       <span className="mascot-buddy__fx" aria-hidden>
         <span className="mascot-buddy__spark mascot-buddy__spark--a">✦</span>
         <span className="mascot-buddy__spark mascot-buddy__spark--b">★</span>

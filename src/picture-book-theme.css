@@ -205,6 +205,9 @@ body {
   .mascot-buddy__spark,
   .mascot-buddy--cheer .mascot-buddy__spark,
   .mascot-buddy.is-pop .mascot-buddy__spark,
+  .mascot-tap-fx,
+  .mascot-tap-fx__bit,
+  .mascot-tap-fx__ring,
   .mascot-buddy__think span,
   .mascot-buddy__bubble,
   .chapter-finale__mascot,
@@ -220,6 +223,7 @@ body {
   }
 
   .mascot-buddy__spark,
+  .mascot-tap-fx,
   .chapter-finale__mascot.mascot-static--cheer::before,
   .chapter-finale__mascot.mascot-static--cheer::after,
   .mascot-buddy__think {
