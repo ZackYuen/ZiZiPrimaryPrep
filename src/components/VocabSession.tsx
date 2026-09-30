@@ -8,6 +8,7 @@ import { SoundToggle } from './SoundToggle'
 import { HintPicture } from './HintPicture'
 import { vocabVisual } from '../lib/teachHint'
 import { Confetti } from './Confetti'
+import { ChapterCelebration } from './ChapterCelebration'
 import { Mascot } from './Mascot'
 import { resolveMascotPresence } from '../lib/mascotPresence'
 
@@ -22,18 +23,23 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
   const [itemIndex, setItemIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
   const [burst, setBurst] = useState(false)
+  const [chapterComplete, setChapterComplete] = useState(false)
   const { speak, stop } = useSpeech()
 
   useEffect(() => {
+    if (chapterComplete) {
+      setBgmMood('celebrate')
+      return
+    }
     setBgmMood(burst ? 'cheer' : 'practice')
-  }, [burst, catIndex, itemIndex])
+  }, [burst, chapterComplete, catIndex, itemIndex])
 
   const cat = vocabCategories[catIndex]
   const item = cat.items[itemIndex]
   const cardId = `vocab-${cat.id}-${itemIndex}`
   const done = completed[cardId]
   const mascot = resolveMascotPresence({
-    cheering: burst,
+    cheering: burst || chapterComplete,
     looking: flipped,
   })
 
@@ -42,31 +48,41 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
     unlockAudio()
     ensureBgm()
     startBgm()
-    playSfx(done ? 'whoosh' : 'star')
+    const categoryFinished = itemIndex >= cat.items.length - 1
+    playSfx(categoryFinished ? 'finale' : done ? 'whoosh' : 'star')
     if (!done) {
       onMarkDone(cardId, 'vocab')
-      setBurst(true)
-      setBgmMood('cheer')
+      if (!categoryFinished) setBurst(true)
+      setBgmMood(categoryFinished ? 'celebrate' : 'cheer')
     } else {
-      setBgmMood('practice')
+      setBgmMood(categoryFinished ? 'celebrate' : 'practice')
     }
     setFlipped(false)
+    if (categoryFinished) {
+      setChapterComplete(true)
+      return
+    }
     if (itemIndex < cat.items.length - 1) {
       setItemIndex((i) => i + 1)
       return
     }
+  }
+
+  const finishChapter = () => {
+    setChapterComplete(false)
     if (catIndex < vocabCategories.length - 1) {
       setCatIndex((c) => c + 1)
       setItemIndex(0)
+      setBgmMood('practice')
       return
     }
-    playSfx('celebrate')
     onBack()
   }
 
   return (
     <section className="session session--vocab">
       <Confetti show={burst} onDone={() => setBurst(false)} />
+      <ChapterCelebration show={chapterComplete} title={cat.title} onDone={finishChapter} />
       <header className="session__top">
         <button
           type="button"
