@@ -2723,11 +2723,11 @@
 
 .mascot-buddy__think {
   position: absolute;
-  top: -2%;
-  right: 4%;
+  top: -10%;
+  right: 2%;
   z-index: 2;
   display: none;
-  gap: 3px;
+  gap: 4px;
   pointer-events: none;
 }
 
@@ -2738,11 +2738,11 @@
 
 .mascot-buddy__think span {
   display: block;
-  width: 5px;
-  height: 5px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: #5eb5d8;
-  box-shadow: 0 1px 0 rgba(27, 58, 75, 0.12);
+  box-shadow: 0 1px 0 rgba(27, 58, 75, 0.16);
   animation: mascot-think-dot 1.15s ease-in-out infinite;
 }
 
@@ -3006,18 +3006,37 @@
 @media (prefers-reduced-motion: reduce) {
   .mascot,
   .mascot-static,
-  .chapter-finale__mascot.mascot-static--cheer::before,
-  .chapter-finale__mascot.mascot-static--cheer::after,
   .mascot-buddy,
-  .mascot-buddy__motion,
+  .mascot-buddy--happy .mascot-buddy__motion,
+  .mascot-buddy--wave .mascot-buddy__motion,
+  .mascot-buddy--think .mascot-buddy__motion,
+  .mascot-buddy--cheer .mascot-buddy__motion,
+  .mascot-buddy.is-pop .mascot-buddy__motion,
+  .mascot-buddy:active .mascot-buddy__motion,
   .mascot-buddy__face,
   .mascot-buddy__spark,
+  .mascot-buddy--cheer .mascot-buddy__spark,
+  .mascot-buddy.is-pop .mascot-buddy__spark,
   .mascot-buddy__think span,
   .mascot-buddy__bubble,
-  .chapter-finale__mascot {
+  .chapter-finale__mascot,
+  .chapter-finale__mascot .mascot--cheer,
+  .chapter-finale__mascot.mascot-static--cheer::before,
+  .chapter-finale__mascot.mascot-static--cheer::after {
     animation: none;
   }
 
+  .mascot,
+  .mascot--happy,
+  .mascot--wave,
+  .mascot--think,
+  .mascot--cheer,
+  .mascot-buddy__motion,
+  .mascot-buddy--happy .mascot-buddy__motion,
+  .mascot-buddy--wave .mascot-buddy__motion,
+  .mascot-buddy--think .mascot-buddy__motion,
+  .mascot-buddy--cheer .mascot-buddy__motion,
+  .mascot-buddy.is-pop .mascot-buddy__motion,
   .mascot-buddy__face.is-blink,
   .mascot-buddy:active .mascot-buddy__motion {
     transform: none;
