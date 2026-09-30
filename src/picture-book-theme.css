@@ -32,33 +32,22 @@ body {
 
 .mascot {
   display: block;
-  border: 3px solid rgba(90, 82, 64, 0.14);
-  border-radius: 30%;
   object-fit: contain;
-  background: #fbf4e5;
-  box-shadow: 0 7px 0 rgba(91, 79, 55, 0.1), 0 12px 24px rgba(52, 66, 66, 0.1);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   mix-blend-mode: normal;
 }
 
-.hero__mascot-wrap .mascot {
-  transform: rotate(-1.5deg);
-}
-
-.hero__mascot-wrap .mascot-buddy .mascot,
-.hero__mascot-wrap .mascot-static .mascot {
-  transform: none;
-}
-
 .mock-cta__art .mascot {
-  border-color: rgba(255, 255, 255, 0.35);
-  border-radius: 20px;
   mix-blend-mode: normal;
 }
 
 .session__mascot.mascot,
 .session__mascot .mascot {
-  border-width: 2px;
-  border-radius: 28%;
+  border: 0;
+  border-radius: 0;
 }
 
 .module-card,
@@ -207,16 +196,10 @@ body {
   .mascot,
   .mascot-static,
   .mascot-buddy,
-  .mascot-figure__hop,
-  .mascot-figure__pose,
-  .mascot-figure__shadow,
-  .mascot-figure__body,
-  .mascot-figure__arm,
-  .mascot-figure__forearm,
-  .mascot-figure__leg,
-  .mascot-figure--cheer .mascot-figure__hop,
-  .mascot-buddy.is-pop .mascot-figure__hop,
-  .mascot-buddy:active .mascot-figure__hop,
+  .mascot-figure--think .mascot,
+  .mascot-figure--cheer .mascot,
+  .mascot-buddy.is-pop .mascot,
+  .mascot-buddy:active .mascot,
   .mascot-buddy__spark,
   .mascot-buddy--cheer .mascot-buddy__spark,
   .mascot-buddy.is-pop .mascot-buddy__spark,
@@ -229,11 +212,8 @@ body {
     animation: none;
   }
 
-  .mascot-figure__hop,
-  .mascot-figure__pose,
-  .mascot-figure__body,
-  .mascot-figure__body.is-blink,
-  .mascot-buddy:active .mascot-figure__hop {
+  .mascot,
+  .mascot-buddy:active .mascot {
     transform: none;
   }
 

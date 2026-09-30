@@ -17,9 +17,17 @@ type Props = {
   bubbleAlign?: 'below' | 'end' | 'side'
 }
 
+/**
+ * Same art language as Zizi-English-Class: one pose PNG per mood, limbs
+ * already drawn. CSS only hops/bobs the whole figure — no overlay sticks.
+ *   happy  → idle worm
+ *   wave   → cheer (arms up, home greeting)
+ *   think  → comfort + nod
+ *   cheer  → cheer + hop
+ */
 const MOOD_ART: Record<MascotMood, string> = {
-  happy: 'zizi-wave.png',
-  wave: 'zizi-wave.png',
+  happy: 'zizi-idle.png',
+  wave: 'zizi-cheer.png',
   think: 'zizi-think.png',
   cheer: 'zizi-cheer.png',
 }
@@ -34,77 +42,36 @@ function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-const LIMB = {
-  arm: 'zizi-limb-arm.png',
-  foot: 'zizi-limb-foot.png',
-}
-
-function limbSrc(file: string) {
+function poseSrc(file: string) {
   return `${import.meta.env.BASE_URL}characters/${file}`
 }
 
-/** One-piece paper arm (chunky mitten, English-class cheer). */
-function PaperLimb({ side }: { side: 'l' | 'r' }) {
-  return (
-    <img
-      className={`mascot-figure__arm mascot-figure__arm--${side}`}
-      src={limbSrc(LIMB.arm)}
-      alt=""
-      draggable={false}
-      aria-hidden
-    />
-  )
-}
-
-/** Layered paper puppet: illustrated body + independent arms/legs/hop. */
-function MascotPuppet({
+/** Cream chip + unclipped pose PNG (English-class buddy-chip / buddy-pose). */
+function MascotPose({
   mood,
   size,
   art,
   alt,
-  blink,
   hopKey,
 }: {
   mood: MascotMood
   size: number
   art: string
   alt: string
-  blink?: boolean
   hopKey?: number | string
 }) {
   return (
     <span className={`mascot-figure mascot-figure--${mood}`}>
-      <span className="mascot-figure__shadow" aria-hidden />
-      <span className="mascot-figure__hop" key={hopKey}>
-        <span className="mascot-figure__pose">
-          <img
-            className="mascot-figure__leg mascot-figure__leg--l"
-            src={limbSrc(LIMB.foot)}
-            alt=""
-            draggable={false}
-            aria-hidden
-          />
-          <img
-            className="mascot-figure__leg mascot-figure__leg--r"
-            src={limbSrc(LIMB.foot)}
-            alt=""
-            draggable={false}
-            aria-hidden
-          />
-          <span className={`mascot-figure__body ${blink ? 'is-blink' : ''}`}>
-            <img
-              className={`mascot mascot--${mood}`}
-              width={size}
-              height={size}
-              src={art}
-              alt={alt}
-              draggable={false}
-            />
-          </span>
-          <PaperLimb side="l" />
-          <PaperLimb side="r" />
-        </span>
-      </span>
+      <span className="mascot-figure__plate" aria-hidden />
+      <img
+        key={hopKey}
+        className={`mascot mascot--${mood}`}
+        width={size}
+        height={size}
+        src={art}
+        alt={alt}
+        draggable={false}
+      />
     </span>
   )
 }
@@ -128,7 +95,7 @@ export function Mascot({
   const shownMood: MascotMood =
     burst === 'tap' ? 'cheer' : burst === 'idle' && mood !== 'cheer' ? 'wave' : mood
   const popped = burst === 'tap'
-  const art = `${import.meta.env.BASE_URL}characters/${MOOD_ART[shownMood]}`
+  const art = poseSrc(MOOD_ART[shownMood])
 
   const clearHide = () => {
     if (hideRef.current != null) {
@@ -188,10 +155,10 @@ export function Mascot({
   if (!interactive) {
     return (
       <span className={`mascot-static mascot-static--${mood} ${className}`.trim()}>
-        <MascotPuppet
+        <MascotPose
           mood={mood}
           size={size}
-          art={`${import.meta.env.BASE_URL}characters/${MOOD_ART[mood]}`}
+          art={poseSrc(MOOD_ART[mood])}
           alt="孜孜的綠色手工小伙伴"
         />
       </span>
@@ -223,12 +190,11 @@ export function Mascot({
         <span />
         <span />
       </span>
-      <MascotPuppet
+      <MascotPose
         mood={shownMood}
         size={size}
         art={art}
         alt=""
-        blink={blink}
         hopKey={`${shownMood}-${motionKey}`}
       />
       {bubble && (

@@ -2536,16 +2536,25 @@
 }
 
 /* ---- Mascot / scenes / SFX UI ----
- * Layered paper puppet so kids see limbs + hop, not a whole-PNG twist:
- *   .mascot-figure__shadow → stays on the ground, scales on jump
- *   .mascot-figure__hop    → vertical travel + squash-stretch
- *   .mascot-figure__arm    → English-class chunky mitten (shoulder rotate)
- *   .mascot-figure__leg    → short paper foot stub at the body corner
- *   .mascot-figure__body   → blink squash; readable think tilt
+ * English-class pattern: pose PNG already includes arms/legs.
+ * CSS only hops / bobs / nods the WHOLE figure — no overlay sticks.
+ * Cream plate sits behind the unclipped img so raised arms aren't cropped.
  */
 .mascot {
+  position: relative;
+  z-index: 1;
   display: block;
-  filter: drop-shadow(0 8px 0 rgba(27, 58, 75, 0.08));
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  transform-origin: 50% 88%;
+  animation: mascot-idle 2.3s ease-in-out infinite;
+  filter: drop-shadow(0 6px 0 rgba(36, 62, 74, 0.12));
+  pointer-events: none;
 }
 
 .mascot-static {
@@ -2574,42 +2583,20 @@
 }
 
 .mascot-buddy .mascot-figure,
-.mascot-buddy .mascot-figure__hop,
-.mascot-buddy .mascot-figure__pose,
-.mascot-buddy .mascot-figure__body,
 .mascot-buddy .mascot {
+  display: block;
   width: 100%;
   height: 100%;
 }
 
-.mascot-static .mascot-figure,
-.mascot-static .mascot-figure__hop,
-.mascot-static .mascot-figure__pose,
-.mascot-static .mascot-figure__body {
+.mascot-static .mascot-figure {
   display: block;
 }
 
-.mascot-figure__hop {
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: 100%;
-  transform-origin: 50% 92%;
-  animation: mascot-idle-bob 2.4s ease-in-out infinite;
-}
-
-.mascot-figure__pose {
-  position: relative;
-  display: block;
-  transform-origin: 50% 78%;
-}
-
-.mascot-figure__body {
-  position: relative;
-  z-index: 2;
-  display: block;
-  width: 100%;
-  transform-origin: 50% 28%;
+.mascot-static .mascot {
+  width: auto;
+  height: auto;
+  max-width: 100%;
 }
 
 .mascot-figure {
@@ -2618,18 +2605,33 @@
   overflow: visible;
 }
 
-.mascot-figure__shadow {
+/* Cream chip behind the PNG (English-class .buddy-chip::before). */
+.mascot-figure__plate {
   position: absolute;
-  left: 18%;
-  right: 18%;
+  left: 8%;
+  right: 8%;
+  top: 12%;
   bottom: 4%;
   z-index: 0;
-  height: 11%;
-  border-radius: 50%;
-  background: rgba(40, 52, 30, 0.22);
+  border-radius: 22%;
+  background: #fffdf7;
+  border: 2px solid rgba(94, 83, 61, 0.16);
+  box-shadow: 0 3px 0 rgba(36, 62, 74, 0.1);
   pointer-events: none;
-  transform-origin: 50% 50%;
-  animation: mascot-shadow-idle 2.4s ease-in-out infinite;
+}
+
+.mascot-figure--think .mascot {
+  animation: mascot-nod 0.7s ease-in-out infinite;
+}
+
+.mascot-figure--cheer .mascot,
+.mascot-buddy.is-pop .mascot {
+  animation: mascot-hop 0.55s ease-in-out infinite;
+}
+
+.mascot-buddy:active .mascot {
+  animation-play-state: paused;
+  transform: scale(0.94) translateY(2px);
 }
 
 .mascot-buddy__think {
@@ -2665,180 +2667,6 @@
 
 .mascot-buddy__think span:nth-child(3) {
   animation-delay: 0.28s;
-}
-
-.mascot-figure__body.is-blink,
-.mascot-buddy__face.is-blink {
-  transform: scaleY(0.78);
-}
-
-.mascot-figure__arm,
-.mascot-figure__leg {
-  position: absolute;
-  pointer-events: none;
-  display: block;
-  object-fit: contain;
-  filter: drop-shadow(0 3px 0 rgba(27, 58, 75, 0.1));
-}
-
-.mascot-figure__arm {
-  /*
-   * English-class pattern: short chunky mitten growing from the
-   * top corners of the rectangular body (not a long lantern tube).
-   * Origin = top-center of the sprite = illustrated shoulder.
-   */
-  top: 32%;
-  width: 28%;
-  height: 32%;
-  z-index: 3;
-}
-
-.mascot-figure__arm--l {
-  left: 6%;
-  transform-origin: 50% 8%;
-  transform: rotate(-26deg);
-}
-
-.mascot-figure__arm--r {
-  left: 66%;
-  right: auto;
-  transform-origin: 50% 8%;
-  transform: rotate(26deg) scaleX(-1);
-}
-
-.mascot-figure__leg {
-  top: 76%;
-  bottom: auto;
-  z-index: 3;
-  width: 22%;
-  transform-origin: 50% 10%;
-}
-
-.mascot-figure__leg--l {
-  left: 12%;
-  transform: rotate(-8deg);
-}
-
-.mascot-figure__leg--r {
-  left: 52%;
-  right: auto;
-  transform: rotate(10deg) scaleX(-1);
-}
-
-/* Cheer PNG sits a little higher — keep the same corner attach. */
-.mascot-figure--cheer .mascot-figure__arm {
-  top: 33%;
-}
-
-.mascot-figure--cheer .mascot-figure__arm--l {
-  left: 10%;
-}
-
-.mascot-figure--cheer .mascot-figure__arm--r {
-  left: 64%;
-}
-
-.mascot-figure--cheer .mascot-figure__leg {
-  top: 68%;
-}
-
-.mascot-figure--cheer .mascot-figure__leg--l {
-  left: 18%;
-}
-
-.mascot-figure--cheer .mascot-figure__leg--r {
-  left: 50%;
-}
-
-.mascot-figure--happy .mascot-figure__arm--l,
-.mascot-figure--wave .mascot-figure__arm--l {
-  animation: mascot-arm-idle-l 2.4s ease-in-out infinite;
-}
-
-.mascot-figure--happy .mascot-figure__arm--r {
-  animation: mascot-arm-idle-r 2.4s ease-in-out infinite;
-}
-
-.mascot-figure--happy .mascot-figure__leg--l,
-.mascot-figure--wave .mascot-figure__leg--l {
-  animation: mascot-leg-idle-l 2.4s ease-in-out infinite;
-}
-
-.mascot-figure--happy .mascot-figure__leg--r,
-.mascot-figure--wave .mascot-figure__leg--r {
-  animation: mascot-leg-idle-r 2.4s ease-in-out infinite;
-}
-
-.mascot-figure--wave .mascot-figure__hop {
-  animation-name: mascot-idle-bob;
-  animation-duration: 2.1s;
-}
-
-.mascot-figure--wave .mascot-figure__arm--r {
-  animation: mascot-arm-wave 0.72s ease-in-out infinite;
-}
-
-.mascot-figure--think .mascot-figure__hop {
-  animation-name: mascot-think-bob;
-  animation-duration: 2.5s;
-}
-
-.mascot-figure--think .mascot-figure__pose {
-  animation: mascot-think-tilt 2.5s ease-in-out infinite;
-}
-
-.mascot-figure--think .mascot-figure__arm--r {
-  animation: mascot-arm-think 2.5s ease-in-out infinite;
-}
-
-.mascot-figure--think .mascot-figure__arm--l {
-  animation: mascot-arm-idle-l 2.5s ease-in-out infinite;
-}
-
-.mascot-figure--think .mascot-figure__shadow {
-  animation-duration: 2.5s;
-}
-
-.mascot-figure--cheer .mascot-figure__hop,
-.mascot-buddy.is-pop .mascot-figure__hop {
-  animation:
-    mascot-cheer-burst 0.62s cubic-bezier(0.2, 1.4, 0.32, 1),
-    mascot-cheer-hop 0.7s ease-in-out 0.62s infinite;
-}
-
-.mascot-figure--cheer .mascot-figure__arm--l,
-.mascot-buddy.is-pop .mascot-figure__arm--l {
-  animation: mascot-arm-cheer-l 0.7s ease-in-out infinite;
-}
-
-.mascot-figure--cheer .mascot-figure__arm--r,
-.mascot-buddy.is-pop .mascot-figure__arm--r {
-  animation: mascot-arm-cheer-r 0.7s ease-in-out infinite;
-}
-
-.mascot-figure--cheer .mascot-figure__leg--l,
-.mascot-buddy.is-pop .mascot-figure__leg--l {
-  animation: mascot-leg-cheer-l 0.7s ease-in-out infinite;
-}
-
-.mascot-figure--cheer .mascot-figure__leg--r,
-.mascot-buddy.is-pop .mascot-figure__leg--r {
-  animation: mascot-leg-cheer-r 0.7s ease-in-out infinite;
-}
-
-.mascot-figure--cheer .mascot-figure__shadow,
-.mascot-buddy.is-pop .mascot-figure__shadow {
-  animation: mascot-shadow-hop 0.7s ease-in-out infinite;
-}
-
-.mascot-buddy:active .mascot-figure__hop {
-  animation: none;
-  transform: translate3d(0, 8px, 0) scale(1.16, 0.78);
-}
-
-.mascot-buddy:active .mascot-figure__shadow {
-  animation: none;
-  transform: scale(1.25, 0.7);
 }
 
 .mascot-buddy__fx {
@@ -2992,232 +2820,39 @@
   }
 }
 
-@keyframes mascot-idle-bob {
+@keyframes mascot-idle {
   0%,
   100% {
-    transform: translate3d(0, 0, 0) scale(1, 1);
+    transform: translateY(0) rotate(-2.5deg);
   }
   50% {
-    transform: translate3d(0, -6%, 0) scale(1.03, 0.97);
+    transform: translateY(-6px) rotate(2.5deg);
   }
 }
 
-@keyframes mascot-shadow-idle {
+@keyframes mascot-hop {
   0%,
   100% {
-    transform: scale(1, 1);
-    opacity: 0.85;
+    transform: translateY(0) rotate(-3deg);
   }
-  50% {
-    transform: scale(0.88, 0.85);
-    opacity: 0.55;
+  35% {
+    transform: translateY(-12px) rotate(4deg) scale(1.05, 0.96);
+  }
+  60% {
+    transform: translateY(0) scale(0.98, 1.04);
   }
 }
 
-@keyframes mascot-think-bob {
+@keyframes mascot-nod {
   0%,
   100% {
-    transform: translate3d(0, 0, 0) scale(1, 1);
+    transform: rotate(0deg);
   }
   40% {
-    transform: translate3d(0, -8%, 0) scale(1.02, 0.98);
-  }
-}
-
-@keyframes mascot-think-tilt {
-  0%,
-  100% {
-    transform: rotate(-6deg);
-  }
-  45% {
-    transform: rotate(-12deg) translate3d(0, -2%, 0);
-  }
-}
-
-@keyframes mascot-arm-idle-l {
-  0%,
-  100% {
-    transform: rotate(-26deg);
-  }
-  50% {
-    transform: rotate(-34deg);
-  }
-}
-
-@keyframes mascot-arm-idle-r {
-  0%,
-  100% {
-    transform: rotate(26deg) scaleX(-1);
-  }
-  50% {
-    transform: rotate(34deg) scaleX(-1);
-  }
-}
-
-@keyframes mascot-leg-idle-l {
-  0%,
-  100% {
-    transform: rotate(-8deg);
-  }
-  50% {
-    transform: rotate(-3deg);
-  }
-}
-
-@keyframes mascot-leg-idle-r {
-  0%,
-  100% {
-    transform: rotate(10deg) scaleX(-1);
-  }
-  50% {
-    transform: rotate(4deg) scaleX(-1);
-  }
-}
-
-@keyframes mascot-arm-wave {
-  0%,
-  100% {
-    transform: rotate(18deg) scaleX(-1);
-  }
-  22% {
-    transform: rotate(-175deg) scaleX(-1);
-  }
-  44% {
-    transform: rotate(-28deg) scaleX(-1);
-  }
-  68% {
-    transform: rotate(-188deg) scaleX(-1);
-  }
-}
-
-@keyframes mascot-arm-think {
-  0%,
-  100% {
-    transform: rotate(48deg) scaleX(-1);
-  }
-  50% {
-    transform: rotate(62deg) scaleX(-1);
-  }
-}
-
-@keyframes mascot-cheer-burst {
-  0% {
-    transform: translate3d(0, 8px, 0) scale(1.22, 0.7);
-  }
-  36% {
-    transform: translate3d(0, -44px, 0) scale(0.84, 1.24);
-  }
-  56% {
-    transform: translate3d(0, 6px, 0) scale(1.2, 0.78);
-  }
-  76% {
-    transform: translate3d(0, -22px, 0) scale(0.92, 1.12);
-  }
-  100% {
-    transform: translate3d(0, 0, 0) scale(1, 1);
-  }
-}
-
-@keyframes mascot-cheer-hop {
-  0%,
-  100% {
-    transform: translate3d(0, 6px, 0) scale(1.18, 0.78);
-  }
-  20% {
-    transform: translate3d(0, -36px, 0) scale(0.86, 1.2);
-  }
-  42% {
-    transform: translate3d(0, -32px, 0) scale(0.9, 1.12);
-  }
-  64% {
-    transform: translate3d(0, 8px, 0) scale(1.22, 0.74);
-  }
-  80% {
-    transform: translate3d(0, -10px, 0) scale(0.98, 1.04);
-  }
-}
-
-@keyframes mascot-arm-cheer-l {
-  0%,
-  100% {
-    transform: rotate(-26deg);
-  }
-  22% {
-    transform: rotate(150deg);
-  }
-  48% {
-    transform: rotate(132deg);
+    transform: rotate(-8deg) translateY(2px);
   }
   70% {
-    transform: rotate(-12deg);
-  }
-}
-
-@keyframes mascot-arm-cheer-r {
-  0%,
-  100% {
-    transform: rotate(26deg) scaleX(-1);
-  }
-  22% {
-    transform: rotate(-150deg) scaleX(-1);
-  }
-  48% {
-    transform: rotate(-132deg) scaleX(-1);
-  }
-  70% {
-    transform: rotate(16deg) scaleX(-1);
-  }
-}
-
-@keyframes mascot-leg-cheer-l {
-  0%,
-  100% {
-    transform: rotate(-6deg) scaleY(0.78);
-  }
-  22% {
-    transform: rotate(-22deg) scaleY(0.58);
-  }
-  48% {
-    transform: rotate(-8deg) scaleY(1.04);
-  }
-  70% {
-    transform: rotate(-14deg) scaleY(0.72);
-  }
-}
-
-@keyframes mascot-leg-cheer-r {
-  0%,
-  100% {
-    transform: rotate(6deg) scaleX(-1) scaleY(0.78);
-  }
-  22% {
-    transform: rotate(22deg) scaleX(-1) scaleY(0.58);
-  }
-  48% {
-    transform: rotate(8deg) scaleX(-1) scaleY(1.04);
-  }
-  70% {
-    transform: rotate(14deg) scaleX(-1) scaleY(0.72);
-  }
-}
-
-@keyframes mascot-shadow-hop {
-  0%,
-  100% {
-    transform: scale(1.2, 0.75);
-    opacity: 0.9;
-  }
-  22% {
-    transform: scale(0.55, 0.45);
-    opacity: 0.28;
-  }
-  48% {
-    transform: scale(0.62, 0.5);
-    opacity: 0.35;
-  }
-  70% {
-    transform: scale(1.28, 0.7);
-    opacity: 0.95;
+    transform: rotate(6deg);
   }
 }
 
@@ -3286,24 +2921,10 @@
   .mascot,
   .mascot-static,
   .mascot-buddy,
-  .mascot-figure__hop,
-  .mascot-figure__pose,
-  .mascot-figure__shadow,
-  .mascot-figure__body,
-  .mascot-figure__arm,
-  .mascot-figure__forearm,
-  .mascot-figure__leg,
-  .mascot-figure--happy .mascot-figure__hop,
-  .mascot-figure--wave .mascot-figure__hop,
-  .mascot-figure--think .mascot-figure__hop,
-  .mascot-figure--cheer .mascot-figure__hop,
-  .mascot-buddy.is-pop .mascot-figure__hop,
-  .mascot-buddy:active .mascot-figure__hop,
-  .mascot-figure--wave .mascot-figure__arm--r,
-  .mascot-figure--wave .mascot-figure__forearm,
-  .mascot-figure--cheer .mascot-figure__arm,
-  .mascot-figure--cheer .mascot-figure__leg,
-  .mascot-buddy__face,
+  .mascot-figure--think .mascot,
+  .mascot-figure--cheer .mascot,
+  .mascot-buddy.is-pop .mascot,
+  .mascot-buddy:active .mascot,
   .mascot-buddy__spark,
   .mascot-buddy--cheer .mascot-buddy__spark,
   .mascot-buddy.is-pop .mascot-buddy__spark,
@@ -3316,29 +2937,9 @@
     animation: none;
   }
 
-  .mascot-figure__hop,
-  .mascot-figure__pose,
-  .mascot-figure__body,
-  .mascot-figure__body.is-blink,
-  .mascot-buddy:active .mascot-figure__hop,
-  .mascot-buddy:active .mascot-figure__shadow {
+  .mascot,
+  .mascot-buddy:active .mascot {
     transform: none;
-  }
-
-  .mascot-figure__arm--l {
-    transform: rotate(-26deg);
-  }
-
-  .mascot-figure__arm--r {
-    transform: rotate(26deg) scaleX(-1);
-  }
-
-  .mascot-figure__leg--l {
-    transform: rotate(-8deg);
-  }
-
-  .mascot-figure__leg--r {
-    transform: rotate(10deg) scaleX(-1);
   }
 
   .mascot-buddy__spark,
