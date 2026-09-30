@@ -262,7 +262,7 @@ export default function App() {
         </button>
 
         <h2 className="section-label">學校專項</h2>
-        <p className="section-lead">本週四校：聽故事 · 揀圖 · 心算 · 記憶</p>
+        <p className="section-lead">學校專項：聽指令 · 認讀 · 心算 · 小組遊戲</p>
         <div className="module-grid">
           {schoolPlans.map((school, i) => (
             <SchoolCard

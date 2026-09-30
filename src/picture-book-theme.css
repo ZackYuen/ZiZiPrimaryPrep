@@ -36,7 +36,7 @@ body {
   border-radius: 30%;
   object-fit: cover;
   box-shadow: 0 7px 0 rgba(91, 79, 55, 0.1), 0 12px 24px rgba(52, 66, 66, 0.1);
-  mix-blend-mode: multiply;
+  mix-blend-mode: normal;
 }
 
 .hero__mascot-wrap .mascot {
