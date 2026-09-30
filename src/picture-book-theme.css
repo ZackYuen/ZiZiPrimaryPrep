@@ -44,13 +44,18 @@ body {
   transform: rotate(-1.5deg);
 }
 
+.hero__mascot-wrap .mascot-buddy .mascot {
+  transform: none;
+}
+
 .mock-cta__art .mascot {
   border-color: rgba(255, 255, 255, 0.35);
   border-radius: 20px;
   mix-blend-mode: normal;
 }
 
-.session__mascot.mascot {
+.session__mascot.mascot,
+.session__mascot .mascot {
   border-width: 2px;
   border-radius: 28%;
 }
@@ -199,7 +204,14 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .mascot,
+  .mascot-buddy,
+  .mascot-buddy__face,
+  .mascot-buddy__bubble,
   .day-glyph {
     animation: none;
+  }
+
+  .mascot-buddy__face.is-blink {
+    transform: none;
   }
 }

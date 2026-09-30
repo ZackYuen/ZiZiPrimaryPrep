@@ -8,6 +8,8 @@ import { SoundToggle } from './SoundToggle'
 import { HintPicture } from './HintPicture'
 import { vocabVisual } from '../lib/teachHint'
 import { Confetti } from './Confetti'
+import { Mascot } from './Mascot'
+import { resolveMascotPresence } from '../lib/mascotPresence'
 
 type Props = {
   completed: Record<string, boolean>
@@ -30,6 +32,10 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
   const item = cat.items[itemIndex]
   const cardId = `vocab-${cat.id}-${itemIndex}`
   const done = completed[cardId]
+  const mascot = resolveMascotPresence({
+    cheering: burst,
+    looking: flipped,
+  })
 
   const next = () => {
     stop()
@@ -74,6 +80,14 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
         >
           {KID.back}
         </button>
+        <Mascot
+          mood={mascot.mood}
+          reason={mascot.reason}
+          size={56}
+          interactive
+          bubbleAlign="end"
+          className="session__mascot"
+        />
         <div className="session__progress">
           <span className="session__title">字詞</span>
           <span>

@@ -261,6 +261,8 @@
 }
 
 .hero__mascot-wrap {
+  position: relative;
+  z-index: 2;
   display: flex;
   justify-content: center;
   margin: 0.35rem 0 0.15rem;
@@ -1108,10 +1110,13 @@
 }
 
 .session__top {
+  position: relative;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  overflow: visible;
 }
 
 .session__progress {
@@ -1133,8 +1138,8 @@
 
 .session__mascot {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
 }
 
 .session__track {
@@ -2535,12 +2540,106 @@
 }
 
 .mascot--cheer {
-  animation: mascot-cheer 0.55s ease;
+  animation: mascot-cheer 0.55s ease, mascot-bounce 2.2s ease-in-out 0.55s infinite;
 }
 
 .mascot__arm {
   transform-origin: 128px 90px;
   animation: wave-arm 0.9s ease-in-out infinite;
+}
+
+.mascot-buddy {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  animation: mascot-bounce 2.8s ease-in-out infinite;
+}
+
+.mascot-buddy--wave {
+  animation-duration: 2.2s;
+}
+
+.mascot-buddy--cheer,
+.mascot-buddy.is-pop {
+  animation: mascot-cheer 0.55s ease, mascot-bounce 2.2s ease-in-out 0.55s infinite;
+}
+
+.mascot-buddy .mascot {
+  width: 100%;
+  height: 100%;
+  animation: none;
+}
+
+.mascot-buddy__face {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 80%;
+}
+
+.mascot-buddy--wave .mascot-buddy__face {
+  animation: mascot-wave-tilt 5.6s ease-in-out infinite;
+}
+
+.mascot-buddy__face.is-blink {
+  transform: scaleY(0.92);
+}
+
+.mascot-buddy__bubble {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 4px);
+  z-index: 8;
+  transform: translateX(-50%);
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: #fffdf7;
+  border: 2px solid rgba(90, 82, 64, 0.16);
+  box-shadow: 0 4px 0 rgba(91, 79, 55, 0.08);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: mascot-bubble-in 0.22s ease;
+}
+
+.mascot-buddy--bubble-end .mascot-buddy__bubble {
+  left: auto;
+  right: 0;
+  top: calc(100% + 2px);
+  transform: none;
+  animation-name: mascot-bubble-in-end;
+}
+
+.mascot-buddy__bubble::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  background: #fffdf7;
+  border-left: 2px solid rgba(90, 82, 64, 0.16);
+  border-top: 2px solid rgba(90, 82, 64, 0.16);
+  transform: rotate(45deg);
+}
+
+.mascot-buddy--bubble-end .mascot-buddy__bubble::before {
+  left: 18px;
+  margin-left: 0;
 }
 
 @keyframes mascot-bounce {
@@ -2565,6 +2664,45 @@
   }
 }
 
+@keyframes mascot-wave-tilt {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0deg);
+  }
+  78% {
+    transform: rotate(-8deg);
+  }
+  86% {
+    transform: rotate(7deg);
+  }
+  94% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes mascot-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes mascot-bubble-in-end {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes wave-arm {
   0%,
   100% {
@@ -2572,6 +2710,19 @@
   }
   50% {
     transform: rotate(-18deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot,
+  .mascot-buddy,
+  .mascot-buddy__face,
+  .mascot-buddy__bubble {
+    animation: none;
+  }
+
+  .mascot-buddy__face.is-blink {
+    transform: none;
   }
 }
 
@@ -3750,7 +3901,8 @@ button.picture-strip__item--choice {
     font-size: 1.45rem;
   }
 
-  .hero__mascot-wrap .mascot {
+  .hero__mascot-wrap .mascot,
+  .hero__mascot-wrap .mascot-buddy {
     width: 88px !important;
     height: 88px !important;
   }
