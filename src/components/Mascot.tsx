@@ -17,9 +17,17 @@ type Props = {
   bubbleAlign?: 'below' | 'end' | 'side'
 }
 
+/**
+ * Same art language as Zizi-English-Class: one pose PNG per mood, limbs
+ * already drawn. CSS only hops/bobs the whole figure — no overlay sticks.
+ *   happy  → idle worm
+ *   wave   → cheer (arms up, home greeting)
+ *   think  → comfort + nod
+ *   cheer  → cheer + hop
+ */
 const MOOD_ART: Record<MascotMood, string> = {
-  happy: 'zizi-wave.png',
-  wave: 'zizi-wave.png',
+  happy: 'zizi-idle.png',
+  wave: 'zizi-cheer.png',
   think: 'zizi-think.png',
   cheer: 'zizi-cheer.png',
 }
@@ -32,6 +40,40 @@ const BLINK_MS = 170
 function prefersReducedMotion() {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+function poseSrc(file: string) {
+  return `${import.meta.env.BASE_URL}characters/${file}`
+}
+
+/** Cream chip + unclipped pose PNG (English-class buddy-chip / buddy-pose). */
+function MascotPose({
+  mood,
+  size,
+  art,
+  alt,
+  hopKey,
+}: {
+  mood: MascotMood
+  size: number
+  art: string
+  alt: string
+  hopKey?: number | string
+}) {
+  return (
+    <span className={`mascot-figure mascot-figure--${mood}`}>
+      <span className="mascot-figure__plate" aria-hidden />
+      <img
+        key={hopKey}
+        className={`mascot mascot--${mood}`}
+        width={size}
+        height={size}
+        src={art}
+        alt={alt}
+        draggable={false}
+      />
+    </span>
+  )
 }
 
 /** Illustrated lime-green paper buddy representing 孜孜 / Seth. */
@@ -53,6 +95,7 @@ export function Mascot({
   const shownMood: MascotMood =
     burst === 'tap' ? 'cheer' : burst === 'idle' && mood !== 'cheer' ? 'wave' : mood
   const popped = burst === 'tap'
+  const art = poseSrc(MOOD_ART[shownMood])
 
   const clearHide = () => {
     if (hideRef.current != null) {
@@ -109,28 +152,14 @@ export function Mascot({
     return () => window.clearInterval(id)
   }, [interactive])
 
-  const art = `${import.meta.env.BASE_URL}characters/${MOOD_ART[shownMood]}`
-  const face = (
-    <img
-      className={`mascot mascot--${shownMood}`}
-      width={size}
-      height={size}
-      src={art}
-      alt=""
-      draggable={false}
-    />
-  )
-
   if (!interactive) {
     return (
       <span className={`mascot-static mascot-static--${mood} ${className}`.trim()}>
-        <img
-          className={`mascot mascot--${mood}`}
-          width={size}
-          height={size}
-          src={`${import.meta.env.BASE_URL}characters/${MOOD_ART[mood]}`}
+        <MascotPose
+          mood={mood}
+          size={size}
+          art={poseSrc(MOOD_ART[mood])}
           alt="孜孜的綠色手工小伙伴"
-          draggable={false}
         />
       </span>
     )
@@ -156,14 +185,18 @@ export function Mascot({
         <span className="mascot-buddy__spark mascot-buddy__spark--b">★</span>
         <span className="mascot-buddy__spark mascot-buddy__spark--c">✦</span>
       </span>
-      <span className="mascot-buddy__motion" key={`${shownMood}-${motionKey}`}>
-        <span className="mascot-buddy__think" aria-hidden>
-          <span />
-          <span />
-          <span />
-        </span>
-        <span className={`mascot-buddy__face ${blink ? 'is-blink' : ''}`}>{face}</span>
+      <span className="mascot-buddy__think" aria-hidden>
+        <span />
+        <span />
+        <span />
       </span>
+      <MascotPose
+        mood={shownMood}
+        size={size}
+        art={art}
+        alt=""
+        hopKey={`${shownMood}-${motionKey}`}
+      />
       {bubble && (
         <span className="mascot-buddy__bubble" role="status" aria-live="polite">
           {bubble}
