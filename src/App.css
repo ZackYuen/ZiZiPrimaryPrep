@@ -266,7 +266,7 @@
   display: flex;
   justify-content: center;
   margin: 0.35rem 0 0.15rem;
-  padding-top: 1.85rem;
+  padding-top: 2.6rem;
   overflow: visible;
   animation: rise-in 0.7s ease 0.05s both;
 }
@@ -2552,7 +2552,7 @@
   border-radius: 0;
   box-shadow: none;
   transform-origin: 50% 88%;
-  animation: mascot-idle 2.3s ease-in-out infinite;
+  animation: mascot-idle 1.8s ease-in-out infinite;
   filter: drop-shadow(0 6px 0 rgba(36, 62, 74, 0.12));
   pointer-events: none;
 }
@@ -2620,18 +2620,26 @@
   pointer-events: none;
 }
 
+.mascot-figure--happy .mascot {
+  animation: mascot-idle 1.8s ease-in-out infinite;
+}
+
+.mascot-figure--wave .mascot {
+  animation: mascot-wave 0.95s ease-in-out infinite;
+}
+
 .mascot-figure--think .mascot {
-  animation: mascot-nod 0.7s ease-in-out infinite;
+  animation: mascot-nod 0.95s ease-in-out infinite;
 }
 
 .mascot-figure--cheer .mascot,
 .mascot-buddy.is-pop .mascot {
-  animation: mascot-hop 0.55s ease-in-out infinite;
+  animation: mascot-hop 0.62s cubic-bezier(0.22, 1.35, 0.36, 1) infinite;
 }
 
 .mascot-buddy:active .mascot {
-  animation-play-state: paused;
-  transform: scale(0.94) translateY(2px);
+  animation: none;
+  transform: translateY(8%) scale(1.16, 0.78);
 }
 
 .mascot-buddy__think {
@@ -2823,36 +2831,58 @@
 @keyframes mascot-idle {
   0%,
   100% {
-    transform: translateY(0) rotate(-2.5deg);
+    transform: translateY(0) rotate(-6deg);
   }
   50% {
-    transform: translateY(-6px) rotate(2.5deg);
+    transform: translateY(-12%) rotate(6deg);
+  }
+}
+
+@keyframes mascot-wave {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-9deg) scale(1, 1);
+  }
+  22% {
+    transform: translateY(-14%) rotate(11deg) scale(1.06, 0.94);
+  }
+  48% {
+    transform: translateY(-4%) rotate(-7deg) scale(0.98, 1.04);
+  }
+  72% {
+    transform: translateY(-16%) rotate(8deg) scale(1.05, 0.95);
   }
 }
 
 @keyframes mascot-hop {
   0%,
   100% {
-    transform: translateY(0) rotate(-3deg);
+    transform: translateY(8%) rotate(-4deg) scale(1.14, 0.8);
   }
-  35% {
-    transform: translateY(-12px) rotate(4deg) scale(1.05, 0.96);
+  28% {
+    transform: translateY(-32%) rotate(6deg) scale(0.88, 1.18);
   }
-  60% {
-    transform: translateY(0) scale(0.98, 1.04);
+  52% {
+    transform: translateY(-16%) rotate(-4deg) scale(0.94, 1.08);
+  }
+  74% {
+    transform: translateY(10%) rotate(4deg) scale(1.16, 0.76);
   }
 }
 
 @keyframes mascot-nod {
   0%,
   100% {
-    transform: rotate(0deg);
+    transform: rotate(0deg) translateY(0);
   }
-  40% {
-    transform: rotate(-8deg) translateY(2px);
+  28% {
+    transform: rotate(-18deg) translateY(8%);
   }
-  70% {
-    transform: rotate(6deg);
+  58% {
+    transform: rotate(14deg) translateY(-6%);
+  }
+  78% {
+    transform: rotate(-8deg) translateY(2%);
   }
 }
 
@@ -2921,6 +2951,8 @@
   .mascot,
   .mascot-static,
   .mascot-buddy,
+  .mascot-figure--happy .mascot,
+  .mascot-figure--wave .mascot,
   .mascot-figure--think .mascot,
   .mascot-figure--cheer .mascot,
   .mascot-buddy.is-pop .mascot,

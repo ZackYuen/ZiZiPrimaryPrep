@@ -196,6 +196,8 @@ body {
   .mascot,
   .mascot-static,
   .mascot-buddy,
+  .mascot-figure--happy .mascot,
+  .mascot-figure--wave .mascot,
   .mascot-figure--think .mascot,
   .mascot-figure--cheer .mascot,
   .mascot-buddy.is-pop .mascot,
