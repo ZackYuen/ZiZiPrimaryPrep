@@ -7,7 +7,7 @@ import { KID } from '../lib/kidLabels'
 import { SoundToggle } from './SoundToggle'
 import { HintPicture } from './HintPicture'
 import { vocabVisual } from '../lib/teachHint'
-import { Confetti } from './Confetti'
+import { CorrectCelebration } from './CorrectCelebration'
 import { ChapterCelebration } from './ChapterCelebration'
 import { Mascot } from './Mascot'
 import { resolveMascotPresence } from '../lib/mascotPresence'
@@ -81,7 +81,7 @@ export function VocabSession({ completed, onMarkDone, onBack }: Props) {
 
   return (
     <section className="session session--vocab">
-      <Confetti show={burst} onDone={() => setBurst(false)} />
+      {burst && <CorrectCelebration onDone={() => setBurst(false)} />}
       <ChapterCelebration show={chapterComplete} title={cat.title} onDone={finishChapter} />
       <header className="session__top">
         <button

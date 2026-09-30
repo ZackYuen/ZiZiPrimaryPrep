@@ -9,7 +9,7 @@ import { useSpeech } from '../hooks/useSpeech'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
 import { setBgmMood } from '../lib/bgm'
 import { storyFrameSrc } from '../lib/storyFrameSrc'
-import { Confetti } from './Confetti'
+import { CorrectCelebration } from './CorrectCelebration'
 import { SoundToggle } from './SoundToggle'
 import { StoryFrameArt } from './StoryFrameArt'
 import { StoryOrderBoard } from './StoryOrderBoard'
@@ -34,6 +34,7 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
   const [ordered, setOrdered] = useState(false)
   const [showWrong, setShowWrong] = useState(false)
   const [justStar, setJustStar] = useState(false)
+  const [showCorrectCeleb, setShowCorrectCeleb] = useState(false)
   const { speak, stop } = useSpeech()
 
   useEffect(() => {
@@ -41,6 +42,12 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
   }, [phase, ordered])
 
   useEffect(() => () => stop(), [stop])
+
+  useEffect(() => {
+    if (!justStar) return
+    const t = window.setTimeout(() => setJustStar(false), 900)
+    return () => window.clearTimeout(t)
+  }, [justStar])
 
   const applyBoard = (next: { slots: (string | null)[]; pool: string[] }, current = story) => {
     setSlots(next.slots)
@@ -55,6 +62,7 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
       playSfx('correct')
       setShowWrong(false)
       setOrdered(true)
+      setShowCorrectCeleb(true)
       return
     }
     playSfx('wrong')
@@ -74,6 +82,7 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
     setOrdered(false)
     setShowWrong(false)
     setJustStar(false)
+    setShowCorrectCeleb(false)
     setPhase('play')
   }
 
@@ -247,7 +256,7 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
         </main>
       )}
 
-      <Confetti show={justStar} onDone={() => setJustStar(false)} />
+      {showCorrectCeleb && <CorrectCelebration onDone={() => setShowCorrectCeleb(false)} />}
       {justStar && <div className="star-burst">+1 ★</div>}
     </section>
   )

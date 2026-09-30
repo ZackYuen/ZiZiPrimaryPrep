@@ -216,6 +216,11 @@ body {
   .chapter-finale__mascot,
   .chapter-finale__mascot.mascot-static--cheer::before,
   .chapter-finale__mascot.mascot-static--cheer::after,
+  .correct-celeb,
+  .correct-celeb__stage,
+  .correct-celeb__spark,
+  .correct-celeb__ring,
+  .correct-celeb .confetti__piece,
   .day-glyph {
     animation: none;
   }
@@ -229,7 +234,10 @@ body {
   .mascot-tap-fx,
   .chapter-finale__mascot.mascot-static--cheer::before,
   .chapter-finale__mascot.mascot-static--cheer::after,
-  .mascot-buddy__think {
+  .mascot-buddy__think,
+  .correct-celeb__spark,
+  .correct-celeb__ring,
+  .correct-celeb .confetti {
     display: none;
   }
 }
