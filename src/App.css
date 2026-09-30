@@ -269,6 +269,11 @@
   animation: rise-in 0.7s ease 0.05s both;
 }
 
+.hero__mascot-wrap .mascot-buddy--bubble-side .mascot-buddy__bubble {
+  left: calc(100% + 6px);
+  min-width: max-content;
+}
+
 .hero__name {
   margin-top: 0.1rem;
   font-family: var(--font-display);
