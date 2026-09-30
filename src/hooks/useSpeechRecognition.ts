@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { isGoogleSttConfigured, recognizeWithGoogle } from '../lib/googleStt'
+import {
+  kidSttFromBrowserError,
+  kidSttFromThrown,
+  kidSttMessage,
+} from '../lib/kidSttCopy'
 import { startPcmCapture, type PcmCaptureSession } from '../lib/pcmCapture'
 
 export type ListenLang = 'yue-Hant-HK' | 'en-US'
@@ -193,11 +198,10 @@ export function useSpeechRecognition() {
     const maxRestart = appleRef.current ? 25 : 30
     const delay = appleRef.current ? 700 : 400
     if (restartCount.current >= maxRestart) {
-      setStatusHint('斷線——再撳 ● 或 ★')
+      setStatusHint(kidSttMessage('network'))
       return
     }
     restartCount.current += 1
-    setStatusHint('')
     if (restartTimer.current) window.clearTimeout(restartTimer.current)
     restartTimer.current = window.setTimeout(() => {
       if (sid !== sessionId.current || !wantListen.current || !sttEnabled.current) return
@@ -211,7 +215,7 @@ export function useSpeechRecognition() {
           try {
             recRef.current.start()
           } catch {
-            setStatusHint('失敗——再撳 ● 或 ★')
+            setStatusHint(kidSttMessage('generic'))
           }
         }, 500)
       }
@@ -229,7 +233,7 @@ export function useSpeechRecognition() {
         setActiveLang(aliveLang)
         setError(null)
         setLastErrorCode(null)
-        setStatusHint('')
+        setStatusHint(kidSttMessage('listening'))
       }
 
       rec.onresult = (event) => {
@@ -270,52 +274,42 @@ export function useSpeechRecognition() {
         if (code === 'aborted') return
         setLastErrorCode(code)
 
-        if (code === 'not-allowed' || code === 'service-not-allowed' || code === 'audio-capture') {
-          if (appleRef.current && (micOkRef.current || code === 'service-not-allowed')) {
-            setError(null)
-            if (restartCount.current < 4) {
-              setStatusHint('重試中…')
-              scheduleRestart(sid)
-            } else {
-              sttEnabled.current = false
-              setLangConfirmed(false)
-              setSttBlocked(true)
-              setListening(false)
-              wantListen.current = false
-              clearTimers()
-              setStatusHint('聽寫失敗——再撳 ● 或 ★')
-            }
-            return
-          }
-          sttEnabled.current = false
-          wantListen.current = false
-          clearTimers()
-          setListening(false)
-          setSttBlocked(true)
-          setError('請允許麥克風')
-          return
-        }
-
-        if (code === 'no-speech') {
+        if (code === 'language-not-supported' && langIdx.current < langsRef.current.length - 1) {
+          langIdx.current += 1
+          rec.lang = langsRef.current[langIdx.current]
+          setRequestedLang(rec.lang)
+          setActiveLang(rec.lang)
+          setLangConfirmed(false)
           setStatusHint('')
           scheduleRestart(sid)
           return
         }
 
-        if (code === 'language-not-supported' || code === 'network') {
-          if (langIdx.current < langsRef.current.length - 1) {
-            langIdx.current += 1
-            rec.lang = langsRef.current[langIdx.current]
-            setRequestedLang(rec.lang)
-            setActiveLang(rec.lang)
-            setLangConfirmed(false)
-            setStatusHint('')
-            scheduleRestart(sid)
-            return
-          }
-          setStatusHint('失敗——再撳 ● 或 ★')
+        const mapped = kidSttFromBrowserError(code, {
+          apple: appleRef.current,
+          micOk: micOkRef.current,
+          restartCount: restartCount.current,
+        })
+
+        if (mapped.retry) {
+          setError(null)
+          setStatusHint(mapped.message)
           scheduleRestart(sid)
+          return
         }
+
+        sttEnabled.current = false
+        wantListen.current = false
+        clearTimers()
+        setListening(false)
+        setLangConfirmed(false)
+        if (mapped.block) setSttBlocked(true)
+        if (mapped.kind === 'mic-permission') {
+          setError(mapped.message)
+        } else {
+          setError(null)
+        }
+        setStatusHint(mapped.message)
       }
 
       rec.onend = () => {
@@ -327,7 +321,7 @@ export function useSpeechRecognition() {
         scheduleRestart(sid)
       }
     },
-    [flushInterim, googleReady, scheduleRestart],
+    [flushInterim, scheduleRestart],
   )
 
   useEffect(() => {
@@ -378,12 +372,12 @@ export function useSpeechRecognition() {
       const session = pcmSessionRef.current
       pcmSessionRef.current = null
       if (!session) {
-        setStatusHint('請再撳 ●')
+        setStatusHint(kidSttMessage('empty'))
         return
       }
 
       setBusy(true)
-      setStatusHint('')
+      setStatusHint(kidSttMessage('transcribing'))
       abortRef.current?.abort()
       const ac = new AbortController()
       abortRef.current = ac
@@ -392,7 +386,7 @@ export function useSpeechRecognition() {
         const { pcm, sampleRate } = await session.stop()
         if (pcm.length < sampleRate * 0.25) {
           setBusy(false)
-          setStatusHint('太短——再撳 ●')
+          setStatusHint(kidSttMessage('too-short'))
           return
         }
         const result = await recognizeWithGoogle({
@@ -415,9 +409,8 @@ export function useSpeechRecognition() {
         setSttBlocked(false)
       } catch (err) {
         if ((err as Error)?.name === 'AbortError') return
-        const msg = err instanceof Error ? err.message : 'Google 失敗'
-        setError(msg)
-        setStatusHint('可再撳 ●，或用 ★')
+        setError(null)
+        setStatusHint(kidSttFromThrown(err))
         setSttBlocked(true)
       } finally {
         setBusy(false)
@@ -426,9 +419,10 @@ export function useSpeechRecognition() {
     }
 
     const hadText = !!(transcriptRef.current.trim() || interimRef.current.trim())
+    const blocked = sttBlocked
     hardStopSession()
-    if (appleRef.current && !hadText && !sttBlocked) {
-      setStatusHint('未出字——再撳 ● 或 ★')
+    if (!hadText && !blocked) {
+      setStatusHint(kidSttMessage('empty'))
     }
   }, [hardStopSession, sttBlocked])
 
@@ -496,7 +490,7 @@ export function useSpeechRecognition() {
             micOkRef.current = true
             setSttAlive(true)
             setLangConfirmed(true)
-            setStatusHint('')
+            setStatusHint(kidSttMessage('listening'))
           })
           .catch((err) => {
             if (sid !== sessionId.current) return
@@ -504,8 +498,8 @@ export function useSpeechRecognition() {
             setListening(false)
             setSttAlive(false)
             setSttBlocked(true)
-            setError(err instanceof Error ? err.message : '無法開麥克風')
-            setStatusHint('請允許麥克風')
+            setError(null)
+            setStatusHint(kidSttFromThrown(err) || kidSttMessage('mic-permission'))
           })
         return true
       }
@@ -515,7 +509,8 @@ export function useSpeechRecognition() {
       if (!Ctor) {
         setSttBlocked(true)
         setListening(false)
-        setError('請設定 Google STT，或撳 ★。')
+        setError(null)
+        setStatusHint(kidSttMessage('unavailable'))
         return false
       }
 
@@ -527,7 +522,7 @@ export function useSpeechRecognition() {
       rec.maxAlternatives = 1
       rec.lang = langsRef.current[0]
       attachHandlers(rec, sid)
-      setStatusHint('')
+      setStatusHint(kidSttMessage('listening'))
 
       try {
         rec.start()
@@ -544,7 +539,10 @@ export function useSpeechRecognition() {
         }
       }
 
-      if (canUseMic()) {
+      // Don't call getUserMedia while webkitSpeechRecognition owns the mic —
+      // the extra capture steals the input on iOS and surfaces as
+      // service-not-allowed / audio-capture.
+      if (!appleRef.current && canUseMic()) {
         void navigator.mediaDevices
           .getUserMedia({ audio: true, video: false })
           .then((stream) => {

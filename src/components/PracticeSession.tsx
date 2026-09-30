@@ -17,6 +17,7 @@ import { looksEnglish, useSpeech } from '../hooks/useSpeech'
 import { useSpeechRecognition, type ListenLang } from '../hooks/useSpeechRecognition'
 import { softSpeakFeedback } from '../lib/softSpeakFeedback'
 import { buildSttPhrases } from '../lib/googleStt'
+import { kidSttMessage } from '../lib/kidSttCopy'
 import { KID } from '../lib/kidLabels'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
 import { duckBgm, setBgmMood } from '../lib/bgm'
@@ -114,7 +115,6 @@ export function PracticeSession({
     error: listenError,
     elapsedSec,
     statusHint,
-    engine,
     busy: listenBusy,
     sttBlocked,
     start: startListening,
@@ -293,12 +293,6 @@ export function PracticeSession({
       }
     })
   }
-
-  // If Safari blocks webpage STT, open the compose field so keyboard mic remains available.
-  useEffect(() => {
-    if (engine !== 'safari' || !sttBlocked) return
-    openKeyboardDictation()
-  }, [engine, sttBlocked])
 
   const speakFeedback = useMemo(() => {
     const heard = spokenText.trim()
@@ -551,6 +545,30 @@ export function PracticeSession({
       item.kind !== 'simon' &&
       item.kind !== 'build' &&
       item.kind !== 'memory')
+
+  const heardText = spokenText.trim()
+  const speakFailWithoutText =
+    item.kind === 'speak' &&
+    !readAloud &&
+    !listening &&
+    !listenBusy &&
+    !heardText &&
+    !!(listenError || statusHint) &&
+    !composeActive
+  const speakShowCompose =
+    composeActive || !!heardText || (listening && !!listenInterim) || (listenBusy && !!heardText)
+  const speakLiveHint =
+    listening && !heardText
+      ? kidSttMessage('listening')
+      : listenBusy && !heardText
+        ? kidSttMessage('transcribing')
+        : ''
+  const speakStatusLine = listenError || statusHint || speakLiveHint
+  const speakShowListenPanel =
+    item.kind === 'speak' &&
+    !readAloud &&
+    !speakFailWithoutText &&
+    (listening || composeActive || listenBusy || !!heardText || !!speakLiveHint)
 
   const backspaceMath = () => {
     if (mathResult === 'ok') return
@@ -952,47 +970,79 @@ export function PracticeSession({
                 </div>
               )}
 
-              {!readAloud && (listening || composeActive || listenBusy || spokenText) && (
+              {speakFailWithoutText && (
+                <div className="listen-status" role="status">
+                  <p
+                    className={
+                      listenError || sttBlocked ? 'listen-status__error' : 'listen-status__hint'
+                    }
+                  >
+                    {listenError || statusHint}
+                  </p>
+                  <button
+                    type="button"
+                    className="pill-btn pill-btn--soft listen-status__type"
+                    onClick={() => {
+                      playSfx('tap')
+                      openKeyboardDictation()
+                    }}
+                    aria-label="打字"
+                  >
+                    ✍
+                  </button>
+                </div>
+              )}
+
+              {speakShowListenPanel && (
                 <div
                   className={`listen-panel listen-panel--optional ${
                     listening || composeActive || listenBusy ? 'is-listening' : ''
-                  }`}
+                  } ${heardText ? '' : 'listen-panel--empty'}`}
                 >
-                  <div
-                    className={`listen-panel__compose ${
-                      composeActive || listening || listenBusy || spokenText ? 'is-active' : ''
-                    }`}
-                  >
-                    <textarea
-                      id="speak-dictation"
-                      ref={dictationRef}
-                      className="listen-panel__input"
-                      value={spokenText}
-                      onChange={(e) => setSpokenText(e.target.value)}
-                      onFocus={() => setComposeActive(true)}
-                      onBlur={() => {
-                        if (!listening && !listenBusy) setComposeActive(false)
-                      }}
-                      readOnly={listening || listenBusy}
-                      lang={listenLang === 'en-US' ? 'en-US' : 'zh-Hant-HK'}
-                      inputMode="text"
-                      enterKeyHint="done"
-                      autoCapitalize="sentences"
-                      autoCorrect="on"
-                      spellCheck
-                      rows={3}
-                      placeholder=""
-                      aria-label="聽寫文字"
-                    />
-                    {listenError ? <p className="listen-panel__error">{listenError}</p> : null}
-                    {!listenError && statusHint && (sttBlocked || (!listening && !listenBusy)) ? (
-                      <p className="listen-panel__hint">{statusHint}</p>
-                    ) : null}
-                  </div>
+                  {speakShowCompose ? (
+                    <div
+                      className={`listen-panel__compose ${
+                        composeActive || listening || listenBusy || heardText ? 'is-active' : ''
+                      } ${heardText ? '' : 'listen-panel__compose--empty'}`}
+                    >
+                      <textarea
+                        id="speak-dictation"
+                        ref={dictationRef}
+                        className="listen-panel__input"
+                        value={spokenText}
+                        onChange={(e) => setSpokenText(e.target.value)}
+                        onFocus={() => setComposeActive(true)}
+                        onBlur={() => {
+                          if (!listening && !listenBusy) setComposeActive(false)
+                        }}
+                        readOnly={listening || listenBusy}
+                        lang={listenLang === 'en-US' ? 'en-US' : 'zh-Hant-HK'}
+                        inputMode="text"
+                        enterKeyHint="done"
+                        autoCapitalize="sentences"
+                        autoCorrect="on"
+                        spellCheck
+                        rows={Math.min(
+                          6,
+                          Math.max(1, spokenText.split('\n').length + (heardText.length > 36 ? 1 : 0)),
+                        )}
+                        placeholder=""
+                        aria-label="聽寫文字"
+                      />
+                      {listenError ? <p className="listen-panel__error">{listenError}</p> : null}
+                      {!listenError && statusHint && (sttBlocked || (!listening && !listenBusy)) ? (
+                        <p className="listen-panel__hint">{statusHint}</p>
+                      ) : null}
+                    </div>
+                  ) : speakStatusLine ? (
+                    <p className="listen-panel__live-hint" role="status">
+                      {speakStatusLine}
+                    </p>
+                  ) : null}
                   <button
                     type="button"
                     className="pill-btn listen-panel__tts"
-                    disabled={!spokenText.trim() || listening || listenBusy}
+                    disabled={!heardText || listening || listenBusy}
                     onClick={() => {
                       unlockAudio()
                       playSfx('tap')
