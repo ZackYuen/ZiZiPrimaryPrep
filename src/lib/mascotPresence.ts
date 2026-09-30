@@ -33,5 +33,6 @@ export function resolveMascotPresence(state: {
   if (state.cheering) return { mood: 'cheer', reason: 'cheer' }
   if (state.encourage) return { mood: 'think', reason: 'encourage' }
   if (state.listening || state.looking) return { mood: 'think', reason: 'listen' }
-  return { mood: 'wave', reason: 'wait' }
+  // Quiet idle on entry — exaggerated cheer/wave is tap or success only.
+  return { mood: 'happy', reason: 'wait' }
 }

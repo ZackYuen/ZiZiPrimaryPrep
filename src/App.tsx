@@ -230,7 +230,7 @@ export default function App() {
       <header className="hero">
         <p className="hero__brand">碩孜升小面試</p>
         <div className="hero__mascot-wrap">
-          <Mascot mood="wave" size={150} interactive bubbleAlign="side" />
+          <Mascot mood="happy" size={150} interactive bubbleAlign="side" />
         </div>
         <h1 className="hero__name">{CHILD.nameShort}</h1>
         <p className="hero__figure">
@@ -248,7 +248,7 @@ export default function App() {
       <main className="home-main">
         <button type="button" className="mock-cta" onClick={() => go({ name: 'mock' })}>
           <span className="mock-cta__art" aria-hidden>
-            <Mascot mood="cheer" size={64} />
+            <Mascot mood="happy" size={64} />
           </span>
           <span className="mock-cta__text">
             <span className="mock-cta__label">★ 面試</span>

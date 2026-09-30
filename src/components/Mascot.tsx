@@ -20,10 +20,10 @@ type Props = {
 /**
  * Same art language as Zizi-English-Class: one pose PNG per mood, limbs
  * already drawn. CSS only hops/bobs the whole figure — no overlay sticks.
- *   happy  → idle worm
- *   wave   → cheer (arms up, home greeting)
+ *   happy  → idle worm (default on load / wait)
+ *   wave   → cheer pose (kept for explicit mood; not auto-played on entry)
  *   think  → comfort + nod
- *   cheer  → cheer + hop
+ *   cheer  → cheer + hop (tap or gameplay success)
  */
 const MOOD_ART: Record<MascotMood, string> = {
   happy: 'zizi-idle.png',
@@ -85,15 +85,16 @@ export function Mascot({
   reason,
   bubbleAlign = 'below',
 }: Props) {
-  const [burst, setBurst] = useState<'tap' | 'idle' | null>(null)
+  const [burst, setBurst] = useState<'tap' | null>(null)
   const [bubble, setBubble] = useState<string | null>(null)
   const [blink, setBlink] = useState(false)
   const [motionKey, setMotionKey] = useState(0)
   const hideRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const blinkHideRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const shownMood: MascotMood =
-    burst === 'tap' ? 'cheer' : burst === 'idle' && mood !== 'cheer' ? 'wave' : mood
+  // Exaggerated cheer/hop only on tap (or a 'cheer' reason). Idle nudge is a
+  // bubble — never auto-swap to the big wave/cheer overlay on load or pause.
+  const shownMood: MascotMood = burst === 'tap' ? 'cheer' : mood
   const popped = burst === 'tap'
   const art = poseSrc(MOOD_ART[shownMood])
 
@@ -104,7 +105,7 @@ export function Mascot({
     }
   }
 
-  const speakFor = (kind: 'tap' | 'cheer' | 'encourage' | 'idle', nextBurst: 'tap' | 'idle' | null) => {
+  const speakFor = (kind: 'tap' | 'cheer' | 'encourage' | 'idle', nextBurst: 'tap' | null) => {
     clearHide()
     if (nextBurst === 'tap') setMotionKey((n) => n + 1)
     setBurst(nextBurst)
@@ -133,7 +134,8 @@ export function Mascot({
     if (!interactive || prefersReducedMotion()) return
     if (mood === 'cheer' || reason === 'cheer' || burst === 'tap') return
     const id = window.setTimeout(() => {
-      speakFor('idle', 'idle')
+      // Bubble only — do not switch to wave/cheer art unprompted.
+      speakFor('idle', null)
     }, IDLE_MS)
     return () => window.clearTimeout(id)
     // Restart the wait whenever the kid or the activity does something.
@@ -154,7 +156,10 @@ export function Mascot({
 
   if (!interactive) {
     return (
-      <span className={`mascot-static mascot-static--${mood} ${className}`.trim()}>
+      <span
+        className={`mascot-static mascot-static--${mood} ${className}`.trim()}
+        style={{ width: size, height: size }}
+      >
         <MascotPose
           mood={mood}
           size={size}
