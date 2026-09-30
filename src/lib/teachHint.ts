@@ -227,6 +227,15 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'evg-animal-day': 'zoo',
   'evg-bridge-talk': 'share',
   'evg-morning': 'daily',
+  'jando-name-zh': 'intro',
+  'jando-name-en': 'intro',
+  'jando-word-pick': 'eat',
+  'jando-m1': 'plus',
+  'jando-m2': 'minus',
+  'jando-m3': 'plus',
+  'jando-m4': 'minus',
+  'jando-m5': 'mix',
+  'jando-teams-3': 'mix',
 }
 
 const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
@@ -405,6 +414,22 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
   'evg-match': {
     kidLine: '英文拖去中文：name 係名字。',
     moreLine: 'egg 雞蛋、broccoli 西蘭花、ear 耳朵。',
+  },
+  'jando-read-zh': {
+    kidLine: '望住圖，逐個讀出嚟。',
+    moreLine: '蘋果、眼睛、老師、朋友、恐龍、書包。',
+  },
+  'jando-read-en': {
+    kidLine: '望住圖，用英文逐個讀。',
+    moreLine: 'apple, cat, red, school, bag.',
+  },
+  'jando-name-zh': {
+    kidLine: '大聲講：我叫袁碩孜。',
+    moreLine: '望住前面，笑住講自己個名。',
+  },
+  'spcc-read': {
+    kidLine: '望住圖，中文同英文都讀。',
+    moreLine: '眼睛、蘋果、疲累、橋樑。mouth, green, purple, children.',
   },
 }
 
@@ -657,6 +682,12 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (item.kind === 'build') return 'move'
   if (item.kind === 'memory') return 'zoo'
   if (item.calendarDay) return 'weekend'
+  if (item.kind === 'math') {
+    if (mathHasMinus(math) && !mathHasPlus(math)) return 'minus'
+    if (mathHasPlus(math) && !mathHasMinus(math)) return 'plus'
+    return 'mix'
+  }
+  if (item.readAloud || /讀呢啲詞|跟住讀/.test(item.promptZh)) return 'talk'
   const p = `${item.promptZh} ${item.promptEn || ''} ${item.cue || ''}`
   if (/policeman|police|警察/.test(p)) return 'policeman'
   if (/firefighter|消防/.test(p)) return 'firefighter'
@@ -680,11 +711,6 @@ function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (/angry|嬲|憤怒|搶/.test(p)) return 'grab'
   if (/happy|開心|興奮/.test(p)) return 'happy'
   if (/job|工作|老師/.test(p)) return 'job'
-  if (item.kind === 'math') {
-    if (mathHasMinus(math) && !mathHasPlus(math)) return 'minus'
-    if (mathHasPlus(math) && !mathHasMinus(math)) return 'plus'
-    return 'mix'
-  }
   if (/誰比較多|邊個多|哪班比較多|邊班多|多多少|多幾多|比較多/.test(p)) return 'mix'
   if (item.kind === 'speak') return 'talk'
   return 'story'

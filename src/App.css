@@ -3182,6 +3182,44 @@ button.picture-strip__item--choice {
   grid-column: 1 / -1;
 }
 
+.speak-box--read,
+.speak-box--solo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.7rem;
+}
+
+.speak-box__done {
+  min-height: 3.4rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.speak-box__done.is-done,
+.speak-box__done:disabled {
+  opacity: 0.45;
+  filter: saturate(0.75);
+  cursor: default;
+}
+
+.speak-box__more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.speak-box__more .pill-btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.listen-panel--optional {
+  padding: 0.55rem;
+}
+
 @media (max-width: 720px) {
   .app-shell {
     padding: 0.65rem 0.65rem 0.8rem;
@@ -3977,6 +4015,17 @@ button.picture-strip__item--choice {
 
   .speak-box--compact .listen-panel {
     padding: 0.4rem;
+  }
+
+  .speak-box--read,
+  .speak-box--solo {
+    margin-top: 0.32rem;
+    gap: 0.45rem;
+  }
+
+  .speak-box__done {
+    min-height: 3rem;
+    font-size: 1.12rem;
   }
 
   .analog-clock {
