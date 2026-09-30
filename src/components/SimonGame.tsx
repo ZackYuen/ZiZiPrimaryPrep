@@ -18,7 +18,7 @@ const ACTION_LABEL: Record<SimonAction, string> = {
   foot: '單腳',
   turn: '轉圈',
   blue: '指藍',
-  sit: '坐下',
+  sit: '坐低',
   nose: '摸鼻',
   door: '指門',
 }
