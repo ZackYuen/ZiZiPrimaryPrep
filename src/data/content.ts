@@ -137,6 +137,8 @@ export type Activity = {
   hideArt?: boolean
   /** Extra picture under public/, shown instead of the mapped hint. */
   hintImage?: string
+  /** Read-the-words: big 「讀完啦」, no recording required. */
+  readAloud?: boolean
   /** Labelled picture strip, e.g. A–D story cards. */
   pictureStrip?: { src: string; label: string }[]
   /** Show hintImage / pictureStrip for this many seconds, then hide. */
@@ -443,6 +445,8 @@ export const days: DayPlan[] = [
         kind: 'speak',
         level: 1,
         cue: '詞匯',
+        readAloud: true,
+        hideArt: true,
         promptZh: '跟住讀：老師好、姓名、今年、歲、就讀、幼稚園、喜歡、多謝',
         sampleZh: '老師好。姓名。今年。歲。就讀。幼稚園。喜歡。多謝。',
         tip: '每個詞慢慢讀兩次。',
@@ -627,6 +631,7 @@ export const days: DayPlan[] = [
         kind: 'speak',
         level: 1,
         cue: '詞匯',
+        readAloud: true,
         promptZh: '跟住讀：吃飯、喝水、跑步、跳躍、讀書、睡覺、寫字、收拾',
         sampleZh: '吃飯。喝水。跑步。跳躍。讀書。睡覺。寫字。收拾。',
       },
@@ -806,6 +811,7 @@ export const days: DayPlan[] = [
         kind: 'speak',
         level: 1,
         cue: '詞匯',
+        readAloud: true,
         promptZh: '跟住讀：唱歌、跳舞、踩單車、做功課、溫習、玩耍、分享、游泳',
         sampleZh: '唱歌。跳舞。踩單車。做功課。溫習。玩耍。分享。游泳。',
         promptEn: 'sing · dance · cycle · do homework',
@@ -957,6 +963,7 @@ export const days: DayPlan[] = [
         level: 1,
         section: '詞匯學習',
         cue: '情緒詞匯',
+        readAloud: true,
         promptZh: '跟住讀情緒詞：開心、驚慌、傷心、興奮、擔憂、失望、憤怒、平靜',
         sampleZh: '開心。驚慌。傷心。興奮。擔憂。失望。憤怒。平靜。',
         tip: '每個詞慢慢讀兩次，邊讀邊做表情更好玩。',
@@ -1202,6 +1209,7 @@ export const days: DayPlan[] = [
         level: 1,
         section: '星期詞匯',
         cue: '星期',
+        readAloud: true,
         promptZh: '跟住讀：星期一、星期二、星期三、星期四、星期五、星期六、星期日',
         sampleZh: '星期一。星期二。星期三。星期四。星期五。星期六。星期日。',
       },
@@ -1624,6 +1632,12 @@ export const mockInterview: Activity[] = [
 
 export function getDay(id: DayId): DayPlan | undefined {
   return days.find((d) => d.id === id)
+}
+
+/** Word-list speak tasks a 5-year-old can finish without the mic. */
+export function isReadAloud(item: Activity): boolean {
+  if (item.readAloud) return true
+  return item.kind === 'speak' && /讀呢啲詞|跟住讀/.test(item.promptZh)
 }
 
 export function normalizeAnswer(s: string): string {
