@@ -1005,6 +1005,15 @@ export function PracticeSession({
                         composeActive || listening || listenBusy || heardText ? 'is-active' : ''
                       } ${heardText ? '' : 'listen-panel__compose--empty'}`}
                     >
+                      {!heardText && listenError ? (
+                        <p className="listen-panel__error">{listenError}</p>
+                      ) : null}
+                      {!heardText &&
+                      !listenError &&
+                      statusHint &&
+                      (sttBlocked || (!listening && !listenBusy)) ? (
+                        <p className="listen-panel__hint">{statusHint}</p>
+                      ) : null}
                       <textarea
                         id="speak-dictation"
                         ref={dictationRef}
@@ -1026,13 +1035,9 @@ export function PracticeSession({
                           6,
                           Math.max(1, spokenText.split('\n').length + (heardText.length > 36 ? 1 : 0)),
                         )}
-                        placeholder=""
+                        placeholder={heardText ? '' : '想打字就喺呢度'}
                         aria-label="聽寫文字"
                       />
-                      {listenError ? <p className="listen-panel__error">{listenError}</p> : null}
-                      {!listenError && statusHint && (sttBlocked || (!listening && !listenBusy)) ? (
-                        <p className="listen-panel__hint">{statusHint}</p>
-                      ) : null}
                     </div>
                   ) : speakStatusLine ? (
                     <p className="listen-panel__live-hint" role="status">
