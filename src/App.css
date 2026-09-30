@@ -3586,14 +3586,14 @@ button.picture-strip__item--choice {
 }
 
 .math-dots {
-  --math-dot-size: 1.45rem;
+  --math-dot-size: 1.35rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem 0.55rem;
+  gap: 0.35rem 0.4rem;
   margin: 0.4rem 0 0.7rem;
-  padding: 0.45rem 0.4rem;
+  padding: 0.4rem 0.3rem;
 }
 
 .math-dots__term {
@@ -3601,17 +3601,17 @@ button.picture-strip__item--choice {
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.28rem;
 }
 
 .math-dots__op {
   flex: 0 0 auto;
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 1.85rem;
   font-weight: 800;
   color: var(--ink);
   line-height: 1;
-  min-width: 1.4em;
+  min-width: 1.15em;
   text-align: center;
 }
 
@@ -3624,7 +3624,7 @@ button.picture-strip__item--choice {
   align-items: flex-end;
   justify-content: center;
   gap: 0.35rem;
-  padding: 0.5rem 0.6rem;
+  padding: 0.4rem 0.45rem;
   background: #fff;
   border-radius: 18px;
   border: 2px solid rgba(27, 58, 75, 0.1);
@@ -4069,31 +4069,32 @@ button.picture-strip__item--choice {
     flex: 0 0 auto;
     min-height: 0;
     margin: 0.2rem 0 0.15rem;
-    --math-dot-size: 1.65rem;
+    --math-dot-size: 1.35rem;
   }
 
   .session__stem .math-ones {
-    gap: 0.4rem;
+    gap: 0.32rem;
   }
 
   .session__stem .math-ten {
-    width: 22px;
-    height: 68px;
+    width: 18px;
+    height: 56px;
   }
 
   .session__stem .math-place {
-    padding: 0.45rem 0.55rem;
+    padding: 0.32rem 0.4rem;
   }
 
   .session__stem .math-dots__op {
-    font-size: 1.85rem;
+    font-size: 1.7rem;
+    min-width: 1.05em;
   }
 
   .session__stem .math-blank,
   .session__stem .math-dots--tiles .math-num-tile {
-    min-width: 2.7rem;
-    min-height: 2.7rem;
-    font-size: 1.45rem;
+    min-width: 2.35rem;
+    min-height: 2.35rem;
+    font-size: 1.3rem;
   }
 
   .session__stem .hint-pic-wrap {
@@ -4295,7 +4296,7 @@ button.picture-strip__item--choice {
 
   .math-dots {
     margin: 0.15rem 0 0.3rem;
-    --math-dot-size: 1.5rem;
+    --math-dot-size: 1.3rem;
   }
 
   .kid-help__btn {
@@ -4390,9 +4391,9 @@ button.picture-strip__item--choice {
   }
 
   .numpad__key {
-    min-height: 2.55rem;
+    min-height: 2.75rem;
     border-radius: 12px;
-    font-size: 1.15rem;
+    font-size: 1.2rem;
   }
 
   .money-fields {
