@@ -4278,8 +4278,8 @@ button.picture-strip__item--choice {
    * reachable on SE-sized / PWA viewports.
    */
   .session--kind-speak.session--practice .session__card--fill-stem .session__stem {
-    flex: 1 1 auto;
-    min-height: 0;
+    flex: 1 0 auto;
+    min-height: auto;
   }
 
   .session--kind-speak.session--practice .session__card--fill-stem .session__response {
@@ -4378,6 +4378,7 @@ button.picture-strip__item--choice {
 
   .session--kind-speak .session__stem .hint-pic-wrap {
     min-height: 7.5rem;
+    max-height: min(34vh, 16rem);
   }
 
   .session__stem .hint-pic-wrap .hint-pic {
@@ -5023,7 +5024,8 @@ button.picture-strip__item--choice {
   }
 
   .session--kind-speak .session__stem .hint-pic-wrap {
-    min-height: 8rem;
+    min-height: 7rem;
+    max-height: min(30vh, 13.5rem);
   }
 
   .session__stem .hint-pic-wrap .hint-pic {
