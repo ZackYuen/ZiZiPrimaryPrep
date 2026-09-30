@@ -212,7 +212,7 @@ export default function App() {
       <header className="hero">
         <p className="hero__brand">碩孜升小面試</p>
         <div className="hero__mascot-wrap">
-          <Mascot mood="wave" size={150} />
+          <Mascot mood="wave" size={150} interactive bubbleAlign="side" />
         </div>
         <h1 className="hero__name">{CHILD.nameShort}</h1>
         <p className="hero__figure">

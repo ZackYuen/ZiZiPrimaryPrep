@@ -32,6 +32,7 @@ import { HintPicture } from './HintPicture'
 import { MathDots } from './MathDots'
 import { KidHelp } from './KidHelp'
 import { resolveTeachHint } from '../lib/teachHint'
+import { resolveMascotPresence } from '../lib/mascotPresence'
 import { TangramBoard } from './TangramBoard'
 import { SimonGame } from './SimonGame'
 import { BuildBoard } from './BuildBoard'
@@ -134,12 +135,14 @@ export function PracticeSession({
     return item.sortItems.every((s) => !!sortPlacement[s.text])
   }, [item, sortPlacement])
 
-  const mascotMood =
-    justStar || mathResult === 'ok' || solvedChoice || (sortChecked && sortCorrect) || gameSolved
-      ? 'cheer'
-      : mathResult === 'no' || wrongAttempts > 0 || (sortChecked && !sortCorrect)
-        ? 'think'
-        : 'happy'
+  const mascot = resolveMascotPresence({
+    cheering:
+      justStar || mathResult === 'ok' || solvedChoice || (sortChecked && sortCorrect) || gameSolved,
+    encourage: mathResult === 'no' || wrongAttempts > 0 || (sortChecked && !sortCorrect),
+    listening: listening || listenBusy,
+    looking: lookLeft != null && lookLeft > 0,
+  })
+  const mascotMood = mascot.mood
 
   useEffect(() => {
     if (listening || listenBusy) {
@@ -542,7 +545,14 @@ export function PracticeSession({
         >
           {KID.back}
         </button>
-        <Mascot mood="think" size={40} className="session__mascot" />
+        <Mascot
+          mood={mascot.mood}
+          reason={mascot.reason}
+          size={76}
+          interactive
+          bubbleAlign="side"
+          className="session__mascot"
+        />
         <div className="session__progress">
           <span className="session__title">{title}</span>
           <span>
