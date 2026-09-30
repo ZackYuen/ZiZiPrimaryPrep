@@ -119,6 +119,7 @@ async function recognizeOneBlob(opts: {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        referrerPolicy: 'origin',
         body: JSON.stringify({
           config: recognitionConfig({
             sampleRate: opts.sampleRate,
@@ -189,6 +190,7 @@ export async function recognizeWithGoogle(opts: {
       const res = await fetch(proxyUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        referrerPolicy: 'origin',
         body: JSON.stringify({
           languageCode,
           sampleRateHertz: opts.sampleRate,
