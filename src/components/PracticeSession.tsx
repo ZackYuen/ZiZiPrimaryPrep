@@ -532,7 +532,25 @@ export function PracticeSession({
   }
 
   const isPadKind = item.kind === 'math' || item.kind === 'clock' || item.kind === 'money'
-  const waitingOnPad = isPadKind && !done && !canProceed()
+  const quietFooter = !done && !canProceed()
+  const fillStem =
+    !!item.scene ||
+    (!artHidden && !item.hideArt && !!(item.pictureStrip && item.pictureStrip.length)) ||
+    (!artHidden && !item.hideArt && !!item.hintImage) ||
+    (!isStoryFocus &&
+      !item.scene &&
+      !item.clock &&
+      !item.coins &&
+      item.calendarDay == null &&
+      !(teach.math && !item.hintImage && !item.pictureStrip) &&
+      !item.hintImage &&
+      !item.pictureStrip &&
+      !item.hideArt &&
+      !artHidden &&
+      item.kind !== 'tangram' &&
+      item.kind !== 'simon' &&
+      item.kind !== 'build' &&
+      item.kind !== 'memory')
 
   const backspaceMath = () => {
     if (mathResult === 'ok') return
@@ -609,7 +627,10 @@ export function PracticeSession({
       </header>
 
       <div className={`session__layout ${isStoryFocus ? 'session__layout--story' : ''}`}>
-        <div className={`session__card ${isStoryFocus ? 'session__card--story' : ''}`} key={item.id}>
+        <div
+          className={`session__card ${isStoryFocus ? 'session__card--story' : ''} ${fillStem ? 'session__card--fill-stem' : ''}`}
+          key={item.id}
+        >
           <div className="session__stem">
           <div className="session__badges">
             {(item.section || item.cue) && (
@@ -1493,7 +1514,7 @@ export function PracticeSession({
         </div>
       </div>
 
-      <footer className={`session__footer ${waitingOnPad ? 'session__footer--quiet' : ''}`}>
+      <footer className={`session__footer ${quietFooter ? 'session__footer--quiet' : ''}`}>
         <button
           type="button"
           className="ghost-btn"
@@ -1510,7 +1531,7 @@ export function PracticeSession({
         </button>
         <button
           type="button"
-          className={waitingOnPad ? 'ghost-btn session__footer-help' : 'primary-btn primary-btn--wide'}
+          className={quietFooter ? 'ghost-btn session__footer-help' : 'primary-btn primary-btn--wide'}
           onClick={handlePrimary}
           aria-label={
             done
