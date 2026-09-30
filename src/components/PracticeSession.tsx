@@ -22,7 +22,7 @@ import { KID } from '../lib/kidLabels'
 import { playSfx, unlockAudio } from '../hooks/useSfx'
 import { duckBgm, setBgmMood } from '../lib/bgm'
 import { SceneArt } from './SceneArt'
-import { Confetti } from './Confetti'
+import { CorrectCelebration } from './CorrectCelebration'
 import { ChapterCelebration } from './ChapterCelebration'
 import { SoundToggle } from './SoundToggle'
 import { AnalogClock } from './AnalogClock'
@@ -36,6 +36,7 @@ import { AnswerPad } from './AnswerPad'
 import { KidHelp } from './KidHelp'
 import { resolveTeachHint } from '../lib/teachHint'
 import { resolveMascotPresence } from '../lib/mascotPresence'
+import { CORRECT_CELEBRATION_MS, shouldCelebrateCorrect } from '../lib/correctCelebration'
 import { CLOCK_DIGIT_KEYS, mathDigitKeys } from '../lib/mathPad'
 import { TangramBoard } from './TangramBoard'
 import { SimonGame } from './SimonGame'
@@ -86,7 +87,7 @@ export function PracticeSession({
   const [index, setIndex] = useState(() => startIndexFor(items))
   const [showSample, setShowSample] = useState(false)
   const [justStar, setJustStar] = useState(false)
-  const [showConfetti, setShowConfetti] = useState(false)
+  const [showCorrectCeleb, setShowCorrectCeleb] = useState(false)
   const [chapterComplete, setChapterComplete] = useState(false)
   const [picked, setPicked] = useState<number | null>(null)
   const [wrongPicks, setWrongPicks] = useState<number[]>([])
@@ -190,6 +191,7 @@ export function PracticeSession({
   const resetInteraction = (_activity: Activity) => {
     setShowSample(false)
     setJustStar(false)
+    setShowCorrectCeleb(false)
     setPicked(null)
     setWrongPicks([])
     setWrongAttempts(0)
@@ -260,11 +262,8 @@ export function PracticeSession({
   }, [item.id, item.lookSeconds, item.hideArt])
 
   useEffect(() => {
-    if (justStar) {
-      playSfx('star')
-      if (!isLast) setShowConfetti(true)
-    }
-  }, [justStar, isLast])
+    if (justStar) playSfx('star')
+  }, [justStar])
 
   const reorderCorrect = useMemo(() => {
     if (item.kind !== 'reorder' || !item.correctOrder) return false
@@ -328,6 +327,8 @@ export function PracticeSession({
   }
 
   const awardAndMaybeNext = (autoNext = false) => {
+    const celebrated = shouldCelebrateCorrect(item.kind, isLast)
+    if (celebrated) setShowCorrectCeleb(true)
     if (!done) {
       onMarkDone(item.id, moduleKey)
       setJustStar(true)
@@ -336,10 +337,11 @@ export function PracticeSession({
     if (advancingRef.current) return
     advancingRef.current = true
     if (advanceTimerRef.current != null) clearTimeout(advanceTimerRef.current)
+    const wait = celebrated ? CORRECT_CELEBRATION_MS : done ? 0 : 800
     advanceTimerRef.current = setTimeout(() => {
       advanceTimerRef.current = null
       goNext()
-    }, done ? 0 : 800)
+    }, wait)
   }
 
   const noteGameWrong = () => {
@@ -600,7 +602,7 @@ export function PracticeSession({
       className={`session session--practice session--kind-${item.kind}`}
       style={{ '--accent': accent } as CSSProperties}
     >
-      <Confetti show={showConfetti} onDone={() => setShowConfetti(false)} />
+      {showCorrectCeleb && <CorrectCelebration onDone={() => setShowCorrectCeleb(false)} />}
       <ChapterCelebration
         show={chapterComplete}
         title={title}
