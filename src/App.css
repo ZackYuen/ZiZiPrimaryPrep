@@ -1138,8 +1138,8 @@
 
 .session__mascot {
   flex-shrink: 0;
-  width: 56px;
-  height: 56px;
+  width: 76px;
+  height: 76px;
 }
 
 .session__track {
@@ -2623,6 +2623,21 @@
   animation-name: mascot-bubble-in-end;
 }
 
+.mascot-buddy--bubble-side .mascot-buddy__bubble {
+  left: calc(100% + 10px);
+  top: 50%;
+  right: auto;
+  transform: translateY(-50%);
+  animation-name: mascot-bubble-in-side;
+}
+
+.mascot-buddy--bubble-side .mascot-buddy__bubble::before {
+  left: 2px;
+  top: 50%;
+  margin: -4px 0 0 0;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
 .mascot-buddy__bubble::before {
   content: '';
   position: absolute;
@@ -2700,6 +2715,17 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes mascot-bubble-in-side {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-6px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0) scale(1);
   }
 }
 

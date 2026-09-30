@@ -107,9 +107,9 @@ export function StoryInterviewSession({ completed, onMarkDone, onBack }: Props) 
         <Mascot
           mood={mascot.mood}
           reason={mascot.reason}
-          size={56}
+          size={76}
           interactive
-          bubbleAlign="end"
+          bubbleAlign="side"
           className="session__mascot"
         />
         <div className="story-interview__heading">

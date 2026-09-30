@@ -548,9 +548,9 @@ export function PracticeSession({
         <Mascot
           mood={mascot.mood}
           reason={mascot.reason}
-          size={56}
+          size={76}
           interactive
-          bubbleAlign="end"
+          bubbleAlign="side"
           className="session__mascot"
         />
         <div className="session__progress">

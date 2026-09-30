@@ -14,7 +14,7 @@ type Props = {
   interactive?: boolean
   /** Auto-speak a short line when gameplay mood changes. */
   reason?: MascotReason
-  bubbleAlign?: 'below' | 'end'
+  bubbleAlign?: 'below' | 'end' | 'side'
 }
 
 const MOOD_ART: Record<MascotMood, string> = {
@@ -24,8 +24,8 @@ const MOOD_ART: Record<MascotMood, string> = {
   cheer: 'zizi-cheer.png',
 }
 
-const TAP_MS = 1800
-const IDLE_MS = 11000
+const TAP_MS = 2600
+const IDLE_MS = 14000
 const BLINK_EVERY_MS = 5000
 const BLINK_MS = 140
 
