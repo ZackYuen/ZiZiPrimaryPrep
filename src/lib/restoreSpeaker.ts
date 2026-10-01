@@ -1,6 +1,8 @@
 /** iOS leftover PlayAndRecord / voice-call routing after getUserMedia or Web Speech. */
 
-let micSessionOpen = false
+let micUsed = false
+let generation = 0
+let restoring: Promise<void> | null = null
 
 function isAppleWebKit(): boolean {
   if (typeof navigator === 'undefined') return false
@@ -11,15 +13,20 @@ function isAppleWebKit(): boolean {
 }
 
 export function markMicSession(): void {
-  micSessionOpen = true
+  generation += 1
+  micUsed = true
 }
 
 export function micSessionWasUsed(): boolean {
-  return micSessionOpen
+  return micUsed || restoring !== null
+}
+
+export function speakerRestorePending(): boolean {
+  return micUsed || restoring !== null
 }
 
 export function clearMicSessionFlag(): void {
-  micSessionOpen = false
+  micUsed = false
 }
 
 /** Tiny silent WAV so HTMLAudio can kick iOS back to the loudspeaker. */
@@ -56,10 +63,14 @@ function playHtmlSilence(): Promise<void> {
   const url = URL.createObjectURL(new Blob([copy], { type: 'audio/wav' }))
   const audio = new Audio(url)
   audio.setAttribute('playsinline', 'true')
+  audio.setAttribute('webkit-playsinline', 'true')
   audio.muted = false
   audio.volume = 0.01
   return new Promise((resolve) => {
+    let settled = false
     const done = () => {
+      if (settled) return
+      settled = true
       URL.revokeObjectURL(url)
       resolve()
     }
@@ -74,12 +85,26 @@ function playHtmlSilence(): Promise<void> {
 /**
  * After dictation/recording: stop leaving iOS in the earpiece (聽筒) route
  * so TTS / 聽題 play on the loudspeaker (揚聲器) again.
+ *
+ * Joins an in-flight restore. A new ● session (`markMicSession`) bumps
+ * generation so an old kick cannot clear the new session’s pending flag.
  */
 export async function restoreSpeakerPlayback(): Promise<void> {
-  if (typeof window === 'undefined') return
-  if (!micSessionOpen) return
-  micSessionOpen = false
-  if (isAppleWebKit()) await playHtmlSilence()
+  if (restoring) return restoring
+  if (!micUsed) return
+  const gen = generation
+  restoring = (async () => {
+    await Promise.resolve()
+    if (typeof window !== 'undefined' && isAppleWebKit()) {
+      await playHtmlSilence()
+    }
+    if (gen === generation) micUsed = false
+  })()
+  try {
+    await restoring
+  } finally {
+    restoring = null
+  }
 }
 
 export function restoreSpeakerPlaybackSoon(): void {

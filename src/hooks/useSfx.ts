@@ -1,4 +1,4 @@
-import { micSessionWasUsed, restoreSpeakerPlayback, restoreSpeakerPlaybackSoon } from '../lib/restoreSpeaker.ts'
+import { restoreSpeakerPlayback, restoreSpeakerPlaybackSoon, speakerRestorePending } from '../lib/restoreSpeaker.ts'
 
 type SfxName =
   | 'tap'
@@ -44,7 +44,7 @@ export function getSfxMuted(): boolean {
 export function unlockAudio() {
   const c = getCtx()
   if (c?.state === 'suspended') void c.resume()
-  if (micSessionWasUsed()) restoreSpeakerPlaybackSoon()
+  if (speakerRestorePending()) restoreSpeakerPlaybackSoon()
 }
 
 function tone(
@@ -171,6 +171,7 @@ function playMp3ViaElement(bytes: Uint8Array): Promise<void> {
   const url = URL.createObjectURL(new Blob([copy], { type: 'audio/mpeg' }))
   const audio = new Audio(url)
   audio.setAttribute('playsinline', 'true')
+  audio.setAttribute('webkit-playsinline', 'true')
   ttsAudio = audio
   return new Promise<void>((resolve, reject) => {
     audio.onended = () => {
@@ -195,10 +196,11 @@ function isAppleWebKit(): boolean {
   return typeof navigator.vendor === 'string' && navigator.vendor.includes('Apple')
 }
 
-/** Play Google TTS MP3. Uses the unlocked Web Audio context so iOS allows it after the tap. */
+/** Play Google TTS MP3. After a mic session, restore the loudspeaker first.
+ *  On iPhone, prefer HTMLAudio so playback is not stuck on the earpiece. */
 export async function playMp3Bytes(bytes: Uint8Array): Promise<void> {
   stopTtsAudio()
-  if (micSessionWasUsed()) await restoreSpeakerPlayback()
+  await restoreSpeakerPlayback()
   // After a mic session, HTMLAudio restores the loudspeaker on iOS (Web Audio
   // can stay stuck on the earpiece / 聽筒). Prefer the media element on Apple.
   if (isAppleWebKit()) {

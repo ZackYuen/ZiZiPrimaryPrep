@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { schoolPlans } from '../data/schoolWeek.ts'
-import { silentWavBytes } from './restoreSpeaker.ts'
+import {
+  markMicSession,
+  micSessionWasUsed,
+  restoreSpeakerPlayback,
+  silentWavBytes,
+} from './restoreSpeaker.ts'
 
 function evangelActivity(id: string) {
   const plan = schoolPlans.find((s) => s.id === 'evangel')
@@ -31,5 +36,22 @@ describe('silentWavBytes', () => {
     assert.equal(ascii(0, 4), 'RIFF')
     assert.equal(ascii(8, 4), 'WAVE')
     assert.ok(bytes.length > 44)
+  })
+})
+
+describe('speaker restore flags', () => {
+  it('clears pending after restore, and keeps pending if mic restarts mid-restore', async () => {
+    markMicSession()
+    assert.equal(micSessionWasUsed(), true)
+    await restoreSpeakerPlayback()
+    assert.equal(micSessionWasUsed(), false)
+
+    markMicSession()
+    const first = restoreSpeakerPlayback()
+    markMicSession()
+    await first
+    assert.equal(micSessionWasUsed(), true)
+    await restoreSpeakerPlayback()
+    assert.equal(micSessionWasUsed(), false)
   })
 })
