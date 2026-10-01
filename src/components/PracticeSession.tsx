@@ -401,12 +401,28 @@ export function PracticeSession({
   }
 
   const teach = useMemo(() => resolveTeachHint(item), [item])
+  const listenStory = item.listenToSample ? item.sampleZh || item.sampleEn : undefined
+
+  const playStory = () => {
+    if (!listenStory) return
+    unlockAudio()
+    speak(listenStory, looksEnglish(listenStory) ? 'en-US' : 'zh-HK')
+  }
 
   const playQuestion = () => {
     unlockAudio()
-    const longStory = !!(item.listenToSample && item.sampleEn && item.sampleEn.length > 160)
-    if (longStory) {
+    if (isStoryFocus) {
       speak(item.promptZh, looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK')
+      return
+    }
+    if (listenStory && listenStory.length > 80) {
+      const storyLang = looksEnglish(listenStory) ? 'en-US' : 'zh-HK'
+      const qLang = looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK'
+      if (item.kind === 'choice' && item.promptZh && storyLang === qLang) {
+        speakQueue([listenStory, item.promptZh], storyLang)
+        return
+      }
+      speak(listenStory, storyLang)
       return
     }
     if (item.promptEn) {
@@ -761,6 +777,12 @@ export function PracticeSession({
           {clockFace && <AnalogClock hour={clockFace.hour} minute={clockFace.minute} />}
           {item.coins && item.purseOwner && <CoinPurse owner={item.purseOwner} coins={item.coins} />}
           {item.calendarDay != null && <JuneCalendar highlightDay={item.calendarDay} />}
+          {listenStory && item.kind !== 'speak' && !isStoryFocus && (
+            <div className="story-listen">
+              <p className="story-listen__cue">先聽故仔</p>
+              <p className="story-listen__body">{listenStory}</p>
+            </div>
+          )}
 
           {isStoryFocus ? (
             <div className="story-focus">
@@ -802,6 +824,19 @@ export function PracticeSession({
                   >
                     {KID.listen} 聽題
                   </button>
+                  {listenStory && !isStoryFocus && (
+                    <button
+                      type="button"
+                      className="pill-btn pill-btn--soft"
+                      onClick={() => {
+                        playSfx('tap')
+                        playStory()
+                      }}
+                      aria-label="聽故事"
+                    >
+                      {KID.listen} 聽故事
+                    </button>
+                  )}
                 </div>
                 {!readAloud && (
                 <KidHelp

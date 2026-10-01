@@ -7,6 +7,7 @@ import {
   kidSttMessage,
 } from '../lib/kidSttCopy'
 import { startPcmCapture, type PcmCaptureSession } from '../lib/pcmCapture'
+import { markMicSession, restoreSpeakerPlaybackSoon } from '../lib/restoreSpeaker.ts'
 
 export type ListenLang = 'yue-Hant-HK' | 'en-US'
 
@@ -226,6 +227,7 @@ export function useSpeechRecognition() {
     setHeardSpeech(false)
     setBusy(false)
     setStatusHint('')
+    restoreSpeakerPlaybackSoon()
   }, [flushInterim, hardStopStt])
 
   const scheduleRestart = useCallback((sid: number) => {
@@ -463,6 +465,7 @@ export function useSpeechRecognition() {
         setSttBlocked(true)
       } finally {
         setBusy(false)
+        restoreSpeakerPlaybackSoon()
       }
       return
     }
@@ -533,6 +536,7 @@ export function useSpeechRecognition() {
       }
 
       modeRef.current = 'webspeech'
+      markMicSession()
       const Ctor = getRecognitionCtor()
       if (!Ctor) {
         setSttBlocked(true)

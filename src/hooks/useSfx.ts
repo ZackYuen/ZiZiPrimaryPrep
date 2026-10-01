@@ -1,3 +1,5 @@
+import { micSessionWasUsed, restoreSpeakerPlayback, restoreSpeakerPlaybackSoon } from '../lib/restoreSpeaker.ts'
+
 type SfxName =
   | 'tap'
   | 'pop'
@@ -42,6 +44,7 @@ export function getSfxMuted(): boolean {
 export function unlockAudio() {
   const c = getCtx()
   if (c?.state === 'suspended') void c.resume()
+  if (micSessionWasUsed()) restoreSpeakerPlaybackSoon()
 }
 
 function tone(
@@ -161,9 +164,51 @@ export function stopTtsAudio() {
   }
 }
 
+function playMp3ViaElement(bytes: Uint8Array): Promise<void> {
+  stopTtsAudio()
+  const copy = new Uint8Array(bytes.byteLength)
+  copy.set(bytes)
+  const url = URL.createObjectURL(new Blob([copy], { type: 'audio/mpeg' }))
+  const audio = new Audio(url)
+  audio.setAttribute('playsinline', 'true')
+  ttsAudio = audio
+  return new Promise<void>((resolve, reject) => {
+    audio.onended = () => {
+      URL.revokeObjectURL(url)
+      if (ttsAudio === audio) ttsAudio = null
+      resolve()
+    }
+    audio.onerror = () => {
+      URL.revokeObjectURL(url)
+      if (ttsAudio === audio) ttsAudio = null
+      reject(new Error('朗讀播放失敗'))
+    }
+    void audio.play().catch(reject)
+  })
+}
+
+function isAppleWebKit(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const ua = navigator.userAgent
+  if (/iPhone|iPad|iPod/i.test(ua)) return true
+  if (/Safari/i.test(ua) && !/Chrome|Chromium|Edg|OPR|CriOS|FxiOS/i.test(ua)) return true
+  return typeof navigator.vendor === 'string' && navigator.vendor.includes('Apple')
+}
+
 /** Play Google TTS MP3. Uses the unlocked Web Audio context so iOS allows it after the tap. */
 export async function playMp3Bytes(bytes: Uint8Array): Promise<void> {
   stopTtsAudio()
+  if (micSessionWasUsed()) await restoreSpeakerPlayback()
+  // After a mic session, HTMLAudio restores the loudspeaker on iOS (Web Audio
+  // can stay stuck on the earpiece / 聽筒). Prefer the media element on Apple.
+  if (isAppleWebKit()) {
+    try {
+      await playMp3ViaElement(bytes)
+      return
+    } catch {
+      /* fall through to Web Audio */
+    }
+  }
   const c = getCtx()
   if (c) {
     if (c.state === 'suspended') await c.resume()
@@ -192,24 +237,7 @@ export async function playMp3Bytes(bytes: Uint8Array): Promise<void> {
       /* fall through to HTMLAudioElement */
     }
   }
-  const copy = new Uint8Array(bytes.byteLength)
-  copy.set(bytes)
-  const url = URL.createObjectURL(new Blob([copy], { type: 'audio/mpeg' }))
-  const audio = new Audio(url)
-  ttsAudio = audio
-  await new Promise<void>((resolve, reject) => {
-    audio.onended = () => {
-      URL.revokeObjectURL(url)
-      if (ttsAudio === audio) ttsAudio = null
-      resolve()
-    }
-    audio.onerror = () => {
-      URL.revokeObjectURL(url)
-      if (ttsAudio === audio) ttsAudio = null
-      reject(new Error('朗讀播放失敗'))
-    }
-    void audio.play().catch(reject)
-  })
+  await playMp3ViaElement(bytes)
 }
 
 muted = getSfxMuted()

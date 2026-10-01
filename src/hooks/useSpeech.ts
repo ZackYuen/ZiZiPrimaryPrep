@@ -3,6 +3,7 @@ import { duckBgm } from '../lib/bgm'
 import { isGoogleTtsConfigured, synthesizeGoogleTts } from '../lib/googleTts'
 import { prepareSpokenText, toPlainSpoken } from '../lib/speakText'
 import { getVoiceSettings } from '../lib/voiceSettings'
+import { restoreSpeakerPlaybackSoon } from '../lib/restoreSpeaker.ts'
 import { playMp3Bytes, stopTtsAudio, unlockAudio } from './useSfx'
 
 export type SpeakLang = 'zh-HK' | 'en-US'
@@ -326,6 +327,7 @@ export function useSpeech() {
     const gen = genRef.current
     const apple = isAppleWebKit()
     unlockAudio()
+    restoreSpeakerPlaybackSoon()
 
     const finish = () => {
       if (gen !== genRef.current) return

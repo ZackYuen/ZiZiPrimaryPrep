@@ -305,6 +305,10 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
     kidLine: '望鐘。而家 10 時，再加 3 個鐘。用 24 小時制打數字。',
     moreLine: '10 加 3 係 13。打 13，唔使打「時」。',
   },
+  'evg-puppy-1': {
+    kidLine: '撳 ▶ 聽故仔。開頭有講星期幾、上下午。',
+    moreLine: '第一句：星期日下午，小希同媽媽去公園散步。',
+  },
   'd6-ming': {
     kidLine: '睇故仔，揀小明做咗咩。',
     moreLine: '跟住圖講：首先……然後……最後……',
