@@ -7,6 +7,7 @@ import {
   kidSttMessage,
 } from '../lib/kidSttCopy'
 import { startPcmCapture, type PcmCaptureSession } from '../lib/pcmCapture'
+import { markMicSession, restoreSpeakerPlayback, restoreSpeakerPlaybackSoon } from '../lib/restoreSpeaker.ts'
 
 export type ListenLang = 'yue-Hant-HK' | 'en-US'
 
@@ -215,8 +216,12 @@ export function useSpeechRecognition() {
     flushInterim()
     hardStopStt(true)
     if (pcmSessionRef.current) {
-      void pcmSessionRef.current.stop().catch(() => undefined)
+      const pcm = pcmSessionRef.current
       pcmSessionRef.current = null
+      // pcm.stop() releases tracks then restores speaker — don't kick first.
+      void pcm.stop().catch(() => undefined)
+    } else {
+      restoreSpeakerPlaybackSoon()
     }
     abortRef.current?.abort()
     abortRef.current = null
@@ -420,6 +425,7 @@ export function useSpeechRecognition() {
       pcmSessionRef.current = null
       if (!session) {
         setStatusHint(kidSttMessage('empty'))
+        restoreSpeakerPlaybackSoon()
         return
       }
 
@@ -463,6 +469,7 @@ export function useSpeechRecognition() {
         setSttBlocked(true)
       } finally {
         setBusy(false)
+        await restoreSpeakerPlayback()
       }
       return
     }
@@ -533,6 +540,7 @@ export function useSpeechRecognition() {
       }
 
       modeRef.current = 'webspeech'
+      markMicSession()
       const Ctor = getRecognitionCtor()
       if (!Ctor) {
         setSttBlocked(true)

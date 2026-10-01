@@ -1,3 +1,5 @@
+import { markMicSession, restoreSpeakerPlayback } from './restoreSpeaker.ts'
+
 /** Capture mic audio as 16-bit PCM for Google Cloud Speech-to-Text. */
 
 export type PcmCaptureSession = {
@@ -201,6 +203,7 @@ export async function startPcmCapture(): Promise<PcmCaptureSession> {
   }
 
   const stream = await getMicStream()
+  markMicSession()
 
   const audioCtx = ctx ?? new AudioCtx()
   if (audioCtx.state === 'suspended') {
@@ -240,9 +243,16 @@ export async function startPcmCapture(): Promise<PcmCaptureSession> {
       } catch {
         /* ignore */
       }
-      stream.getTracks().forEach((t) => t.stop())
+      stream.getTracks().forEach((t) => {
+        try {
+          t.stop()
+        } catch {
+          /* ignore */
+        }
+      })
       const inRate = audioCtx.sampleRate
       await audioCtx.close().catch(() => undefined)
+      await restoreSpeakerPlayback()
 
       const merged = new Float32Array(total)
       let offset = 0

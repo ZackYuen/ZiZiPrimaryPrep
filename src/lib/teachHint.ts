@@ -1,4 +1,5 @@
 import type { Activity, ActivityKind, SceneId } from '../data/content'
+import { looksLikeClockItem, looksLikeClockPrompt } from './activityKind.ts'
 
 export type HintVisualId =
   | 'me'
@@ -156,6 +157,7 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'd6-en2': 'uniform',
   'd6-en3': 'football',
   'd6-en4': 'police-help',
+  'd6-r1': 'clock',
   'd6-r2': 'mix',
   'd6-r3a': 'mix',
   'cky-simon': 'move',
@@ -290,6 +292,22 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
   'd3-share': {
     kidLine: '講點樣同朋友分享玩具。',
     moreLine: '我會話：我哋一齊玩，輪流得唔得？',
+  },
+  'd4-t1': {
+    kidLine: '望鐘。而家 3 時，再加 2 個鐘，撳數字再撳 ✓。',
+    moreLine: '3 加 2 係 5 時。打 5 或者 5:00。',
+  },
+  'd4-t1b': {
+    kidLine: '望鐘。而家 11 時，再加 3 個鐘。用 24 小時制打數字。',
+    moreLine: '11 加 3 係 14。打 14，唔使打「時」。',
+  },
+  'd6-r1': {
+    kidLine: '望鐘。而家 10 時，再加 3 個鐘。用 24 小時制打數字。',
+    moreLine: '10 加 3 係 13。打 13，唔使打「時」。',
+  },
+  'evg-puppy-1': {
+    kidLine: '撳 ▶ 聽故仔。開頭有講星期幾、上下午。',
+    moreLine: '第一句：星期日下午，小希同媽媽去公園散步。',
   },
   'd6-ming': {
     kidLine: '睇故仔，揀小明做咗咩。',
@@ -648,6 +666,7 @@ function parseStory(prompt: string): MathModel | undefined {
 
 /** Count-dots / number tiles that match the question. Skip if it would mislead. */
 export function parseMathModel(prompt: string): MathModel | undefined {
+  if (looksLikeClockPrompt(prompt)) return undefined
   const sequence = parseSequence(prompt)
   if (sequence) return sequence
   const chain = parseExplicitChain(prompt)
@@ -672,7 +691,7 @@ export function mathHasPlus(math?: MathModel): boolean {
 function inferVisual(item: Activity, math?: MathModel): HintVisualId {
   if (ID_VISUAL[item.id]) return ID_VISUAL[item.id]
   if (item.scene && SCENE_VISUAL[item.scene]) return SCENE_VISUAL[item.scene]!
-  if (item.kind === 'clock' || item.clock) return 'clock'
+  if (item.kind === 'clock' || item.clock || looksLikeClockItem(item)) return 'clock'
   if (item.kind === 'money' || item.coins || /錢包|銀包|硬幣|幾多元/.test(`${item.promptZh}`)) return 'coins'
   if (item.kind === 'sort') return 'sort'
   if (item.kind === 'reorder') return 'reorder'
@@ -771,14 +790,15 @@ export function vocabVisual(catId: string, zh: string): HintVisualId {
   return 'talk'
 }
 export function resolveTeachHint(item: Activity): TeachHint {
+  const clockLike = looksLikeClockItem(item)
   const math =
-    item.kind === 'math'
+    item.kind === 'math' && !clockLike
       ? parseMathModel(item.promptZh)
       : item.kind === 'choice'
         ? parseSequence(item.promptZh)
         : undefined
   const visual = inferVisual(item, math)
-  const copy = ID_KID[item.id] || defaultKidLine(item.kind)
+  const copy = ID_KID[item.id] || defaultKidLine(clockLike ? 'clock' : item.kind)
   let moreLine = copy.moreLine
   if (!ID_KID[item.id] && item.sampleZh) {
     moreLine = `可以咁開頭：${item.sampleZh.slice(0, 18)}${item.sampleZh.length > 18 ? '…' : ''}`
@@ -787,6 +807,6 @@ export function resolveTeachHint(item: Activity): TeachHint {
     visual,
     kidLine: copy.kidLine,
     moreLine,
-    math: item.kind === 'math' || item.kind === 'choice' ? math : undefined,
+    math: clockLike ? undefined : item.kind === 'math' || item.kind === 'choice' ? math : undefined,
   }
 }

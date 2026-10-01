@@ -3,6 +3,7 @@ import { duckBgm } from '../lib/bgm'
 import { isGoogleTtsConfigured, synthesizeGoogleTts } from '../lib/googleTts'
 import { prepareSpokenText, toPlainSpoken } from '../lib/speakText'
 import { getVoiceSettings } from '../lib/voiceSettings'
+import { restoreSpeakerPlayback, speakerRestorePending } from '../lib/restoreSpeaker.ts'
 import { playMp3Bytes, stopTtsAudio, unlockAudio } from './useSfx'
 
 export type SpeakLang = 'zh-HK' | 'en-US'
@@ -381,24 +382,33 @@ export function useSpeech() {
       start()
     }
 
-    if (isGoogleTtsConfigured()) {
-      const ac = new AbortController()
-      abortRef.current = ac
-      void (async () => {
-        try {
-          const bytes = await synthesizeGoogleTts(trimmed, lang, ac.signal)
-          if (gen !== genRef.current) return
-          await playMp3Bytes(bytes)
-          finish()
-        } catch (err) {
-          if (gen !== genRef.current) return
-          if (err instanceof DOMException && err.name === 'AbortError') return
-          speakBrowser()
-        }
-      })()
+    const begin = () => {
+      if (gen !== genRef.current) return
+      if (isGoogleTtsConfigured()) {
+        const ac = new AbortController()
+        abortRef.current = ac
+        void (async () => {
+          try {
+            const bytes = await synthesizeGoogleTts(trimmed, lang, ac.signal)
+            if (gen !== genRef.current) return
+            await playMp3Bytes(bytes)
+            finish()
+          } catch (err) {
+            if (gen !== genRef.current) return
+            if (err instanceof DOMException && err.name === 'AbortError') return
+            speakBrowser()
+          }
+        })()
+        return
+      }
+      speakBrowser()
+    }
+
+    if (speakerRestorePending()) {
+      void restoreSpeakerPlayback().then(begin)
       return
     }
-    speakBrowser()
+    begin()
   }, [])
 
   const speakChunks = useCallback(

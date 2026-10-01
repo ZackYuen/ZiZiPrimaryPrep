@@ -1,7 +1,7 @@
 /** Content digitized from K3 學校專項每週練習（蔡繼有、聖保羅書院小學、王錦輝、播道）,
  *  plus an original 真道書院 practice track (group games + basics + parent talking points). */
 
-import { CHILD, type Activity } from './content'
+import { CHILD, type Activity } from './content.ts'
 
 const sw = (file: string) => `school-week/${file}`
 
@@ -922,6 +922,7 @@ export const schoolPlans: SchoolPlan[] = [
         flexibleSpeak: true,
         promptZh: '先聽《迷路的小狗》，再用一句講小希做咗咩。',
         sampleZh: PUPPY_STORY,
+        tip: '撳 ▶ 聽題會讀完整故仔。第一句：星期日下午，小希同媽媽去公園。',
       },
       {
         id: 'evg-puppy-1',
@@ -930,7 +931,10 @@ export const schoolPlans: SchoolPlan[] = [
         section: '專項一 · 理解',
         cue: '迷路的小狗',
         hintImage: sw('lost-puppy.jpg'),
+        listenToSample: true,
         promptZh: '故仔發生喺幾時？',
+        sampleZh: PUPPY_STORY,
+        tip: '撳 ▶ 聽故事。開頭一句有講星期幾同上下午。',
         choices: [
           { text: '星期日下午', correct: true },
           { text: '星期一早上', correct: false },
@@ -945,7 +949,9 @@ export const schoolPlans: SchoolPlan[] = [
         section: '專項一 · 理解',
         cue: '迷路的小狗',
         hintImage: sw('lost-puppy.jpg'),
+        listenToSample: true,
         promptZh: '小狗戴住咩？',
+        sampleZh: PUPPY_STORY,
         choices: [
           { text: '黃色帽子', correct: false },
           { text: '紅色頸圈', correct: true },
@@ -960,7 +966,9 @@ export const schoolPlans: SchoolPlan[] = [
         section: '專項一 · 理解',
         cue: '迷路的小狗',
         hintImage: sw('lost-puppy.jpg'),
+        listenToSample: true,
         promptZh: '媽媽點解唔俾小希即刻帶小狗返屋企？',
+        sampleZh: PUPPY_STORY,
         choices: [
           { text: '小狗太大', correct: false },
           { text: '主人可能喺附近搵緊', correct: true },
@@ -975,7 +983,9 @@ export const schoolPlans: SchoolPlan[] = [
         section: '專項一 · 理解',
         cue: '迷路的小狗',
         hintImage: sw('lost-puppy.jpg'),
+        listenToSample: true,
         promptZh: '管理員點樣搵到狗主人？',
+        sampleZh: PUPPY_STORY,
         choices: [
           { text: '睇頸圈電話', correct: true },
           { text: '問途人', correct: false },
@@ -990,7 +1000,9 @@ export const schoolPlans: SchoolPlan[] = [
         section: '專項一 · 理解',
         cue: '迷路的小狗',
         hintImage: sw('lost-puppy.jpg'),
+        listenToSample: true,
         promptZh: '小希做得好嘅地方係咩？',
+        sampleZh: PUPPY_STORY,
         choices: [
           { text: '自己帶走小狗', correct: false },
           { text: '大聲嚇小狗', correct: false },
