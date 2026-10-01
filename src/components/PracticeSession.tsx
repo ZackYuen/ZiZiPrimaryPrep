@@ -38,6 +38,7 @@ import { resolveTeachHint } from '../lib/teachHint'
 import { resolveMascotPresence } from '../lib/mascotPresence'
 import { CORRECT_CELEBRATION_MS, shouldCelebrateCorrect } from '../lib/correctCelebration'
 import { CLOCK_DIGIT_KEYS, mathDigitKeys } from '../lib/mathPad'
+import { clockFaceFor, clockPlaceholder, padKind, sessionKind } from '../lib/activityKind'
 import { TangramBoard } from './TangramBoard'
 import { SimonGame } from './SimonGame'
 import { BuildBoard } from './BuildBoard'
@@ -133,6 +134,8 @@ export function PracticeSession({
   const [gameSolved, setGameSolved] = useState(false)
 
   const item = items[index]
+  const kindPad = padKind(item)
+  const clockFace = clockFaceFor(item)
   const isStoryFocus = item.id === 'd1-en-story'
   const readAloud = isReadAloud(item)
   const isLast = index >= items.length - 1
@@ -375,7 +378,7 @@ export function PracticeSession({
 
   const isSolved = (): boolean => {
     if (item.kind === 'choice') return solvedChoice
-    if (item.kind === 'math' || item.kind === 'clock' || item.kind === 'money') {
+    if (kindPad === 'math' || kindPad === 'clock' || kindPad === 'money') {
       return mathResult === 'ok'
     }
     if (item.kind === 'reorder') return reorderCorrect
@@ -527,7 +530,7 @@ export function PracticeSession({
     else setMoneyJiao((p) => `${p}${key}`)
   }
 
-  const isPadKind = item.kind === 'math' || item.kind === 'clock' || item.kind === 'money'
+  const isPadKind = kindPad === 'math' || kindPad === 'clock' || kindPad === 'money'
   const quietFooter = !done && !canProceed()
   const fillStem =
     !!item.scene ||
@@ -535,7 +538,7 @@ export function PracticeSession({
     (!artHidden && !item.hideArt && !!item.hintImage) ||
     (!isStoryFocus &&
       !item.scene &&
-      !item.clock &&
+      !clockFace &&
       !item.coins &&
       item.calendarDay == null &&
       !(teach.math && !item.hintImage && !item.pictureStrip) &&
@@ -599,7 +602,7 @@ export function PracticeSession({
 
   return (
     <section
-      className={`session session--practice session--kind-${item.kind}`}
+      className={`session session--practice session--kind-${sessionKind(item)}`}
       style={{ '--accent': accent } as CSSProperties}
     >
       {showCorrectCeleb && <CorrectCelebration onDone={() => setShowCorrectCeleb(false)} />}
@@ -739,7 +742,7 @@ export function PracticeSession({
           )}
           {!isStoryFocus &&
             !item.scene &&
-            !item.clock &&
+            !clockFace &&
             !item.coins &&
             item.calendarDay == null &&
             !(teach.math && !item.hintImage && !item.pictureStrip) &&
@@ -755,7 +758,7 @@ export function PracticeSession({
               <HintPicture visual={teach.visual} />
             </div>
           )}
-          {item.clock && <AnalogClock hour={item.clock.hour} minute={item.clock.minute} />}
+          {clockFace && <AnalogClock hour={clockFace.hour} minute={clockFace.minute} />}
           {item.coins && item.purseOwner && <CoinPurse owner={item.purseOwner} coins={item.coins} />}
           {item.calendarDay != null && <JuneCalendar highlightDay={item.calendarDay} />}
 
@@ -808,7 +811,7 @@ export function PracticeSession({
                   hideArt={
                     !!teach.math ||
                     (!item.scene &&
-                      !item.clock &&
+                      !clockFace &&
                       !item.coins &&
                       item.calendarDay == null &&
                       !item.hintImage &&
@@ -1206,12 +1209,12 @@ export function PracticeSession({
             </div>
           )}
 
-          {item.kind === 'clock' && (
+          {kindPad === 'clock' && (
             <>
               <AnswerPad
                 label="撳數字，再撳 ✓"
                 value={mathInput}
-                placeholder="__:__"
+                placeholder={clockPlaceholder(item)}
                 keys={CLOCK_DIGIT_KEYS}
                 locked={mathResult === 'ok'}
                 padLabel="時間鍵盤"
@@ -1327,7 +1330,7 @@ export function PracticeSession({
             </div>
           )}
 
-          {item.kind === 'math' && (
+          {kindPad === 'math' && (
             <>
               <AnswerPad
                 label="撳數字，再撳 ✓"
