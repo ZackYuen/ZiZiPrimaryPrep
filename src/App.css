@@ -6246,6 +6246,47 @@ button.picture-strip__item--choice {
   border-radius: 999px;
 }
 
+.picture-strip__item .kid-count {
+  flex: 1 1 auto;
+  min-height: 5.5rem;
+  border-radius: 12px 12px 0 0;
+}
+
+.picture-strip__item .kid-count .kid-count__item,
+.session__stem .picture-strip__item .kid-count .kid-count__item {
+  flex: 0 0 auto;
+  width: 30%;
+  max-width: 3rem;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.picture-strip__item .kid-count--1 .kid-count__item,
+.picture-strip__item .kid-count--2 .kid-count__item,
+.session__stem .picture-strip__item .kid-count--1 .kid-count__item,
+.session__stem .picture-strip__item .kid-count--2 .kid-count__item {
+  width: 40%;
+  max-width: 3.6rem;
+}
+
+.picture-strip__item .kid-count--plate {
+  flex: 0 0 auto;
+  width: min(100%, 11rem);
+  margin: 0 auto;
+  padding: 14%;
+  border-radius: 999px;
+}
+
+.picture-strip__item .kid-count--plate .kid-count__item,
+.session__stem .picture-strip__item .kid-count--plate .kid-count__item {
+  width: 40%;
+  max-width: 3.2rem;
+  border-radius: 999px;
+}
+
 .hint-count .kid-count {
   width: min(320px, 86vw);
   min-height: 8rem;
@@ -6312,7 +6353,6 @@ button.picture-strip__item--choice {
 .picture-strip--scenes .picture-strip__item {
   min-height: 0;
 }
-
 .picture-strip--scenes .kid-pic {
   width: 100%;
   max-width: none;
