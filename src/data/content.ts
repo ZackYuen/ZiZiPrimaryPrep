@@ -84,13 +84,28 @@ export type KidPicId =
   | 'cake'
   | 'gift'
   | 'door'
+  | 'party-room'
   | 'apple'
+  | 'orange'
+  | 'book'
+  | 'spoon'
   | 'cat'
   | 'teddy'
   | 'long-pencil'
   | 'short-crayon'
   | 'park-full'
   | 'park-empty'
+  | 'zoo'
+  | 'library'
+  | 'rain'
+  | 'eat'
+  | 'sleep'
+  | 'mall-staff'
+  | 'mall-alone'
+  | 'mall-stranger'
+  | 'fall-help'
+  | 'fall-laugh'
+  | 'fall-ignore'
   | 'star'
 
 export type PlaceCell = 'tl' | 'tr' | 'bl' | 'br'
@@ -123,6 +138,30 @@ export type SortItem = {
 export type Choice = {
   text: string
   correct: boolean
+  /** Chat cards: model sentence spoken back after he taps this answer. */
+  say?: string
+}
+
+/** A picture choice: one plate, a counted group of a plate, or one jigsaw square. */
+export type PictureChoice = {
+  src: string
+  label: string
+  kidPic?: KidPicId
+  kidShadow?: boolean
+  /** Show this many copies of kidPic (1–5) so he counts instead of reads. */
+  count?: number
+  /** Draw the group on a plate (「邊碟多啲」). */
+  plate?: boolean
+  /** Colour ring for colour chat cards. */
+  ring?: string
+  /** One square of a 3×3 cut of kidPic. */
+  piece?: { col: number; row: number }
+}
+
+export type JigsawHole = {
+  pic: KidPicId
+  col: number
+  row: number
 }
 
 /** Hong Kong coin face values in dollars (0.1 = 1 角) */
@@ -206,7 +245,15 @@ export type Activity = {
   /** Read-the-words: big 「讀完啦」, no recording required. */
   readAloud?: boolean
   /** Labelled picture strip, e.g. A–D story cards. */
-  pictureStrip?: { src: string; label: string; kidPic?: KidPicId; kidShadow?: boolean }[]
+  pictureStrip?: PictureChoice[]
+  /** Big counted group shown above the choices. */
+  hintCount?: { pic: KidPicId; n: number }
+  /** Square plate with one 3×3 square cut out; choices are pieces. */
+  jigsaw?: JigsawHole
+  /** Any answer is right; the voice repeats his choice as a sentence and he moves on when ready. */
+  chatCard?: boolean
+  /** Lay wide scene choices out one per row so each is big enough to read the situation. */
+  sceneChoices?: boolean
   /** Show hintImage / pictureStrip for this many seconds, then hide. */
   lookSeconds?: number
   tangram?: TangramGame
