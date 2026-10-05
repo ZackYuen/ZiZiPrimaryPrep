@@ -1690,11 +1690,11 @@ export const schoolPlans: SchoolPlan[] = [
         hideArt: true,
         autoSpeak: true,
         instantSort: true,
-        promptZh: '食得嘅放去蘋果格，動物放去熊貓格。',
+        promptZh: '食得嘅放去蘋果格，動物放去企鵝格。',
         buckets: ['食物', '動物'],
         bucketLooks: {
           食物: { kidPic: 'apple' },
-          動物: { kidPic: 'panda' },
+          動物: { kidPic: 'penguin' },
         },
         sortItems: [
           { text: '紅蘿蔔', bucket: '食物', kidPic: 'carrot' },
@@ -1813,12 +1813,12 @@ export const schoolPlans: SchoolPlan[] = [
         choices: [
           { text: '兔仔', correct: true },
           { text: '貓仔', correct: false },
-          { text: '熊貓', correct: false },
+          { text: '企鵝', correct: false },
         ],
         pictureStrip: [
           { src: 'kid:rabbit-q', label: '', kidPic: 'rabbit' },
           { src: 'kid:cat-q', label: '', kidPic: 'cat' },
-          { src: 'kid:panda-q', label: '', kidPic: 'panda' },
+          { src: 'kid:penguin-q', label: '', kidPic: 'penguin' },
         ],
       },
       {

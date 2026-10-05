@@ -484,7 +484,7 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
     moreLine: '鉛筆長，蠟筆短。',
   },
   'dbs-sort-type': {
-    kidLine: '食得嘅放蘋果格，動物放熊貓格。',
+    kidLine: '食得嘅放蘋果格，動物放企鵝格。',
     moreLine: '紅蘿蔔同蛋糕食得；兔仔同貓仔係動物。',
   },
   'dbs-place-tl': {

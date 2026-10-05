@@ -5969,8 +5969,8 @@ button.picture-strip__item--choice {
 }
 
 .place-grid__cell.is-over {
-  border-color: #6bcb8b;
-  background: #eef9f0;
+  border-color: #7ea8d6;
+  background: #eef4fb;
 }
 
 .place-grid__ghost {
@@ -6081,8 +6081,33 @@ button.picture-strip__item--choice {
 /* ---- 家長須知 (in-session, adult only) ---- */
 
 .session__parent-btn {
+  flex: 0 0 auto;
   font-weight: 900;
   color: #1b4f8a;
+}
+
+.session__top .session__progress {
+  min-width: 0;
+}
+
+.session__top .session__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .session__parent-btn {
+    width: 2.65rem;
+    min-width: 2.65rem;
+    height: 2.65rem;
+    padding: 0;
+    font-size: 1.05rem;
+  }
+
+  .session__top .sound-toggle {
+    flex: 0 0 auto;
+  }
 }
 
 .parent-sheet {

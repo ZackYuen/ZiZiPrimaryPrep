@@ -19,7 +19,7 @@ const ART: Record<KidPicId, string> = {
   bamboo: 'school-week/games/mem-bamboo.jpg',
   carrot: 'school-week/games/mem-carrot.jpg',
   rabbit: 'school-week/games/mem-rabbit.jpg',
-  panda: 'school-week/games/mem-panda.jpg',
+  penguin: 'school-week/games/mem-penguin.jpg',
   cake: 'school-week/games/party-cake.jpg',
   gift: 'school-week/games/party-gift.jpg',
   door: 'school-week/games/simon-door.jpg',

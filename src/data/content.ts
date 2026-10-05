@@ -80,7 +80,7 @@ export type KidPicId =
   | 'bamboo'
   | 'carrot'
   | 'rabbit'
-  | 'panda'
+  | 'penguin'
   | 'cake'
   | 'gift'
   | 'door'
