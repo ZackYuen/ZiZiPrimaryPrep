@@ -14,6 +14,7 @@ export const KID = {
   starOk: '★',
   readDone: '★ 讀完啦',
   speakDone: '★ 講完啦',
+  lookDone: '★ 睇完喇',
   mic: '●',
   micStop: '■',
   micLabel: '●',

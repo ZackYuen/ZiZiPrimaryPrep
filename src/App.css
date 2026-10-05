@@ -5687,3 +5687,165 @@ button.picture-strip__item--choice {
   height: 100%;
   display: block;
 }
+
+.session--kid-voice .session__q,
+.session--kid-voice .session__q-en {
+  font-size: 1rem;
+  font-weight: 650;
+  color: var(--ink-soft, #5a6570);
+}
+
+.session--kid-voice .session__cue {
+  opacity: 0.72;
+}
+
+.look-then {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  margin: 0 0 0.75rem;
+}
+
+.kid-pic {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.kid-pic--shadow {
+  background: #e8e4d8;
+}
+
+.picture-strip--quiet .picture-strip__caption,
+.picture-strip--quiet figcaption {
+  display: none;
+}
+
+.picture-strip--story {
+  margin-bottom: 0.4rem;
+}
+
+.picture-strip__item .kid-pic {
+  max-width: none;
+}
+
+.place-grid {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.place-grid.is-shake {
+  animation: place-shake 0.35s ease;
+}
+
+@keyframes place-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-6px);
+  }
+  60% {
+    transform: translateX(6px);
+  }
+}
+
+.place-grid__box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.55rem;
+  min-height: 16rem;
+}
+
+.place-grid__cell {
+  min-height: 7.2rem;
+  border-radius: 22px;
+  border: 4px solid rgba(27, 79, 138, 0.22);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.place-grid__cell .kid-pic {
+  max-width: 96px;
+}
+
+.place-grid__dot {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  background: rgba(27, 79, 138, 0.16);
+}
+
+.place-grid__cell.is-picked,
+.place-grid__cell.is-correct {
+  border-color: #6bcb8b;
+  box-shadow: 0 0 0 4px #6bcb8b55;
+  background: #f3fbf4;
+}
+
+.place-grid__cell.is-wrong {
+  border-color: #e85d75;
+  opacity: 0.55;
+}
+
+.sort-box--pics .sort-bucket {
+  min-height: 10rem;
+}
+
+.sort-bucket__swatch {
+  display: block;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 999px;
+  border: 3px solid rgba(27, 58, 75, 0.2);
+  margin: 0 auto 0.35rem;
+}
+
+.sort-bucket__bar {
+  display: block;
+  height: 1.15rem;
+  border-radius: 999px;
+  margin: 0.35rem auto 0.2rem;
+  border: 3px solid rgba(27, 58, 75, 0.18);
+}
+
+.sort-bucket__bar--long {
+  width: 88%;
+}
+
+.sort-bucket__bar--short {
+  width: 36%;
+}
+
+.sort-box--pics .chip--pic {
+  padding: 0.2rem;
+  min-width: 5.4rem;
+  min-height: 4.6rem;
+  border-radius: 18px;
+}
+
+.sort-box--pics .chip--pic .kid-pic {
+  max-width: 88px;
+}
+
+@media (max-width: 520px) {
+  .place-grid__box {
+    min-height: 14rem;
+  }
+
+  .place-grid__cell {
+    min-height: 6.4rem;
+  }
+}

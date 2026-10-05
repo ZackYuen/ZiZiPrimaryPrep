@@ -9,7 +9,7 @@ import { Mascot } from './components/Mascot'
 import { SoundToggle } from './components/SoundToggle'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { CHILD, days, getDay, mockInterview, type DayId } from './data/content'
-import { getSchool, schoolPlans, type SchoolId } from './data/schoolWeek'
+import { getSchool, isSchoolId, schoolPlans, type SchoolId } from './data/schoolWeek'
 import { storyInterviews } from './data/storyInterview'
 import { useProgress } from './hooks/useProgress'
 import { useBackgroundMusic } from './hooks/useBackgroundMusic'
@@ -36,13 +36,7 @@ function viewFromSearch(): View {
   if (typeof window === 'undefined') return { name: 'home' }
   const p = new URLSearchParams(window.location.search)
   const school = p.get('school')
-  if (
-    school === 'cky' ||
-    school === 'spcc' ||
-    school === 'wkf' ||
-    school === 'evangel' ||
-    school === 'jando'
-  ) {
+  if (school && isSchoolId(school)) {
     return { name: 'school', id: school }
   }
   const day = p.get('day')

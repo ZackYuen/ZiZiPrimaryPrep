@@ -53,6 +53,16 @@ function SchoolGlyph({ id }: { id: SchoolPlan['id'] }) {
       </svg>
     )
   }
+  if (id === 'dbs') {
+    return (
+      <svg className="day-glyph" viewBox="0 0 64 64" aria-hidden>
+        <rect width="64" height="64" rx="18" fill="#7EA8D6" />
+        <rect x="14" y="16" width="36" height="36" rx="8" fill="#fff" />
+        <path d="M32 16 v36 M14 34 h36" stroke="#1B4F8A" strokeWidth="3" />
+        <polygon points="23,23 26,29 32,29 27,33 29,39 23,35 17,39 19,33 14,29 20,29" fill="#F5C84C" />
+      </svg>
+    )
+  }
   return (
     <svg className="day-glyph" viewBox="0 0 64 64" aria-hidden>
       <rect width="64" height="64" rx="18" fill="#F5C84C" />

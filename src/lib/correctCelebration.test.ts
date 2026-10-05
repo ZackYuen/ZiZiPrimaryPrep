@@ -24,6 +24,7 @@ describe('shouldCelebrateCorrect', () => {
       'simon',
       'build',
       'memory',
+      'place',
     ]
     for (const kind of scored) {
       assert.equal(shouldCelebrateCorrect(kind, false), true)
