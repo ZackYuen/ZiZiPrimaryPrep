@@ -14,6 +14,7 @@ const SCORED_KINDS: ReadonlySet<ActivityKind> = new Set([
   'simon',
   'build',
   'memory',
+  'place',
 ])
 
 /**

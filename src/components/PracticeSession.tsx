@@ -44,6 +44,10 @@ import { SimonGame } from './SimonGame'
 import { BuildBoard } from './BuildBoard'
 import { MemoryMatch } from './MemoryMatch'
 import { Mascot } from './Mascot'
+import { KidPic } from './KidPic'
+import { PlaceGrid } from './PlaceGrid'
+import { ParentNoteSheet } from './ParentNoteSheet'
+import type { SchoolParentNote } from '../data/schoolWeek'
 
 type Props = {
   title: string
@@ -54,6 +58,8 @@ type Props = {
   onMarkDone: (itemId: string, moduleKey: ModuleKey) => void
   onBack: () => void
   celebrate?: boolean
+  /** Adult-only note opened from the header; not part of the quiz. */
+  parentNote?: SchoolParentNote
 }
 
 const MONEY_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '✓'] as const
@@ -84,6 +90,7 @@ export function PracticeSession({
   onMarkDone,
   onBack,
   celebrate = false,
+  parentNote,
 }: Props) {
   const [index, setIndex] = useState(() => startIndexFor(items))
   const [showSample, setShowSample] = useState(false)
@@ -132,6 +139,8 @@ export function PracticeSession({
   const [artHidden, setArtHidden] = useState(false)
   const [lookLeft, setLookLeft] = useState<number | null>(null)
   const [gameSolved, setGameSolved] = useState(false)
+  const [looked, setLooked] = useState(true)
+  const [parentOpen, setParentOpen] = useState(false)
 
   const item = items[index]
   const kindPad = padKind(item)
@@ -226,6 +235,7 @@ export function PracticeSession({
     setArtHidden(!!_activity.hideArt)
     setLookLeft(_activity.lookSeconds ?? null)
     setGameSolved(false)
+    setLooked(!_activity.lookThen)
     if (_activity.kind === 'reorder' && _activity.fragments) {
       const shuffled = [..._activity.fragments].sort(() => Math.random() - 0.5)
       setPool(shuffled)
@@ -391,7 +401,8 @@ export function PracticeSession({
       item.kind === 'tangram' ||
       item.kind === 'simon' ||
       item.kind === 'build' ||
-      item.kind === 'memory'
+      item.kind === 'memory' ||
+      item.kind === 'place'
     ) {
       return gameSolved
     }
@@ -411,11 +422,15 @@ export function PracticeSession({
 
   const playQuestion = () => {
     unlockAudio()
+    if (item.lookThen && !looked) {
+      speak(item.lookThen.promptZh || '睇清楚幅圖，睇完撳星星。', 'zh-HK')
+      return
+    }
     if (isStoryFocus) {
       speak(item.promptZh, looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK')
       return
     }
-    if (listenStory && listenStory.length > 80) {
+    if (listenStory && (listenStory.length > 80 || item.hideStoryText || item.autoSpeak)) {
       const storyLang = looksEnglish(listenStory) ? 'en-US' : 'zh-HK'
       const qLang = looksEnglish(item.promptZh) ? 'en-US' : 'zh-HK'
       if (item.kind === 'choice' && item.promptZh && storyLang === qLang) {
@@ -437,14 +452,15 @@ export function PracticeSession({
   }
 
   useEffect(() => {
-    if (item.kind !== 'speak') return
+    if (item.kind !== 'speak' && !item.autoSpeak) return
+    if (parentOpen) return
     const timer = window.setTimeout(() => {
       playQuestion()
     }, 400)
     return () => window.clearTimeout(timer)
     // Replay only when the question changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [item.id])
+  }, [item.id, looked, parentOpen])
 
   const canProceed = (): boolean => {
     if (done) return true
@@ -455,7 +471,8 @@ export function PracticeSession({
       item.kind === 'tangram' ||
       item.kind === 'simon' ||
       item.kind === 'build' ||
-      item.kind === 'memory'
+      item.kind === 'memory' ||
+      item.kind === 'place'
     ) {
       return isSolved()
     }
@@ -565,7 +582,8 @@ export function PracticeSession({
       item.kind !== 'tangram' &&
       item.kind !== 'simon' &&
       item.kind !== 'build' &&
-      item.kind !== 'memory')
+      item.kind !== 'memory' &&
+      item.kind !== 'place')
 
   const heardText = spokenText.trim()
   const speakFailWithoutText =
@@ -618,7 +636,7 @@ export function PracticeSession({
 
   return (
     <section
-      className={`session session--practice session--kind-${sessionKind(item)}`}
+      className={`session session--practice session--kind-${sessionKind(item)}${item.autoSpeak ? ' session--kid-voice' : ''}`}
       style={{ '--accent': accent } as CSSProperties}
     >
       {showCorrectCeleb && <CorrectCelebration onDone={() => setShowCorrectCeleb(false)} />}
@@ -662,8 +680,25 @@ export function PracticeSession({
             <div style={{ width: `${((index + 1) / items.length) * 100}%` }} />
           </div>
         </div>
+        {parentNote && (
+          <button
+            type="button"
+            className="ghost-btn session__parent-btn"
+            onClick={() => {
+              stop()
+              playSfx('flip')
+              setParentOpen(true)
+            }}
+            aria-label="家長須知"
+          >
+            {KID.parentHint}
+          </button>
+        )}
         <SoundToggle />
       </header>
+      {parentNote && parentOpen && (
+        <ParentNoteSheet title={title} note={parentNote} onClose={() => setParentOpen(false)} />
+      )}
 
       <div className={`session__layout ${isStoryFocus ? 'session__layout--story' : ''}`}>
         <div
@@ -681,8 +716,55 @@ export function PracticeSession({
           </div>
 
           {item.scene && <SceneArt scene={item.scene} alt={item.promptZh} />}
-          {!artHidden && !item.hideArt && item.pictureStrip && item.pictureStrip.length > 0 && (
-            <div className={`picture-strip picture-strip--${item.pictureStrip.length}`}>
+          {item.lookThen && !looked && (
+            <div className="look-then">
+              <div className="hint-pic-wrap">
+                <KidPic id={item.lookThen.first} size={280} />
+              </div>
+              <button
+                type="button"
+                className="primary-btn primary-btn--wide"
+                onClick={() => {
+                  unlockAudio()
+                  playSfx('tap')
+                  setLooked(true)
+                }}
+                aria-label="睇完喇"
+              >
+                {KID.lookDone}
+              </button>
+            </div>
+          )}
+          {item.lookThen && looked && (
+            <div className="hint-pic-wrap look-then__second">
+              <KidPic id={item.lookThen.second} size={240} />
+              {item.lookThen.missingAt && !solvedChoice && !revealAnswer && (
+                <span
+                  className="look-then__missing"
+                  style={{ left: `${item.lookThen.missingAt.x}%`, top: `${item.lookThen.missingAt.y}%` }}
+                  aria-hidden
+                >
+                  ?
+                </span>
+              )}
+            </div>
+          )}
+          {item.hintKidPic && !item.lookThen && (
+            <div className="hint-pic-wrap">
+              <KidPic id={item.hintKidPic} size={220} />
+            </div>
+          )}
+          {item.storyPics && item.storyPics.length > 0 && (
+            <div className={`picture-strip picture-strip--${item.storyPics.length} picture-strip--story`}>
+              {item.storyPics.map((picId) => (
+                <figure key={picId} className="picture-strip__item">
+                  <KidPic id={picId} size={160} />
+                </figure>
+              ))}
+            </div>
+          )}
+          {looked && item.pictureStrip && item.pictureStrip.length > 0 && (
+            <div className={`picture-strip picture-strip--${item.pictureStrip.length}${item.hideChoiceWords ? ' picture-strip--quiet' : ''}`}>
               {item.pictureStrip.map((pic, picIndex) => {
                 const choice = item.kind === 'choice' ? item.choices?.[picIndex] : undefined
                 const selected = picked === picIndex
@@ -690,17 +772,20 @@ export function PracticeSession({
                 const showCorrect = (solvedChoice || revealAnswer) && !!choice?.correct
                 const lockedChoice = solvedChoice || revealAnswer
                 const clickable = !!choice && item.kind === 'choice'
-                const body = (
-                  <>
-                    <img src={mediaSrc(pic.src)} alt="" width={240} height={180} />
-                    <span className="picture-strip__caption">{pic.label}</span>
-                  </>
+                const art = pic.kidPic ? (
+                  <KidPic id={pic.kidPic} shadow={pic.kidShadow} size={200} />
+                ) : (
+                  <img src={mediaSrc(pic.src)} alt="" width={240} height={180} />
                 )
+                const caption =
+                  item.hideChoiceWords || !pic.label ? null : (
+                    <span className="picture-strip__caption">{pic.label}</span>
+                  )
                 if (!clickable) {
                   return (
                     <figure key={pic.src} className="picture-strip__item">
-                      <img src={mediaSrc(pic.src)} alt="" width={240} height={180} />
-                      <figcaption>{pic.label}</figcaption>
+                      {art}
+                      {pic.label && !item.hideChoiceWords ? <figcaption>{pic.label}</figcaption> : null}
                     </figure>
                   )
                 }
@@ -734,13 +819,14 @@ export function PracticeSession({
                       }
                     }}
                   >
-                    {body}
+                    {art}
+                    {caption}
                   </button>
                 )
               })}
             </div>
           )}
-          {!artHidden && !item.hideArt && item.hintImage && (
+          {!artHidden && item.hintImage && (
             <div className="hint-pic-wrap">
               <img
                 className="hint-pic hint-pic--picture-book"
@@ -769,7 +855,10 @@ export function PracticeSession({
             item.kind !== 'tangram' &&
             item.kind !== 'simon' &&
             item.kind !== 'build' &&
-            item.kind !== 'memory' && (
+            item.kind !== 'memory' &&
+            item.kind !== 'place' &&
+            !item.hintKidPic &&
+            !item.lookThen && (
             <div className="hint-pic-wrap">
               <HintPicture visual={teach.visual} />
             </div>
@@ -777,7 +866,7 @@ export function PracticeSession({
           {clockFace && <AnalogClock hour={clockFace.hour} minute={clockFace.minute} />}
           {item.coins && item.purseOwner && <CoinPurse owner={item.purseOwner} coins={item.coins} />}
           {item.calendarDay != null && <JuneCalendar highlightDay={item.calendarDay} />}
-          {listenStory && item.kind !== 'speak' && !isStoryFocus && (
+          {listenStory && item.kind !== 'speak' && !isStoryFocus && !item.hideStoryText && (
             <div className="story-listen">
               <p className="story-listen__cue">先聽故仔</p>
               <p className="story-listen__body">{listenStory}</p>
@@ -808,8 +897,12 @@ export function PracticeSession({
           ) : (
             <>
               <div className={isPadKind ? 'session__q-block' : undefined}>
-              <h2 className="session__q">{item.promptZh}</h2>
-              {item.promptEn && <p className="session__q-en">{item.promptEn}</p>}
+              <h2 className="session__q">
+                {item.lookThen && !looked
+                  ? item.lookThen.promptZh || '睇清楚幅圖，睇完撳星星。'
+                  : item.promptZh}
+              </h2>
+              {item.promptEn && looked && <p className="session__q-en">{item.promptEn}</p>}
 
               <div className={`session__tools ${isPadKind ? 'session__tools--quiet' : ''}`}>
                 <div className="session__actions">
@@ -1411,14 +1504,32 @@ export function PracticeSession({
                 pool={pool}
                 placement={sortPlacement}
                 answerByText={Object.fromEntries(item.sortItems.map((s) => [s.text, s.bucket]))}
+                artByText={Object.fromEntries(
+                  item.sortItems.filter((s) => s.kidPic).map((s) => [s.text, s.kidPic!]),
+                )}
+                bucketLooks={item.bucketLooks}
+                pictureMode={!!item.instantSort || item.sortItems.some((s) => s.kidPic)}
                 locked={sortChecked && sortCorrect}
                 checked={sortChecked}
                 reveal={revealAnswer}
                 onPlace={(text, bucket) => {
                   unlockAudio()
-                  setSortPlacement((prev) => ({ ...prev, [text]: bucket }))
+                  const correctBucket = item.sortItems?.find((s) => s.text === text)?.bucket
+                  if (item.instantSort && correctBucket && correctBucket !== bucket) {
+                    playSfx('wrong')
+                    registerWrong(item.tip)
+                    return
+                  }
+                  const next = { ...sortPlacement, [text]: bucket }
+                  setSortPlacement(next)
                   setSortChecked(false)
                   setCoachMsg(null)
+                  if (item.instantSort && item.sortItems?.every((s) => next[s.text] === s.bucket)) {
+                    setSortChecked(true)
+                    playSfx('correct')
+                    setCoachMsg('全部分對啦！好叻！')
+                    awardAndMaybeNext(true)
+                  }
                 }}
                 onReturn={(text) => {
                   setSortPlacement((prev) => {
@@ -1431,6 +1542,7 @@ export function PracticeSession({
                 }}
               />
               <div className="session__actions">
+                {!item.instantSort && (
                 <button
                   type="button"
                   className="pill-btn"
@@ -1451,6 +1563,7 @@ export function PracticeSession({
                 >
                   {KID.check}
                 </button>
+                )}
                 {!sortCorrect && !revealAnswer && wrongAttempts >= 1 && (
                   <button
                     type="button"
@@ -1543,10 +1656,21 @@ export function PracticeSession({
             />
           )}
 
+          {item.kind === 'place' && item.place && (
+            <PlaceGrid
+              target={item.place.target}
+              locked={gameSolved}
+              reveal={revealAnswer}
+              onSolved={solveGame}
+              onWrong={noteGameWrong}
+            />
+          )}
+
           {(item.kind === 'tangram' ||
             item.kind === 'simon' ||
             item.kind === 'build' ||
-            item.kind === 'memory') && (
+            item.kind === 'memory' ||
+            item.kind === 'place') && (
             <>
               {coachMsg && (
                 <p className={`math-feedback ${gameSolved ? 'is-ok' : 'is-no'}`}>{coachMsg}</p>

@@ -18,6 +18,7 @@ export type ActivityKind =
   | 'simon'
   | 'build'
   | 'memory'
+  | 'place'
 
 export type TangramMode = 'assemble' | 'pair' | 'count' | 'count-tri'
 export type TangramShape = 'triangle' | 'boat'
@@ -67,9 +68,56 @@ export type MemoryGame = {
   pairs: { id: string; a: MemoryFace; b: MemoryFace }[]
 }
 
+/** Watercolour plates reused from the Simon / memory / party games (see KidPic). */
+export type KidPicId =
+  | 'stand'
+  | 'turn'
+  | 'sit'
+  | 'foot'
+  | 'banana'
+  | 'hat'
+  | 'umbrella'
+  | 'bamboo'
+  | 'carrot'
+  | 'rabbit'
+  | 'penguin'
+  | 'cake'
+  | 'gift'
+  | 'door'
+  | 'apple'
+  | 'cat'
+  | 'teddy'
+  | 'long-pencil'
+  | 'short-crayon'
+  | 'park-full'
+  | 'park-empty'
+  | 'star'
+
+export type PlaceCell = 'tl' | 'tr' | 'bl' | 'br'
+
+export type PlaceGame = {
+  target: PlaceCell
+}
+
+export type LookThen = {
+  first: KidPicId
+  second: KidPicId
+  /** Spoken while the first picture is up. */
+  promptZh?: string
+  /** Where the missing thing was on the second picture (percent of width / height). */
+  missingAt?: { x: number; y: number }
+}
+
+export type BucketLook = {
+  color?: string
+  kidPic?: KidPicId
+  bar?: 'long' | 'short'
+}
+
 export type SortItem = {
   text: string
   bucket: string
+  kidPic?: KidPicId
 }
 
 export type Choice = {
@@ -122,6 +170,24 @@ export type Activity = {
   sortItems?: SortItem[]
   /** Bucket labels in display order */
   buckets?: string[]
+  /** Picture / colour bins for a 5-year-old who cannot read the bucket words. */
+  bucketLooks?: Record<string, BucketLook>
+  /** Check each drop immediately; celebrate when every picture is in the right bin. */
+  instantSort?: boolean
+  /** Spoken 2×2 box: tap one cell. */
+  place?: PlaceGame
+  /** Show picture A, wait for ★ 睇完喇, then picture B + tap what is missing. */
+  lookThen?: LookThen
+  /** Big picture drawn in-app (no extra photo file). */
+  hintKidPic?: KidPicId
+  /** Mini-story shown as pictures instead of a paragraph. */
+  storyPics?: KidPicId[]
+  /** Do not print the story script on screen — voice + pictures only. */
+  hideStoryText?: boolean
+  /** Auto-play the spoken prompt so a non-reader can start. */
+  autoSpeak?: boolean
+  /** Hide A/B/中文 captions on picture choices — parent can still hear ▶. */ 
+  hideChoiceWords?: boolean
   /** Analog clock face for clock-reading activities */
   clock?: { hour: number; minute: number }
   /** Coins shown in a purse for money-counting activities */
@@ -140,7 +206,7 @@ export type Activity = {
   /** Read-the-words: big 「讀完啦」, no recording required. */
   readAloud?: boolean
   /** Labelled picture strip, e.g. A–D story cards. */
-  pictureStrip?: { src: string; label: string }[]
+  pictureStrip?: { src: string; label: string; kidPic?: KidPicId; kidShadow?: boolean }[]
   /** Show hintImage / pictureStrip for this many seconds, then hide. */
   lookSeconds?: number
   tangram?: TangramGame

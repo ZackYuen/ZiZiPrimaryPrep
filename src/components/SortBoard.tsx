@@ -1,6 +1,8 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { playSfx } from '../hooks/useSfx'
+import type { BucketLook, KidPicId } from '../data/content'
+import { KidPic } from './KidPic'
 
 type DragFrom = { kind: 'pool' } | { kind: 'bucket'; bucket: string }
 
@@ -23,12 +25,32 @@ type Props = {
   reveal?: boolean
   onPlace: (text: string, bucket: string) => void
   onReturn: (text: string) => void
+  artByText?: Record<string, KidPicId>
+  bucketLooks?: Record<string, BucketLook>
+  pictureMode?: boolean
 }
 
 function bucketLabel(bucket: string): string {
   if (bucket === '正面的') return '＋'
   if (bucket === '負面的') return '－'
   return bucket
+}
+
+function BucketMark({ look, label }: { look: BucketLook; label: string }) {
+  if (look.kidPic) return <KidPic id={look.kidPic} size={64} />
+  if (look.bar) {
+    return (
+      <span
+        className={`sort-bucket__bar sort-bucket__bar--${look.bar}`}
+        style={{ background: look.color || '#E85D75' }}
+        aria-label={label}
+      />
+    )
+  }
+  if (look.color) {
+    return <span className="sort-bucket__swatch" style={{ background: look.color }} aria-label={label} />
+  }
+  return <>{bucketLabel(label)}</>
 }
 
 /**
@@ -45,6 +67,9 @@ export function SortBoard({
   reveal,
   onPlace,
   onReturn,
+  artByText = {},
+  bucketLooks = {},
+  pictureMode = false,
 }: Props) {
   const canPointer = typeof window !== 'undefined' && 'PointerEvent' in window
   const [selected, setSelected] = useState<string | null>(null)
@@ -218,27 +243,33 @@ export function SortBoard({
     drag && ghostOn
       ? createPortal(
           <div
-            className="reorder__ghost chip chip--placed"
+            className={`reorder__ghost chip chip--placed ${pictureMode ? 'chip--pic' : ''}`}
             style={{ left: drag.x, top: drag.y }}
             aria-hidden
           >
-            {drag.text}
+            {artByText[drag.text] ? <KidPic id={artByText[drag.text]} size={110} /> : drag.text}
           </div>,
           document.body,
         )
       : null
 
-  const hint = canPointer
+  const hint = pictureMode
     ? selected
-      ? `已揀「${selected}」→ 拖去或撳 ＋ / －`
-      : '拖詞去 ＋ / － （亦可先撳再撳圓圈）'
-    : selected
-      ? `已揀「${selected}」→ 再撳 ＋ 或 －`
-      : '先撳詞，再撳 ＋ 或 －'
+      ? '再撳大格'
+      : canPointer
+        ? '拖圖去大格，或者先撳圖再撳格'
+        : '先撳圖，再撳大格'
+    : canPointer
+      ? selected
+        ? `已揀「${selected}」→ 拖去或撳 ＋ / －`
+        : '拖詞去 ＋ / － （亦可先撳再撳圓圈）'
+      : selected
+        ? `已揀「${selected}」→ 再撳 ＋ 或 －`
+        : '先撳詞，再撳 ＋ 或 －'
 
   return (
-    <div className={`sort-box ${drag ? 'is-dragging' : ''}`}>
-      <p className="reorder__hint">{hint}</p>
+    <div className={`sort-box ${drag ? 'is-dragging' : ''} ${pictureMode ? 'sort-box--pics' : ''}`}>
+      <p className={`reorder__hint ${pictureMode ? 'reorder__hint--parent' : ''}`}>{hint}</p>
 
       <div className="sort-buckets">
         {buckets.map((bucket) => (
@@ -256,6 +287,11 @@ export function SortBoard({
             ]
               .filter(Boolean)
               .join(' ')}
+            style={
+              pictureMode && bucketLooks[bucket]?.color && !bucketLooks[bucket]?.bar
+                ? { background: `${bucketLooks[bucket]?.color}33`, borderColor: bucketLooks[bucket]?.color }
+                : undefined
+            }
             onClick={() => tapBucket(bucket)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -266,7 +302,11 @@ export function SortBoard({
             aria-label={bucket}
           >
             <span className="sort-bucket__title" title={bucket}>
-              {bucketLabel(bucket)}
+              {bucketLooks[bucket] ? (
+                <BucketMark look={bucketLooks[bucket]} label={bucket} />
+              ) : (
+                bucketLabel(bucket)
+              )}
             </span>
             <div className="sort-bucket__items">
               {pool
@@ -283,6 +323,7 @@ export function SortBoard({
                       type="button"
                       className={[
                         'chip chip--placed',
+                        pictureMode ? 'chip--pic' : '',
                         wrongHere ? 'is-sort-wrong' : '',
                         showOk ? 'is-sort-ok' : '',
                         isSource ? 'is-dragging-source' : '',
@@ -309,7 +350,7 @@ export function SortBoard({
                       onPointerCancel={canPointer ? cancelDrag : undefined}
                       aria-label={`已放入：${text}`}
                     >
-                      {text}
+                      {artByText[text] ? <KidPic id={artByText[text]} size={110} /> : text}
                     </button>
                   )
                 })}
@@ -317,6 +358,13 @@ export function SortBoard({
           </div>
         ))}
       </div>
+
+      {pictureMode && available.length > 0 && Object.keys(placement).length === 0 && (
+        <div className="sort-box__cue" aria-hidden>
+          <span>↑</span>
+          <span>↑</span>
+        </div>
+      )}
 
       <div
         ref={poolRef}
@@ -329,6 +377,7 @@ export function SortBoard({
             type="button"
             className={[
               'chip',
+              pictureMode ? 'chip--pic' : '',
               selected === text ? 'chip--active' : '',
               drag?.text === text && drag.from.kind === 'pool' ? 'is-dragging-source' : '',
             ]
@@ -341,12 +390,14 @@ export function SortBoard({
             onPointerMove={canPointer ? onPointerMove : undefined}
             onPointerUp={canPointer ? finishDrag : undefined}
             onPointerCancel={canPointer ? cancelDrag : undefined}
-            aria-label={`詞語：${text}`}
+            aria-label={text}
           >
-            {text}
+            {artByText[text] ? <KidPic id={artByText[text]} size={120} /> : text}
           </button>
         ))}
-        {available.length === 0 && <span className="reorder__placeholder">詞語都分晒啦</span>}
+        {available.length === 0 && (
+          <span className="reorder__placeholder">{pictureMode ? '圖都分晒啦' : '詞語都分晒啦'}</span>
+        )}
       </div>
 
       {ghost}
