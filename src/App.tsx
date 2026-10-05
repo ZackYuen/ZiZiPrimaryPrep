@@ -171,6 +171,7 @@ export default function App() {
         completed={progress.completed}
         onMarkDone={markDone}
         onBack={() => go({ name: 'home' })}
+        parentNote={school.parentNote}
       />,
     )
   }

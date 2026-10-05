@@ -46,6 +46,8 @@ import { MemoryMatch } from './MemoryMatch'
 import { Mascot } from './Mascot'
 import { KidPic } from './KidPic'
 import { PlaceGrid } from './PlaceGrid'
+import { ParentNoteSheet } from './ParentNoteSheet'
+import type { SchoolParentNote } from '../data/schoolWeek'
 
 type Props = {
   title: string
@@ -56,6 +58,8 @@ type Props = {
   onMarkDone: (itemId: string, moduleKey: ModuleKey) => void
   onBack: () => void
   celebrate?: boolean
+  /** Adult-only note opened from the header; not part of the quiz. */
+  parentNote?: SchoolParentNote
 }
 
 const MONEY_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '✓'] as const
@@ -86,6 +90,7 @@ export function PracticeSession({
   onMarkDone,
   onBack,
   celebrate = false,
+  parentNote,
 }: Props) {
   const [index, setIndex] = useState(() => startIndexFor(items))
   const [showSample, setShowSample] = useState(false)
@@ -135,6 +140,7 @@ export function PracticeSession({
   const [lookLeft, setLookLeft] = useState<number | null>(null)
   const [gameSolved, setGameSolved] = useState(false)
   const [looked, setLooked] = useState(true)
+  const [parentOpen, setParentOpen] = useState(false)
 
   const item = items[index]
   const kindPad = padKind(item)
@@ -447,13 +453,14 @@ export function PracticeSession({
 
   useEffect(() => {
     if (item.kind !== 'speak' && !item.autoSpeak) return
+    if (parentOpen) return
     const timer = window.setTimeout(() => {
       playQuestion()
     }, 400)
     return () => window.clearTimeout(timer)
     // Replay only when the question changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [item.id, looked])
+  }, [item.id, looked, parentOpen])
 
   const canProceed = (): boolean => {
     if (done) return true
@@ -673,8 +680,25 @@ export function PracticeSession({
             <div style={{ width: `${((index + 1) / items.length) * 100}%` }} />
           </div>
         </div>
+        {parentNote && (
+          <button
+            type="button"
+            className="ghost-btn session__parent-btn"
+            onClick={() => {
+              stop()
+              playSfx('flip')
+              setParentOpen(true)
+            }}
+            aria-label="家長須知"
+          >
+            {KID.parentHint}
+          </button>
+        )}
         <SoundToggle />
       </header>
+      {parentNote && parentOpen && (
+        <ParentNoteSheet title={title} note={parentNote} onClose={() => setParentOpen(false)} />
+      )}
 
       <div className={`session__layout ${isStoryFocus ? 'session__layout--story' : ''}`}>
         <div
@@ -712,8 +736,17 @@ export function PracticeSession({
             </div>
           )}
           {item.lookThen && looked && (
-            <div className="hint-pic-wrap">
+            <div className="hint-pic-wrap look-then__second">
               <KidPic id={item.lookThen.second} size={240} />
+              {item.lookThen.missingAt && !solvedChoice && !revealAnswer && (
+                <span
+                  className="look-then__missing"
+                  style={{ left: `${item.lookThen.missingAt.x}%`, top: `${item.lookThen.missingAt.y}%` }}
+                  aria-hidden
+                >
+                  ?
+                </span>
+              )}
             </div>
           )}
           {item.hintKidPic && !item.lookThen && (

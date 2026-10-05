@@ -269,7 +269,7 @@ export function SortBoard({
 
   return (
     <div className={`sort-box ${drag ? 'is-dragging' : ''} ${pictureMode ? 'sort-box--pics' : ''}`}>
-      <p className="reorder__hint">{hint}</p>
+      <p className={`reorder__hint ${pictureMode ? 'reorder__hint--parent' : ''}`}>{hint}</p>
 
       <div className="sort-buckets">
         {buckets.map((bucket) => (
@@ -287,6 +287,11 @@ export function SortBoard({
             ]
               .filter(Boolean)
               .join(' ')}
+            style={
+              pictureMode && bucketLooks[bucket]?.color && !bucketLooks[bucket]?.bar
+                ? { background: `${bucketLooks[bucket]?.color}33`, borderColor: bucketLooks[bucket]?.color }
+                : undefined
+            }
             onClick={() => tapBucket(bucket)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -353,6 +358,13 @@ export function SortBoard({
           </div>
         ))}
       </div>
+
+      {pictureMode && available.length > 0 && Object.keys(placement).length === 0 && (
+        <div className="sort-box__cue" aria-hidden>
+          <span>↑</span>
+          <span>↑</span>
+        </div>
+      )}
 
       <div
         ref={poolRef}

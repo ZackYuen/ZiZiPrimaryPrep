@@ -232,16 +232,16 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'jando-name-zh': 'intro',
   'dbs-pose-stand': 'play-fun',
   'dbs-pose-turn': 'play-fun',
-  'dbs-pose-step': 'play-fun',
+  'dbs-pose-foot': 'play-fun',
   'dbs-sort-color': 'sort',
   'dbs-sort-length': 'sort',
   'dbs-sort-type': 'sort',
   'dbs-place-tl': 'move',
   'dbs-place-br': 'move',
-  'dbs-missing-ball': 'park',
+  'dbs-missing-teddy': 'park',
   'dbs-shadow-apple': 'eat',
-  'dbs-shadow-cat': 'zoo',
-  'dbs-story-dog': 'park',
+  'dbs-shadow-teddy': 'lost-toy',
+  'dbs-story-rabbit': 'park',
   'dbs-story-rain': 'family',
   'dbs-pic-apple': 'eat',
   'dbs-say-cat': 'zoo',
@@ -465,71 +465,71 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
   },
   'dbs-pose-stand': {
     kidLine: '聽完，撳企喺度嗰幅。',
-    moreLine: '腳企直、面向你嗰幅。',
+    moreLine: '企直直、望住你嗰個哥哥。',
   },
   'dbs-pose-turn': {
-    kidLine: '聽完，撳轉圈嗰幅。',
-    moreLine: '側面向、好似轉緊嗰幅。',
+    kidLine: '聽完，撳轉身嗰幅。',
+    moreLine: '背脊向住你、轉緊身嗰個。',
   },
-  'dbs-pose-step': {
-    kidLine: '聽完，撳行前嗰幅。',
-    moreLine: '一隻腳踏前嗰幅。',
+  'dbs-pose-foot': {
+    kidLine: '聽完，撳舉起一隻腳嗰幅。',
+    moreLine: '一隻腳喺地、一隻腳舉高嗰個。',
   },
   'dbs-sort-color': {
-    kidLine: '紅圖放紅格，藍圖放藍格。',
-    moreLine: '望顏色，唔使睇字。',
+    kidLine: '黃色放黃格，綠色放綠格。',
+    moreLine: '香蕉同草帽係黃色；遮同竹係綠色。',
   },
   'dbs-sort-length': {
-    kidLine: '長條放長格，短條放短格。',
-    moreLine: '邊條長過就放長嗰邊。',
+    kidLine: '長嘅放長條，短嘅放短條。',
+    moreLine: '鉛筆長，蠟筆短。',
   },
   'dbs-sort-type': {
-    kidLine: '生果去蘋果格，玩具去公仔格。',
-    moreLine: '香蕉橙係生果；車同波係玩具。',
+    kidLine: '食得嘅放蘋果格，動物放熊貓格。',
+    moreLine: '紅蘿蔔同蛋糕食得；兔仔同貓仔係動物。',
   },
   'dbs-place-tl': {
-    kidLine: '星星放去上面左邊。',
-    moreLine: '第一格，靠近上面同左手。',
+    kidLine: '拎星星，放去 ZiZi 指住嗰格。',
+    moreLine: '上面左邊：最高、近左手嗰格。',
   },
   'dbs-place-br': {
-    kidLine: '星星放去下面右邊。',
-    moreLine: '最尾嗰格，靠近下面同右手。',
+    kidLine: '拎星星，放去 ZiZi 指住嗰格。',
+    moreLine: '下面右邊：最低、近右手嗰格。',
   },
-  'dbs-missing-ball': {
+  'dbs-missing-teddy': {
     kidLine: '先睇圖，撳星星，再撳少咗嗰樣。',
-    moreLine: '第二幅少咗個波。',
+    moreLine: '野餐布上面本來有隻熊仔。',
   },
   'dbs-shadow-apple': {
-    kidLine: '望蘋果，撳同一個影。',
-    moreLine: '圓圓、上面有葉嗰個。',
+    kidLine: '望蘋果，撳同一個形狀嘅影。',
+    moreLine: '圓圓、上面有塊葉嗰個。',
   },
-  'dbs-shadow-cat': {
-    kidLine: '望貓，撳同一個影。',
-    moreLine: '有耳有尾巴嗰個。',
+  'dbs-shadow-teddy': {
+    kidLine: '望熊仔，撳同一個形狀嘅影。',
+    moreLine: '頭上有兩隻圓耳仔嗰個。',
   },
-  'dbs-story-dog': {
-    kidLine: '聽完故仔，撳小寶見到嘅嘢。',
-    moreLine: '故仔入面有隻黃貓。',
+  'dbs-story-rabbit': {
+    kidLine: '聽完故仔，撳小寶見到嘅動物。',
+    moreLine: '故仔入面有隻白兔仔。',
   },
   'dbs-story-rain': {
     kidLine: '聽完故仔，撳媽媽攞嘅嘢。',
     moreLine: '落雨，媽媽攞遮。',
   },
   'dbs-pic-apple': {
-    kidLine: '望上面蘋果，撳同樣嘅圖。',
-    moreLine: '紅紅圓圓、有葉嗰個。',
+    kidLine: '望上面蘋果，撳一樣嘅圖。',
+    moreLine: '紅紅圓圓、有塊葉嗰個。',
   },
   'dbs-say-cat': {
-    kidLine: '望住貓，大聲講「貓」。',
+    kidLine: '望住貓仔，大聲講「貓仔」。',
     moreLine: '講完撳 ★。',
   },
   'dbs-en-cat': {
-    kidLine: '聽到 cat，撳貓。',
+    kidLine: '聽到 cat，撳貓仔。',
     moreLine: '唔使讀英文，聽完撳圖。',
   },
   'dbs-en-red': {
-    kidLine: '聽到 red，撳紅色。',
-    moreLine: '紅蘋果，唔係藍波。',
+    kidLine: '聽到 red，撳紅色嘅蘋果。',
+    moreLine: '紅蘋果，唔係綠遮或者黃香蕉。',
   },
   'dbs-en-apple': {
     kidLine: '聽到 apple，撳蘋果。',
@@ -568,7 +568,7 @@ function defaultKidLine(kind: ActivityKind): { kidLine: string; moreLine: string
     case 'memory':
       return { kidLine: '翻兩張，搵同一對。', moreLine: '企鵝配藍波，大象配綠傘。' }
     case 'place':
-      return { kidLine: '聽完，撳一格放星星。', moreLine: '上面左邊、上面右邊、下面左邊、下面右邊。' }
+      return { kidLine: '拎星星，放去 ZiZi 指住嗰格。', moreLine: '上面左邊、上面右邊、下面左邊、下面右邊。' }
     default:
       return { kidLine: '睇圖再試。', moreLine: '試完唔識可以再撳 ?' }
   }

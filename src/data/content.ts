@@ -68,37 +68,30 @@ export type MemoryGame = {
   pairs: { id: string; a: MemoryFace; b: MemoryFace }[]
 }
 
+/** Watercolour plates reused from the Simon / memory / party games (see KidPic). */
 export type KidPicId =
   | 'stand'
   | 'turn'
   | 'sit'
-  | 'step'
-  | 'red-cup'
-  | 'blue-bag'
-  | 'yellow-star'
-  | 'red-apple'
-  | 'blue-ball'
-  | 'long-ribbon'
-  | 'short-ribbon'
+  | 'foot'
+  | 'banana'
+  | 'hat'
+  | 'umbrella'
+  | 'bamboo'
+  | 'carrot'
+  | 'rabbit'
+  | 'panda'
+  | 'cake'
+  | 'gift'
+  | 'door'
+  | 'apple'
+  | 'cat'
+  | 'teddy'
   | 'long-pencil'
   | 'short-crayon'
-  | 'apple'
-  | 'banana'
-  | 'orange'
-  | 'car'
-  | 'teddy'
-  | 'ball'
-  | 'cat'
-  | 'umbrella'
   | 'park-full'
-  | 'park-no-ball'
-  | 'story-boy'
-  | 'story-dog'
-  | 'story-apple'
-  | 'story-rain'
-  | 'story-umbrella'
-  | 'story-cake'
-  | 'token'
+  | 'park-empty'
+  | 'star'
 
 export type PlaceCell = 'tl' | 'tr' | 'bl' | 'br'
 
@@ -111,6 +104,8 @@ export type LookThen = {
   second: KidPicId
   /** Spoken while the first picture is up. */
   promptZh?: string
+  /** Where the missing thing was on the second picture (percent of width / height). */
+  missingAt?: { x: number; y: number }
 }
 
 export type BucketLook = {
