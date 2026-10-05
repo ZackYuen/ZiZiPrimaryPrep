@@ -14,7 +14,7 @@ describe('男拔面試練習', () => {
   it('is a parent-recognisable short session', () => {
     assert.match(plan.title, /男拔面試練習/)
     assert.ok(plan.activities.length >= 8)
-    assert.ok(plan.activities.length <= 20)
+    assert.ok(plan.activities.length <= 30)
   })
 
   it('covers the kid skill shapes with original items', () => {
@@ -28,6 +28,39 @@ describe('男拔面試練習', () => {
     assert.ok(ids.some((id) => id.startsWith('dbs-pic-')))
     assert.ok(ids.some((id) => id.startsWith('dbs-say-')))
     assert.ok(ids.some((id) => id.startsWith('dbs-en-')))
+    for (const prefix of ['dbs-count-', 'dbs-safe-', 'dbs-chat-', 'dbs-use-', 'dbs-jigsaw-']) {
+      assert.ok(ids.some((id) => id.startsWith(prefix)), prefix)
+    }
+  })
+
+  it('counts with pictures only, up to five', () => {
+    const counts = plan.activities.filter((a) => a.id.startsWith('dbs-count-'))
+    assert.ok(counts.length >= 2)
+    for (const item of counts) {
+      const groups = item.pictureStrip ?? []
+      assert.ok(groups.every((g) => g.count && g.count >= 1 && g.count <= 5), item.id)
+      assert.equal(new Set(groups.map((g) => g.count)).size, groups.length, `${item.id} groups must differ`)
+      assert.doesNotMatch(item.promptZh, /[0-9]/, `${item.id} should not need numerals`)
+    }
+    const more = plan.activities.find((a) => a.id === 'dbs-count-more')
+    assert.equal(more?.choices?.length, 2)
+  })
+
+  it('situation items show three scenes with one safe answer', () => {
+    for (const item of plan.activities.filter((a) => a.id.startsWith('dbs-safe-'))) {
+      assert.equal(item.choices?.length, 3)
+      assert.equal(item.choices?.filter((c) => c.correct).length, 1)
+      assert.equal(item.sceneChoices, true)
+    }
+  })
+
+  it('chat cards accept any answer and model a sentence', () => {
+    const chats = plan.activities.filter((a) => a.id.startsWith('dbs-chat-'))
+    assert.equal(chats.length, 3)
+    for (const item of chats) {
+      assert.equal(item.chatCard, true)
+      assert.ok(item.choices?.every((c) => c.correct && c.say), item.id)
+    }
   })
 
   it('lets a non-reader finish every item from voice and pictures', () => {
@@ -71,7 +104,7 @@ describe('男拔面試練習', () => {
     const note = plan.parentNote
     assert.ok(note, 'missing parent note')
     const text = [note.blurb, ...note.talkingPoints.map((p) => `${p.title} ${p.body}`)].join('\n')
-    for (const must of [/兩分鐘/, /點解揀/, /補習/, /做錯/, /科技/, /唔怕難/, /好奇/, /瞓覺前/, /冇安排/, /語言/, /數感/, /追問/, /退出教育局/]) {
+    for (const must of [/10 月 8 至 10 日/, /中文同英文/, /夠鐘就停，唔緊要/, /冇玩具/, /坐定/, /可能有計時/, /兩分鐘/, /點解揀/, /補習/, /做錯/, /科技/, /唔怕難/, /好奇/, /瞓覺前/, /冇安排/, /語言/, /數感/, /追問/, /退出教育局/]) {
       assert.match(text, must)
     }
     assert.doesNotMatch(text, /\d{8}|QR|掃碼|學費|IBDP|\bIB\b|亞皆老|報名日期/)

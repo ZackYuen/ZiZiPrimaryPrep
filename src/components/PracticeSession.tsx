@@ -44,7 +44,7 @@ import { SimonGame } from './SimonGame'
 import { BuildBoard } from './BuildBoard'
 import { MemoryMatch } from './MemoryMatch'
 import { Mascot } from './Mascot'
-import { KidPic } from './KidPic'
+import { KidCount, KidPic, KidPiece } from './KidPic'
 import { PlaceGrid } from './PlaceGrid'
 import { ParentNoteSheet } from './ParentNoteSheet'
 import type { SchoolParentNote } from '../data/schoolWeek'
@@ -691,7 +691,9 @@ export function PracticeSession({
             }}
             aria-label="家長須知"
           >
-            {KID.parentHint}
+            家長
+            <br />
+            須知
           </button>
         )}
         <SoundToggle />
@@ -750,8 +752,34 @@ export function PracticeSession({
             </div>
           )}
           {item.hintKidPic && !item.lookThen && (
-            <div className="hint-pic-wrap">
+            <div className={`hint-pic-wrap${item.sceneChoices ? ' hint-pic-wrap--small' : ''}`}>
               <KidPic id={item.hintKidPic} size={220} />
+            </div>
+          )}
+          {item.hintCount && (
+            <div className="hint-pic-wrap hint-count">
+              <KidCount id={item.hintCount.pic} n={item.hintCount.n} />
+            </div>
+          )}
+          {item.jigsaw && (
+            <div className="hint-pic-wrap">
+              <div className="jigsaw">
+                <KidPic id={item.jigsaw.pic} size={260} />
+                <span
+                  className={`jigsaw__hole${solvedChoice || revealAnswer ? ' is-filled' : ''}`}
+                  style={{
+                    left: `${(item.jigsaw.col * 100) / 3}%`,
+                    top: `${(item.jigsaw.row * 100) / 3}%`,
+                  }}
+                  aria-hidden
+                >
+                  {solvedChoice || revealAnswer ? (
+                    <KidPiece id={item.jigsaw.pic} col={item.jigsaw.col} row={item.jigsaw.row} />
+                  ) : (
+                    '?'
+                  )}
+                </span>
+              </div>
             </div>
           )}
           {item.storyPics && item.storyPics.length > 0 && (
@@ -764,15 +792,30 @@ export function PracticeSession({
             </div>
           )}
           {looked && item.pictureStrip && item.pictureStrip.length > 0 && (
-            <div className={`picture-strip picture-strip--${item.pictureStrip.length}${item.hideChoiceWords ? ' picture-strip--quiet' : ''}`}>
+            <div
+              className={[
+                'picture-strip',
+                `picture-strip--${item.pictureStrip.length}`,
+                item.hideChoiceWords ? 'picture-strip--quiet' : '',
+                item.sceneChoices ? 'picture-strip--scenes' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            >
               {item.pictureStrip.map((pic, picIndex) => {
                 const choice = item.kind === 'choice' ? item.choices?.[picIndex] : undefined
                 const selected = picked === picIndex
                 const triedWrong = wrongPicks.includes(picIndex)
-                const showCorrect = (solvedChoice || revealAnswer) && !!choice?.correct
+                const showCorrect = item.chatCard
+                  ? selected
+                  : (solvedChoice || revealAnswer) && !!choice?.correct
                 const lockedChoice = solvedChoice || revealAnswer
                 const clickable = !!choice && item.kind === 'choice'
-                const art = pic.kidPic ? (
+                const art = pic.kidPic && pic.piece ? (
+                  <KidPiece id={pic.kidPic} col={pic.piece.col} row={pic.piece.row} />
+                ) : pic.kidPic && pic.count ? (
+                  <KidCount id={pic.kidPic} n={pic.count} plate={pic.plate} />
+                ) : pic.kidPic ? (
                   <KidPic id={pic.kidPic} shadow={pic.kidShadow} size={200} />
                 ) : (
                   <img src={mediaSrc(pic.src)} alt="" width={240} height={180} />
@@ -799,13 +842,23 @@ export function PracticeSession({
                       selected && choice.correct ? 'is-selected' : '',
                       showCorrect ? 'is-correct' : '',
                       triedWrong && !choice.correct ? 'is-wrong' : '',
+                      item.chatCard && lockedChoice && !selected ? 'is-dim' : '',
                     ]
                       .filter(Boolean)
                       .join(' ')}
+                    style={pic.ring ? ({ '--ring': pic.ring } as CSSProperties) : undefined}
                     disabled={lockedChoice || triedWrong}
                     onClick={() => {
                       unlockAudio()
                       if (lockedChoice || triedWrong) return
+                      if (item.chatCard) {
+                        setPicked(picIndex)
+                        setCoachMsg(null)
+                        playSfx('correct')
+                        if (choice.say) speak(`好呀！你講吓：${choice.say}`, 'zh-HK')
+                        awardAndMaybeNext(false)
+                        return
+                      }
                       if (choice.correct) {
                         setPicked(picIndex)
                         setCoachMsg('答對啦！你好努力！')
@@ -824,6 +877,22 @@ export function PracticeSession({
                   </button>
                 )
               })}
+            </div>
+          )}
+          {item.chatCard && solvedChoice && (
+            <div className="chat-card__done">
+              <button
+                type="button"
+                className="primary-btn primary-btn--wide"
+                onClick={() => {
+                  unlockAudio()
+                  playSfx('tap')
+                  goNext()
+                }}
+                aria-label="講完喇"
+              >
+                {KID.speakDone}
+              </button>
             </div>
           )}
           {!artHidden && item.hintImage && (

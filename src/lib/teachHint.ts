@@ -248,6 +248,17 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'dbs-en-cat': 'zoo',
   'dbs-en-red': 'eat',
   'dbs-en-apple': 'eat',
+  'dbs-count-books': 'book',
+  'dbs-count-five': 'mix',
+  'dbs-count-more': 'eat',
+  'dbs-jigsaw-room': 'birthday',
+  'dbs-use-umbrella': 'daily',
+  'dbs-use-spoon': 'eat',
+  'dbs-safe-mall': 'police-help',
+  'dbs-safe-fall': 'share',
+  'dbs-chat-colour': 'like-blue',
+  'dbs-chat-fruit': 'eat',
+  'dbs-chat-place': 'park',
   'jando-name-en': 'intro',
   'jando-word-pick': 'eat',
   'jando-m1': 'plus',
@@ -534,6 +545,50 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
   'dbs-en-apple': {
     kidLine: '聽到 apple，撳蘋果。',
     moreLine: '唔使讀句子，聽一個字就撳。',
+  },
+  'dbs-count-books': {
+    kidLine: '一本一本數書，再撳一樣多星星嗰格。',
+    moreLine: '有三本書，搵三粒星星。',
+  },
+  'dbs-count-five': {
+    kidLine: '逐個橙數，數到五就撳。',
+    moreLine: '一、二、三、四、五。',
+  },
+  'dbs-count-more': {
+    kidLine: '數吓兩碟，撳多啲嗰碟。',
+    moreLine: '一碟兩個，一碟四個。四個多啲。',
+  },
+  'dbs-jigsaw-room': {
+    kidLine: '望住個窿，搵返嗰塊。',
+    moreLine: '右下角係禮物盒。',
+  },
+  'dbs-use-umbrella': {
+    kidLine: '遮幾時用？撳嗰幅。',
+    moreLine: '落雨就開遮。',
+  },
+  'dbs-use-spoon': {
+    kidLine: '匙羹用嚟做咩？撳嗰幅。',
+    moreLine: '食飯用匙羹。',
+  },
+  'dbs-safe-mall': {
+    kidLine: '搵唔到媽媽，要搵邊個幫手？',
+    moreLine: '搵着制服嘅職員姐姐，唔好自己走，唔好跟陌生人。',
+  },
+  'dbs-safe-fall': {
+    kidLine: '同學跌親，要點做？',
+    moreLine: '扶佢，叫老師嚟幫手。',
+  },
+  'dbs-chat-colour': {
+    kidLine: '撳你鍾意嘅顏色，揀邊個都啱。',
+    moreLine: '可以講：我鍾意黃色。',
+  },
+  'dbs-chat-fruit': {
+    kidLine: '撳你鍾意食嘅生果，揀邊個都啱。',
+    moreLine: '可以講：我鍾意食蘋果。',
+  },
+  'dbs-chat-place': {
+    kidLine: '撳你鍾意去玩嘅地方，揀邊個都啱。',
+    moreLine: '可以講：我鍾意去公園玩。',
   },
   'spcc-read': {
     kidLine: '望住圖，中文同英文都讀。',
