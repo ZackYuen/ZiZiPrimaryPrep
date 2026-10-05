@@ -730,7 +730,7 @@ export function PracticeSession({
               ))}
             </div>
           )}
-          {!artHidden && looked && item.pictureStrip && item.pictureStrip.length > 0 && (
+          {looked && item.pictureStrip && item.pictureStrip.length > 0 && (
             <div className={`picture-strip picture-strip--${item.pictureStrip.length}${item.hideChoiceWords ? ' picture-strip--quiet' : ''}`}>
               {item.pictureStrip.map((pic, picIndex) => {
                 const choice = item.kind === 'choice' ? item.choices?.[picIndex] : undefined

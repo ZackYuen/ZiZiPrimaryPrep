@@ -37,35 +37,35 @@ function kid(x: number, y: number, opts: { pose?: 'stand' | 'turn' | 'sit' | 'st
   const shirt = opts.shirt ?? '#5EB5D8'
   const face = (
     <>
-      <circle cx={x} cy={y - 28} r="16" fill="#FFD8B0" stroke={INK} strokeWidth="3" />
-      <circle cx={x - 5} cy={y - 30} r="2" fill={INK} />
-      <circle cx={x + 5} cy={y - 30} r="2" fill={INK} />
-      <path d={`M${x - 4} ${y - 22} q4 4 8 0`} fill="none" stroke={INK} strokeWidth="2" />
+      <circle cx={x} cy={y - 36} r="22" fill="#FFD8B0" stroke={INK} strokeWidth="3.5" />
+      <circle cx={x - 7} cy={y - 38} r="3" fill={INK} />
+      <circle cx={x + 7} cy={y - 38} r="3" fill={INK} />
+      <path d={`M${x - 6} ${y - 28} q6 6 12 0`} fill="none" stroke={INK} strokeWidth="2.5" />
     </>
   )
   if (pose === 'sit') {
     return (
       <>
         {face}
-        <rect x={x - 16} y={y - 12} width="32" height="28" rx="10" fill={shirt} stroke={INK} strokeWidth="3" />
-        <path d={`M${x - 16} ${y + 8} q-10 16 -4 22`} fill="none" stroke={shirt} strokeWidth="8" strokeLinecap="round" />
-        <path d={`M${x + 16} ${y + 8} q10 16 4 22`} fill="none" stroke={shirt} strokeWidth="8" strokeLinecap="round" />
-        <path d={`M${x - 18} ${y + 2} h-14`} stroke="#FFD8B0" strokeWidth="7" strokeLinecap="round" />
-        <path d={`M${x + 18} ${y + 2} h14`} stroke="#FFD8B0" strokeWidth="7" strokeLinecap="round" />
+        <rect x={x - 24} y={y - 16} width="48" height="36" rx="14" fill={shirt} stroke={INK} strokeWidth="3.5" />
+        <path d={`M${x - 22} ${y + 16} q-16 18 -2 28`} fill="none" stroke="#3D6BB3" strokeWidth="10" strokeLinecap="round" />
+        <path d={`M${x + 22} ${y + 16} q16 18 2 28`} fill="none" stroke="#3D6BB3" strokeWidth="10" strokeLinecap="round" />
+        <path d={`M${x - 24} ${y} h-20`} stroke="#FFD8B0" strokeWidth="9" strokeLinecap="round" />
+        <path d={`M${x + 24} ${y} h20`} stroke="#FFD8B0" strokeWidth="9" strokeLinecap="round" />
       </>
     )
   }
   if (pose === 'turn') {
     return (
       <>
-        <circle cx={x} cy={y - 28} r="16" fill="#FFD8B0" stroke={INK} strokeWidth="3" />
-        <circle cx={x + 4} cy={y - 30} r="2" fill={INK} />
-        <path d={`M${x + 1} ${y - 22} q4 3 7 0`} fill="none" stroke={INK} strokeWidth="2" />
-        <rect x={x - 12} y={y - 12} width="24" height="36" rx="10" fill={shirt} stroke={INK} strokeWidth="3" />
-        <path d={`M${x} ${y} q22 -18 28 8`} fill="none" stroke="#FFD8B0" strokeWidth="7" strokeLinecap="round" />
-        <path d={`M${x - 8} ${y + 24} v16`} stroke="#3D6BB3" strokeWidth="8" strokeLinecap="round" />
-        <path d={`M${x + 8} ${y + 24} v16`} stroke="#3D6BB3" strokeWidth="8" strokeLinecap="round" />
-        <path d={`M${x - 36} ${y - 8} q18 -22 36 -6`} fill="none" stroke="#F5C84C" strokeWidth="4" strokeDasharray="4 5" />
+        <path d={`M${x - 52} ${y - 10} q24 -28 48 -4`} fill="none" stroke="#F5C84C" strokeWidth="5" strokeDasharray="5 6" />
+        <circle cx={x} cy={y - 36} r="22" fill="#FFD8B0" stroke={INK} strokeWidth="3.5" />
+        <circle cx={x + 6} cy={y - 38} r="3" fill={INK} />
+        <path d={`M${x + 2} ${y - 28} q6 4 10 0`} fill="none" stroke={INK} strokeWidth="2.5" />
+        <rect x={x - 16} y={y - 16} width="32" height="46" rx="14" fill={shirt} stroke={INK} strokeWidth="3.5" />
+        <path d={`M${x + 4} ${y - 2} q28 -16 34 12`} fill="none" stroke="#FFD8B0" strokeWidth="9" strokeLinecap="round" />
+        <path d={`M${x - 10} ${y + 28} v20`} stroke="#3D6BB3" strokeWidth="10" strokeLinecap="round" />
+        <path d={`M${x + 10} ${y + 28} v20`} stroke="#3D6BB3" strokeWidth="10" strokeLinecap="round" />
       </>
     )
   }
@@ -73,22 +73,22 @@ function kid(x: number, y: number, opts: { pose?: 'stand' | 'turn' | 'sit' | 'st
     return (
       <>
         {face}
-        <rect x={x - 16} y={y - 12} width="32" height="34" rx="10" fill={shirt} stroke={INK} strokeWidth="3" />
-        <path d={`M${x + 16} ${y - 2} l18 -8`} stroke="#FFD8B0" strokeWidth="7" strokeLinecap="round" />
-        <path d={`M${x - 16} ${y} l-10 8`} stroke="#FFD8B0" strokeWidth="7" strokeLinecap="round" />
-        <path d={`M${x - 8} ${y + 22} v14`} stroke="#3D6BB3" strokeWidth="8" strokeLinecap="round" />
-        <path d={`M${x + 10} ${y + 20} l16 10`} stroke="#3D6BB3" strokeWidth="8" strokeLinecap="round" />
+        <rect x={x - 22} y={y - 16} width="44" height="42" rx="14" fill={shirt} stroke={INK} strokeWidth="3.5" />
+        <path d={`M${x + 22} ${y - 2} l24 -10`} stroke="#FFD8B0" strokeWidth="9" strokeLinecap="round" />
+        <path d={`M${x - 22} ${y + 2} l-16 10`} stroke="#FFD8B0" strokeWidth="9" strokeLinecap="round" />
+        <path d={`M${x - 10} ${y + 26} v18`} stroke="#3D6BB3" strokeWidth="10" strokeLinecap="round" />
+        <path d={`M${x + 14} ${y + 22} l22 16`} stroke="#3D6BB3" strokeWidth="10" strokeLinecap="round" />
       </>
     )
   }
   return (
     <>
       {face}
-      <rect x={x - 16} y={y - 12} width="32" height="36" rx="10" fill={shirt} stroke={INK} strokeWidth="3" />
-      <path d={`M${x - 16} ${y} h-16`} stroke="#FFD8B0" strokeWidth="7" strokeLinecap="round" />
-      <path d={`M${x + 16} ${y} h16`} stroke="#FFD8B0" strokeWidth="7" strokeLinecap="round" />
-      <path d={`M${x - 8} ${y + 24} v16`} stroke="#3D6BB3" strokeWidth="8" strokeLinecap="round" />
-      <path d={`M${x + 8} ${y + 24} v16`} stroke="#3D6BB3" strokeWidth="8" strokeLinecap="round" />
+      <rect x={x - 22} y={y - 16} width="44" height="46" rx="14" fill={shirt} stroke={INK} strokeWidth="3.5" />
+      <path d={`M${x - 22} ${y} h-22`} stroke="#FFD8B0" strokeWidth="9" strokeLinecap="round" />
+      <path d={`M${x + 22} ${y} h22`} stroke="#FFD8B0" strokeWidth="9" strokeLinecap="round" />
+      <path d={`M${x - 10} ${y + 30} v20`} stroke="#3D6BB3" strokeWidth="10" strokeLinecap="round" />
+      <path d={`M${x + 10} ${y + 30} v20`} stroke="#3D6BB3" strokeWidth="10" strokeLinecap="round" />
     </>
   )
 }
@@ -96,9 +96,9 @@ function kid(x: number, y: number, opts: { pose?: 'stand' | 'turn' | 'sit' | 'st
 function apple(x: number, y: number, fill = '#E85D75') {
   return (
     <>
-      <circle cx={x} cy={y} r="22" fill={fill} stroke={INK} strokeWidth="3" />
-      <path d={`M${x} ${y - 20} q6 -16 16 -10`} fill="none" stroke="#2F8A4E" strokeWidth="4" />
-      <ellipse cx={x + 8} cy={y - 8} rx="5" ry="8" fill="#fff8" />
+      <circle cx={x} cy={y} r="34" fill={fill} stroke={INK} strokeWidth="3.5" />
+      <path d={`M${x} ${y - 30} q8 -20 22 -12`} fill="none" stroke="#2F8A4E" strokeWidth="5" />
+      <ellipse cx={x + 12} cy={y - 12} rx="7" ry="12" fill="#fff8" />
     </>
   )
 }
@@ -106,10 +106,10 @@ function apple(x: number, y: number, fill = '#E85D75') {
 function banana(x: number, y: number) {
   return (
     <path
-      d={`M${x - 28} ${y + 10} q20 -40 56 -8 q-28 6 -40 18 z`}
+      d={`M${x - 40} ${y + 16} q28 -56 78 -10 q-38 8 -54 24 z`}
       fill="#F5C84C"
       stroke={INK}
-      strokeWidth="3"
+      strokeWidth="3.5"
     />
   )
 }
@@ -117,9 +117,9 @@ function banana(x: number, y: number) {
 function orange(x: number, y: number) {
   return (
     <>
-      <circle cx={x} cy={y} r="22" fill="#F4A24A" stroke={INK} strokeWidth="3" />
-      <circle cx={x} cy={y} r="8" fill="none" stroke="#E07A2F" strokeWidth="2" />
-      <path d={`M${x} ${y - 22} q8 -10 14 -4`} fill="none" stroke="#2F8A4E" strokeWidth="4" />
+      <circle cx={x} cy={y} r="34" fill="#F4A24A" stroke={INK} strokeWidth="3.5" />
+      <circle cx={x} cy={y} r="12" fill="none" stroke="#E07A2F" strokeWidth="2.5" />
+      <path d={`M${x} ${y - 32} q10 -14 20 -6`} fill="none" stroke="#2F8A4E" strokeWidth="5" />
     </>
   )
 }
@@ -127,9 +127,9 @@ function orange(x: number, y: number) {
 function ball(x: number, y: number, fill = '#7EC8E3') {
   return (
     <>
-      <circle cx={x} cy={y} r="22" fill={fill} stroke={INK} strokeWidth="3" />
-      <path d={`M${x - 16} ${y} h32`} stroke="#fff" strokeWidth="3" />
-      <path d={`M${x} ${y - 16} v32`} stroke="#fff" strokeWidth="3" />
+      <circle cx={x} cy={y} r="32" fill={fill} stroke={INK} strokeWidth="3.5" />
+      <ellipse cx={x - 10} cy={y - 10} rx="10" ry="8" fill="#fff6" />
+      <path d={`M${x - 18} ${y + 6} q18 16 36 0`} fill="none" stroke="#fff" strokeWidth="3" />
     </>
   )
 }
@@ -137,13 +137,14 @@ function ball(x: number, y: number, fill = '#7EC8E3') {
 function cat(x: number, y: number) {
   return (
     <>
-      <ellipse cx={x} cy={y + 8} rx="28" ry="20" fill="#E8B84A" stroke={INK} strokeWidth="3" />
-      <circle cx={x + 18} cy={y - 10} r="16" fill="#E8B84A" stroke={INK} strokeWidth="3" />
-      <polygon points={`${x + 8},${y - 20} ${x + 12},${y - 34} ${x + 20},${y - 18}`} fill="#E8B84A" stroke={INK} strokeWidth="3" />
-      <polygon points={`${x + 20},${y - 18} ${x + 30},${y - 34} ${x + 32},${y - 16}`} fill="#E8B84A" stroke={INK} strokeWidth="3" />
-      <circle cx={x + 14} cy={y - 12} r="2" fill={INK} />
-      <circle cx={x + 24} cy={y - 12} r="2" fill={INK} />
-      <path d={`M${x + 16} ${y - 5} h8`} stroke={INK} strokeWidth="2" />
+      <ellipse cx={x} cy={y + 16} rx="40" ry="26" fill="#E8B84A" stroke={INK} strokeWidth="3.5" />
+      <circle cx={x + 22} cy={y - 12} r="22" fill="#E8B84A" stroke={INK} strokeWidth="3.5" />
+      <polygon points={`${x + 8},${y - 24} ${x + 12},${y - 46} ${x + 26},${y - 22}`} fill="#E8B84A" stroke={INK} strokeWidth="3.5" />
+      <polygon points={`${x + 24},${y - 22} ${x + 40},${y - 46} ${x + 42},${y - 18}`} fill="#E8B84A" stroke={INK} strokeWidth="3.5" />
+      <circle cx={x + 16} cy={y - 14} r="3" fill={INK} />
+      <circle cx={x + 30} cy={y - 14} r="3" fill={INK} />
+      <path d={`M${x + 18} ${y - 4} h16`} stroke={INK} strokeWidth="2.5" />
+      <path d={`M${x - 36} ${y + 8} q-16 8 -8 22`} fill="none" stroke="#E8B84A" strokeWidth="8" strokeLinecap="round" />
     </>
   )
 }
@@ -188,9 +189,9 @@ function umbrella(x: number, y: number, fill = '#5EB5D8') {
 function cup(x: number, y: number, fill = '#E85D75') {
   return (
     <>
-      <path d={`M${x - 18} ${y - 16} h36 l-6 44 h-24 z`} fill={fill} stroke={INK} strokeWidth="3" />
-      <ellipse cx={x} cy={y - 16} rx="18" ry="6" fill="#fff" stroke={INK} strokeWidth="3" />
-      <path d={`M${x + 18} ${y - 4} q16 6 4 22`} fill="none" stroke={fill} strokeWidth="5" />
+      <path d={`M${x - 26} ${y - 20} h52 l-8 58 h-36 z`} fill={fill} stroke={INK} strokeWidth="3.5" />
+      <ellipse cx={x} cy={y - 20} rx="26" ry="9" fill="#fff" stroke={INK} strokeWidth="3.5" />
+      <path d={`M${x + 26} ${y - 4} q22 8 6 30`} fill="none" stroke={fill} strokeWidth="7" />
     </>
   )
 }
@@ -198,8 +199,8 @@ function cup(x: number, y: number, fill = '#E85D75') {
 function bag(x: number, y: number, fill = '#3D6BB3') {
   return (
     <>
-      <rect x={x - 22} y={y - 8} width="44" height="40" rx="8" fill={fill} stroke={INK} strokeWidth="3" />
-      <path d={`M${x - 12} ${y - 8} v-16 q12 -10 24 0 v16`} fill="none" stroke={INK} strokeWidth="4" />
+      <rect x={x - 32} y={y - 6} width="64" height="52" rx="12" fill={fill} stroke={INK} strokeWidth="3.5" />
+      <path d={`M${x - 16} ${y - 6} v-20 q16 -14 32 0 v20`} fill="none" stroke={INK} strokeWidth="5" />
     </>
   )
 }

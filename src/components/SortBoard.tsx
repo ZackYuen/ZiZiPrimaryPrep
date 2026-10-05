@@ -247,7 +247,7 @@ export function SortBoard({
             style={{ left: drag.x, top: drag.y }}
             aria-hidden
           >
-            {artByText[drag.text] ? <KidPic id={artByText[drag.text]} size={72} /> : drag.text}
+            {artByText[drag.text] ? <KidPic id={artByText[drag.text]} size={110} /> : drag.text}
           </div>,
           document.body,
         )
@@ -345,7 +345,7 @@ export function SortBoard({
                       onPointerCancel={canPointer ? cancelDrag : undefined}
                       aria-label={`已放入：${text}`}
                     >
-                      {artByText[text] ? <KidPic id={artByText[text]} size={72} /> : text}
+                      {artByText[text] ? <KidPic id={artByText[text]} size={110} /> : text}
                     </button>
                   )
                 })}
@@ -378,9 +378,9 @@ export function SortBoard({
             onPointerMove={canPointer ? onPointerMove : undefined}
             onPointerUp={canPointer ? finishDrag : undefined}
             onPointerCancel={canPointer ? cancelDrag : undefined}
-            aria-label={pictureMode ? '圖' : `詞語：${text}`}
+            aria-label={text}
           >
-            {artByText[text] ? <KidPic id={artByText[text]} size={88} /> : text}
+            {artByText[text] ? <KidPic id={artByText[text]} size={120} /> : text}
           </button>
         ))}
         {available.length === 0 && (

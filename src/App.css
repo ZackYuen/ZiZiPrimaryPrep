@@ -5801,7 +5801,7 @@ button.picture-strip__item--choice {
 }
 
 .sort-box--pics .sort-bucket {
-  min-height: 10rem;
+  min-height: 11.5rem;
 }
 
 .sort-bucket__swatch {
@@ -5830,14 +5830,18 @@ button.picture-strip__item--choice {
 }
 
 .sort-box--pics .chip--pic {
-  padding: 0.2rem;
-  min-width: 5.4rem;
-  min-height: 4.6rem;
-  border-radius: 18px;
+  padding: 0.15rem;
+  min-width: 6.8rem;
+  min-height: 6.2rem;
+  border-radius: 20px;
 }
 
 .sort-box--pics .chip--pic .kid-pic {
-  max-width: 88px;
+  max-width: 120px;
+}
+
+.picture-strip--quiet .picture-strip__item {
+  min-height: 7.4rem;
 }
 
 @media (max-width: 520px) {
