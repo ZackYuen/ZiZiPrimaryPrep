@@ -62,10 +62,10 @@ export const wkf2Plan: SchoolPlan = {
         { text: '公園書', correct: true, say: '我揀公園書。' },
       ],
       pictureStrip: [
-        { src: 'kid:wkf2-cover-book', label: '', kidPic: 'book' },
-        { src: 'kid:wkf2-cover-lib', label: '', kidPic: 'library' },
-        { src: 'kid:wkf2-cover-rabbit', label: '', kidPic: 'rabbit' },
-        { src: 'kid:wkf2-cover-park', label: '', kidPic: 'park-full' },
+        { src: 'kid:wkf2-cover-book', label: '', kidPic: 'r2-cover-star' },
+        { src: 'kid:wkf2-cover-lib', label: '', kidPic: 'r2-cover-library' },
+        { src: 'kid:wkf2-cover-rabbit', label: '', kidPic: 'r2-cover-rabbit' },
+        { src: 'kid:wkf2-cover-park', label: '', kidPic: 'r2-cover-park' },
       ],
     },
     {
@@ -79,7 +79,7 @@ export const wkf2Plan: SchoolPlan = {
       hideChoiceWords: true,
       hideStoryText: true,
       listenToSample: true,
-      storyPics: ['library'],
+      storyPics: ['r2-library'],
       promptZh: '邊個喺書入面？',
       sampleZh: '小寶去圖書館睇一本兔仔書。兔仔喺草地搵紅蘿蔔。搵到就跳嚟跳去。',
       choices: [
@@ -88,9 +88,9 @@ export const wkf2Plan: SchoolPlan = {
         { text: '企鵝', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:wkf2-who-rabbit', label: '', kidPic: 'rabbit' },
-        { src: 'kid:wkf2-who-cat', label: '', kidPic: 'cat' },
-        { src: 'kid:wkf2-who-penguin', label: '', kidPic: 'penguin' },
+        { src: 'kid:wkf2-who-rabbit', label: '', kidPic: 'r2-rabbit' },
+        { src: 'kid:wkf2-who-cat', label: '', kidPic: 'r2-cat' },
+        { src: 'kid:wkf2-who-penguin', label: '', kidPic: 'r2-penguin' },
       ],
     },
     {
@@ -104,7 +104,7 @@ export const wkf2Plan: SchoolPlan = {
       hideChoiceWords: true,
       hideStoryText: true,
       listenToSample: true,
-      storyPics: ['library'],
+      storyPics: ['r2-library'],
       promptZh: '兔仔做咗咩事？',
       sampleZh: '兔仔喺草地搵紅蘿蔔。',
       choices: [
@@ -113,9 +113,9 @@ export const wkf2Plan: SchoolPlan = {
         { text: '開遮', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:wkf2-what-sleep', label: '', kidPic: 'sleep' },
-        { src: 'kid:wkf2-what-carrot', label: '', kidPic: 'carrot' },
-        { src: 'kid:wkf2-what-rain', label: '', kidPic: 'rain' },
+        { src: 'kid:wkf2-what-sleep', label: '', kidPic: 'r2-sleep' },
+        { src: 'kid:wkf2-what-carrot', label: '', kidPic: 'r2-carrot' },
+        { src: 'kid:wkf2-what-rain', label: '', kidPic: 'r2-rain' },
       ],
     },
     {
@@ -129,7 +129,7 @@ export const wkf2Plan: SchoolPlan = {
       hideChoiceWords: true,
       hideStoryText: true,
       listenToSample: true,
-      storyPics: ['library'],
+      storyPics: ['r2-library'],
       promptZh: '點解兔仔跳嚟跳去？',
       sampleZh: '因為搵到嘢食，所以好開心。',
       choices: [
@@ -138,9 +138,9 @@ export const wkf2Plan: SchoolPlan = {
         { text: '戴帽', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:wkf2-why-eat', label: '', kidPic: 'eat' },
-        { src: 'kid:wkf2-why-rain', label: '', kidPic: 'rain' },
-        { src: 'kid:wkf2-why-hat', label: '', kidPic: 'hat' },
+        { src: 'kid:wkf2-why-eat', label: '', kidPic: 'r2-eat' },
+        { src: 'kid:wkf2-why-rain', label: '', kidPic: 'r2-rain' },
+        { src: 'kid:wkf2-why-hat', label: '', kidPic: 'r2-hat' },
       ],
     },
     {
@@ -152,7 +152,7 @@ export const wkf2Plan: SchoolPlan = {
       hideArt: true,
       autoSpeak: true,
       hideChoiceWords: true,
-      hintKidPic: 'park-full',
+      hintKidPic: 'r2-park',
       promptZh: '公園入面有邊個？',
       choices: [
         { text: '熊仔', correct: true },
@@ -160,9 +160,9 @@ export const wkf2Plan: SchoolPlan = {
         { text: '企鵝', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:wkf2-look-teddy', label: '', kidPic: 'teddy' },
-        { src: 'kid:wkf2-look-cat', label: '', kidPic: 'cat' },
-        { src: 'kid:wkf2-look-penguin', label: '', kidPic: 'penguin' },
+        { src: 'kid:wkf2-look-teddy', label: '', kidPic: 'r2-teddy' },
+        { src: 'kid:wkf2-look-cat', label: '', kidPic: 'r2-cat' },
+        { src: 'kid:wkf2-look-penguin', label: '', kidPic: 'r2-penguin' },
       ],
     },
     {
@@ -174,7 +174,7 @@ export const wkf2Plan: SchoolPlan = {
       hideArt: true,
       autoSpeak: true,
       hideChoiceWords: true,
-      hintKidPic: 'park-full',
+      hintKidPic: 'r2-park',
       sceneChoices: true,
       promptZh: '佢哋喺邊度玩？',
       choices: [
@@ -183,9 +183,9 @@ export const wkf2Plan: SchoolPlan = {
         { text: '瞓覺', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:wkf2-look-lib', label: '', kidPic: 'library' },
-        { src: 'kid:wkf2-look-park', label: '', kidPic: 'park-full' },
-        { src: 'kid:wkf2-look-sleep', label: '', kidPic: 'sleep' },
+        { src: 'kid:wkf2-look-lib', label: '', kidPic: 'r2-library' },
+        { src: 'kid:wkf2-look-park', label: '', kidPic: 'r2-park' },
+        { src: 'kid:wkf2-look-sleep', label: '', kidPic: 'r2-sleep' },
       ],
     },
     {
@@ -197,7 +197,7 @@ export const wkf2Plan: SchoolPlan = {
       hideArt: true,
       autoSpeak: true,
       hideChoiceWords: true,
-      hintKidPic: 'park-full',
+      hintKidPic: 'r2-park',
       sceneChoices: true,
       promptZh: '點解去公園？',
       choices: [
@@ -206,9 +206,9 @@ export const wkf2Plan: SchoolPlan = {
         { text: '去睇書', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:wkf2-look-run', label: '', kidPic: 'park-full' },
-        { src: 'kid:wkf2-look-eat', label: '', kidPic: 'eat' },
-        { src: 'kid:wkf2-look-book', label: '', kidPic: 'book' },
+        { src: 'kid:wkf2-look-run', label: '', kidPic: 'r2-park' },
+        { src: 'kid:wkf2-look-eat', label: '', kidPic: 'r2-eat' },
+        { src: 'kid:wkf2-look-book', label: '', kidPic: 'r2-book' },
       ],
     },
     {
@@ -267,9 +267,9 @@ export const wkf2Plan: SchoolPlan = {
         { text: '貓仔', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:wkf2-name-me', label: '', kidPic: 'stand' },
-        { src: 'kid:wkf2-name-apple', label: '', kidPic: 'apple' },
-        { src: 'kid:wkf2-name-cat', label: '', kidPic: 'cat' },
+        { src: 'kid:wkf2-name-me', label: '', kidPic: 'r2-me' },
+        { src: 'kid:wkf2-name-apple', label: '', kidPic: 'r2-apple' },
+        { src: 'kid:wkf2-name-cat', label: '', kidPic: 'r2-cat' },
       ],
     },
     {
@@ -290,9 +290,9 @@ export const wkf2Plan: SchoolPlan = {
         { text: '書', correct: true, say: 'I like books.' },
       ],
       pictureStrip: [
-        { src: 'kid:wkf2-like-apple', label: '', kidPic: 'apple' },
-        { src: 'kid:wkf2-like-cat', label: '', kidPic: 'cat' },
-        { src: 'kid:wkf2-like-book', label: '', kidPic: 'book' },
+        { src: 'kid:wkf2-like-apple', label: '', kidPic: 'r2-apple' },
+        { src: 'kid:wkf2-like-cat', label: '', kidPic: 'r2-cat' },
+        { src: 'kid:wkf2-like-book', label: '', kidPic: 'r2-book' },
       ],
     },
     {
@@ -312,9 +312,9 @@ export const wkf2Plan: SchoolPlan = {
         { text: '扶佢叫老師', correct: true },
       ],
       pictureStrip: [
-        { src: 'kid:wkf2-fall-laugh', label: '', kidPic: 'fall-laugh' },
-        { src: 'kid:wkf2-fall-ignore', label: '', kidPic: 'fall-ignore' },
-        { src: 'kid:wkf2-fall-help', label: '', kidPic: 'fall-help' },
+        { src: 'kid:wkf2-fall-laugh', label: '', kidPic: 'r2-fall-laugh' },
+        { src: 'kid:wkf2-fall-ignore', label: '', kidPic: 'r2-fall-ignore' },
+        { src: 'kid:wkf2-fall-help', label: '', kidPic: 'r2-fall-help' },
       ],
     },
     {
@@ -334,9 +334,9 @@ export const wkf2Plan: SchoolPlan = {
         { text: '跟陌生人', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:wkf2-mall-alone', label: '', kidPic: 'mall-alone' },
-        { src: 'kid:wkf2-mall-staff', label: '', kidPic: 'mall-staff' },
-        { src: 'kid:wkf2-mall-stranger', label: '', kidPic: 'mall-stranger' },
+        { src: 'kid:wkf2-mall-alone', label: '', kidPic: 'r2-mall-alone' },
+        { src: 'kid:wkf2-mall-staff', label: '', kidPic: 'r2-mall-staff' },
+        { src: 'kid:wkf2-mall-stranger', label: '', kidPic: 'r2-mall-stranger' },
       ],
     },
     {
@@ -356,9 +356,9 @@ export const wkf2Plan: SchoolPlan = {
         { text: '笑佢', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:wkf2-share-gift', label: '', kidPic: 'gift' },
-        { src: 'kid:wkf2-share-ignore', label: '', kidPic: 'fall-ignore' },
-        { src: 'kid:wkf2-share-laugh', label: '', kidPic: 'fall-laugh' },
+        { src: 'kid:wkf2-share-gift', label: '', kidPic: 'r2-share' },
+        { src: 'kid:wkf2-share-ignore', label: '', kidPic: 'r2-fall-ignore' },
+        { src: 'kid:wkf2-share-laugh', label: '', kidPic: 'r2-fall-laugh' },
       ],
     },
   ],
@@ -422,9 +422,9 @@ export const jando2Plan: SchoolPlan = {
         { text: '食飯枱', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:jando2-first-park', label: '', kidPic: 'park-full' },
-        { src: 'kid:jando2-first-sleep', label: '', kidPic: 'sleep' },
-        { src: 'kid:jando2-first-eat', label: '', kidPic: 'eat' },
+        { src: 'kid:jando2-first-park', label: '', kidPic: 'r2-park' },
+        { src: 'kid:jando2-first-sleep', label: '', kidPic: 'r2-sleep' },
+        { src: 'kid:jando2-first-eat', label: '', kidPic: 'r2-eat' },
       ],
     },
     {
@@ -446,9 +446,9 @@ export const jando2Plan: SchoolPlan = {
         { text: '帽', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:jando2-next-book', label: '', kidPic: 'book' },
-        { src: 'kid:jando2-next-carrot', label: '', kidPic: 'carrot' },
-        { src: 'kid:jando2-next-hat', label: '', kidPic: 'hat' },
+        { src: 'kid:jando2-next-book', label: '', kidPic: 'r2-book' },
+        { src: 'kid:jando2-next-carrot', label: '', kidPic: 'r2-carrot' },
+        { src: 'kid:jando2-next-hat', label: '', kidPic: 'r2-hat' },
       ],
     },
     {
@@ -470,9 +470,9 @@ export const jando2Plan: SchoolPlan = {
         { text: '食嘢', correct: true },
       ],
       pictureStrip: [
-        { src: 'kid:jando2-last-rain', label: '', kidPic: 'rain' },
-        { src: 'kid:jando2-last-gift', label: '', kidPic: 'gift' },
-        { src: 'kid:jando2-last-eat', label: '', kidPic: 'eat' },
+        { src: 'kid:jando2-last-rain', label: '', kidPic: 'r2-rain' },
+        { src: 'kid:jando2-last-gift', label: '', kidPic: 'r2-gift' },
+        { src: 'kid:jando2-last-eat', label: '', kidPic: 'r2-eat' },
       ],
     },
     {
@@ -492,9 +492,9 @@ export const jando2Plan: SchoolPlan = {
         { text: '點解睇書', correct: true, say: '點解要睇書？' },
       ],
       pictureStrip: [
-        { src: 'kid:jando2-why-carrot', label: '', kidPic: 'carrot' },
-        { src: 'kid:jando2-why-umb', label: '', kidPic: 'umbrella' },
-        { src: 'kid:jando2-why-book', label: '', kidPic: 'book' },
+        { src: 'kid:jando2-why-carrot', label: '', kidPic: 'r2-why-carrot' },
+        { src: 'kid:jando2-why-umb', label: '', kidPic: 'r2-why-umbrella' },
+        { src: 'kid:jando2-why-book', label: '', kidPic: 'r2-why-book' },
       ],
     },
     {
@@ -514,9 +514,9 @@ export const jando2Plan: SchoolPlan = {
         { text: '自己走開', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:jando2-care-laugh', label: '', kidPic: 'fall-laugh' },
-        { src: 'kid:jando2-care-help', label: '', kidPic: 'fall-help' },
-        { src: 'kid:jando2-care-ignore', label: '', kidPic: 'fall-ignore' },
+        { src: 'kid:jando2-care-laugh', label: '', kidPic: 'r2-fall-laugh' },
+        { src: 'kid:jando2-care-help', label: '', kidPic: 'r2-fall-help' },
+        { src: 'kid:jando2-care-ignore', label: '', kidPic: 'r2-fall-ignore' },
       ],
     },
     {
@@ -528,7 +528,7 @@ export const jando2Plan: SchoolPlan = {
       hideArt: true,
       autoSpeak: true,
       hideChoiceWords: true,
-      hintCount: { pic: 'apple', n: 2 },
+      hintCount: { pic: 'r2-apple', n: 2 },
       promptZh: '呢度有兩個蘋果，再加一個，一共幾多？撳一樣多星星。',
       choices: [
         { text: '兩粒', correct: false },
@@ -550,7 +550,7 @@ export const jando2Plan: SchoolPlan = {
       hideArt: true,
       autoSpeak: true,
       hideChoiceWords: true,
-      hintCount: { pic: 'orange', n: 4 },
+      hintCount: { pic: 'r2-orange', n: 4 },
       promptZh: '四個橙，食咗一個，剩幾多？撳一樣多星星。',
       choices: [
         { text: '三粒', correct: true },
@@ -581,9 +581,9 @@ export const jando2Plan: SchoolPlan = {
         { text: '貓仔', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:jando2-zh-apple', label: '', kidPic: 'apple' },
-        { src: 'kid:jando2-zh-banana', label: '', kidPic: 'banana' },
-        { src: 'kid:jando2-zh-cat', label: '', kidPic: 'cat' },
+        { src: 'kid:jando2-zh-apple', label: '', kidPic: 'r2-apple' },
+        { src: 'kid:jando2-zh-banana', label: '', kidPic: 'r2-banana' },
+        { src: 'kid:jando2-zh-cat', label: '', kidPic: 'r2-cat' },
       ],
     },
     {
@@ -605,9 +605,9 @@ export const jando2Plan: SchoolPlan = {
         { text: 'apple', correct: false },
       ],
       pictureStrip: [
-        { src: 'kid:jando2-en-cat', label: '', kidPic: 'cat' },
-        { src: 'kid:jando2-en-book', label: '', kidPic: 'book' },
-        { src: 'kid:jando2-en-apple', label: '', kidPic: 'apple' },
+        { src: 'kid:jando2-en-cat', label: '', kidPic: 'r2-cat' },
+        { src: 'kid:jando2-en-book', label: '', kidPic: 'r2-book' },
+        { src: 'kid:jando2-en-apple', label: '', kidPic: 'r2-apple' },
       ],
     },
   ],

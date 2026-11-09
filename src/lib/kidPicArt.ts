@@ -39,6 +39,38 @@ const ART: Record<KidPicId, string> = {
   'fall-laugh': 'school-week/dbs/sit-fall-laugh.jpg',
   'fall-ignore': 'school-week/dbs/sit-fall-ignore.jpg',
   star: 'school-week/dbs/star.png',
+  'r2-apple': 'school-week/round2/r2-apple.jpg',
+  'r2-banana': 'school-week/round2/r2-banana.jpg',
+  'r2-orange': 'school-week/round2/r2-orange.jpg',
+  'r2-book': 'school-week/round2/r2-book.jpg',
+  'r2-cat': 'school-week/round2/r2-cat.jpg',
+  'r2-rabbit': 'school-week/round2/r2-rabbit.jpg',
+  'r2-penguin': 'school-week/round2/r2-penguin.jpg',
+  'r2-teddy': 'school-week/round2/r2-teddy.jpg',
+  'r2-carrot': 'school-week/round2/r2-carrot.jpg',
+  'r2-hat': 'school-week/round2/r2-hat.jpg',
+  'r2-umbrella': 'school-week/round2/r2-umbrella.jpg',
+  'r2-gift': 'school-week/round2/r2-gift.jpg',
+  'r2-cover-star': 'school-week/round2/r2-cover-star.jpg',
+  'r2-cover-library': 'school-week/round2/r2-cover-library.jpg',
+  'r2-cover-rabbit': 'school-week/round2/r2-cover-rabbit.jpg',
+  'r2-cover-park': 'school-week/round2/r2-cover-park.jpg',
+  'r2-library': 'school-week/round2/r2-library.jpg',
+  'r2-park': 'school-week/round2/r2-park.jpg',
+  'r2-sleep': 'school-week/round2/r2-sleep.jpg',
+  'r2-eat': 'school-week/round2/r2-eat.jpg',
+  'r2-rain': 'school-week/round2/r2-rain.jpg',
+  'r2-me': 'school-week/round2/r2-me.jpg',
+  'r2-why-carrot': 'school-week/round2/r2-why-carrot.jpg',
+  'r2-why-umbrella': 'school-week/round2/r2-why-umbrella.jpg',
+  'r2-why-book': 'school-week/round2/r2-why-book.jpg',
+  'r2-fall-help': 'school-week/round2/r2-fall-help.jpg',
+  'r2-fall-laugh': 'school-week/round2/r2-fall-laugh.jpg',
+  'r2-fall-ignore': 'school-week/round2/r2-fall-ignore.jpg',
+  'r2-mall-staff': 'school-week/round2/r2-mall-staff.jpg',
+  'r2-mall-alone': 'school-week/round2/r2-mall-alone.jpg',
+  'r2-mall-stranger': 'school-week/round2/r2-mall-stranger.jpg',
+  'r2-share': 'school-week/round2/r2-share.jpg',
 }
 
 const SHADOW: Partial<Record<KidPicId, string>> = {
@@ -63,10 +95,28 @@ export const WIDE_KID_PICS: ReadonlySet<KidPicId> = new Set<KidPicId>([
   'fall-help',
   'fall-laugh',
   'fall-ignore',
+  'r2-library',
+  'r2-park',
+  'r2-sleep',
+  'r2-eat',
+  'r2-rain',
+  'r2-why-carrot',
+  'r2-why-umbrella',
+  'r2-why-book',
+  'r2-fall-help',
+  'r2-fall-laugh',
+  'r2-fall-ignore',
+  'r2-mall-staff',
+  'r2-mall-alone',
+  'r2-mall-stranger',
+  'r2-share',
 ])
+
+export function kidPicFile(id: KidPicId, shadow = false) {
+  return (shadow && SHADOW[id]) || ART[id]
+}
 
 export function kidPicSrc(id: KidPicId, shadow = false) {
   const base = import.meta.env.BASE_URL || '/'
-  const file = (shadow && SHADOW[id]) || ART[id]
-  return `${base}${file}`
+  return `${base}${kidPicFile(id, shadow)}`
 }

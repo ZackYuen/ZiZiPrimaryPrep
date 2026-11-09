@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
+import { existsSync } from 'node:fs'
+import { resolve } from 'node:path'
+import type { Activity, KidPicId } from '../data/content.ts'
 import { getSchool } from '../data/schoolWeek.ts'
+import { kidPicFile } from './kidPicArt.ts'
 import {
   JANDO2_FORBIDDEN_CHILD_COPY,
   ROUND2_KID_KINDS,
@@ -9,6 +13,19 @@ import {
   round2Plan,
   WKF2_FORBIDDEN_CHILD_COPY,
 } from './secondRoundPractice.ts'
+
+const ROUND2_KEEP_SHARED: ReadonlySet<KidPicId> = new Set(['star', 'stand', 'sit', 'foot'])
+
+function round2KidPics(item: Activity): KidPicId[] {
+  const ids: KidPicId[] = []
+  if (item.hintKidPic) ids.push(item.hintKidPic)
+  if (item.hintCount?.pic) ids.push(item.hintCount.pic)
+  ids.push(...(item.storyPics ?? []))
+  for (const pic of item.pictureStrip ?? []) {
+    if (pic.kidPic) ids.push(pic.kidPic)
+  }
+  return ids
+}
 
 describe('王錦輝二輪 playable stations', () => {
   const plan = round2Plan('wkf2')
@@ -54,7 +71,7 @@ describe('王錦輝二輪 playable stations', () => {
     const looks = plan.activities.filter((a) => a.id.startsWith('wkf2-look-'))
     assert.equal(looks.length, 3)
     for (const item of looks) {
-      assert.equal(item.hintKidPic, 'park-full')
+      assert.equal(item.hintKidPic, 'r2-park')
       assert.ok((item.pictureStrip?.length ?? 0) >= 2)
       assert.ok((item.pictureStrip?.length ?? 0) <= 3)
     }
@@ -213,6 +230,32 @@ describe('真道二輪 playable stations', () => {
       /挫折/,
     ]) {
       assert.match(text, must)
+    }
+  })
+})
+
+describe('round-2 art is new plates, not 男拔／一輪 sprites', () => {
+  it('keeps only star / pose chrome reused; everything else is school-week/round2', () => {
+    for (const id of ['wkf2', 'jando2'] as const) {
+      const plan = round2Plan(id)
+      for (const item of plan.activities) {
+        for (const pic of round2KidPics(item)) {
+          const file = kidPicFile(pic)
+          if (ROUND2_KEEP_SHARED.has(pic)) {
+            assert.ok(
+              /school-week\/(games|dbs)\//.test(file) || file.endsWith('star.png'),
+              `${item.id} ${pic} expected shared chrome`,
+            )
+            continue
+          }
+          assert.match(pic, /^r2-/, `${item.id} still uses old id ${pic}`)
+          assert.match(file, /^school-week\/round2\//, `${item.id} ${pic} → ${file}`)
+          assert.ok(
+            existsSync(resolve('public', file)),
+            `missing public/${file}`,
+          )
+        }
+      }
     }
   })
 })
