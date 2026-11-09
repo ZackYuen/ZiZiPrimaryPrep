@@ -21,6 +21,12 @@ const SCORED_KINDS: ReadonlySet<ActivityKind> = new Set([
  * Speak / 讀完啦 / parent checklist stay free of a covering overlay.
  * Last item uses the existing chapter finale instead.
  */
-export function shouldCelebrateCorrect(kind: ActivityKind, isLast: boolean): boolean {
-  return !isLast && SCORED_KINDS.has(kind)
+export function shouldCelebrateCorrect(
+  kind: ActivityKind,
+  isLast: boolean,
+  extra?: { parentCheck?: boolean },
+): boolean {
+  if (isLast) return false
+  if (extra?.parentCheck) return true
+  return SCORED_KINDS.has(kind)
 }

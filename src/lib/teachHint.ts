@@ -259,6 +259,30 @@ const ID_VISUAL: Record<string, HintVisualId> = {
   'dbs-chat-colour': 'like-blue',
   'dbs-chat-fruit': 'eat',
   'dbs-chat-place': 'park',
+  'wkf2-book-pick': 'book',
+  'wkf2-book-who': 'zoo',
+  'wkf2-book-what': 'eat',
+  'wkf2-book-why': 'happy',
+  'wkf2-look-who': 'park',
+  'wkf2-look-what': 'park',
+  'wkf2-look-why': 'run',
+  'wkf2-do-step': 'play-fun',
+  'wkf2-do-stop': 'play-fun',
+  'wkf2-do-stand': 'play-fun',
+  'wkf2-en-name': 'intro',
+  'wkf2-en-like': 'like-blue',
+  'wkf2-help-fall': 'share',
+  'wkf2-help-mall': 'police-help',
+  'wkf2-help-share': 'gift',
+  'jando2-story-first': 'park',
+  'jando2-story-next': 'eat',
+  'jando2-story-last': 'eat',
+  'jando2-ask-why': 'talk',
+  'jando2-care': 'share',
+  'jando2-add': 'plus',
+  'jando2-minus': 'minus',
+  'jando2-word-zh': 'eat',
+  'jando2-word-en': 'zoo',
   'jando-name-en': 'intro',
   'jando-word-pick': 'eat',
   'jando-m1': 'plus',
@@ -589,6 +613,102 @@ const ID_KID: Record<string, { kidLine: string; moreLine: string }> = {
   'dbs-chat-place': {
     kidLine: '撳你鍾意去玩嘅地方，揀邊個都啱。',
     moreLine: '可以講：我鍾意去公園玩。',
+  },
+  'wkf2-book-pick': {
+    kidLine: '撳一本你想睇嘅書。',
+    moreLine: '四本都得，揀完跟住講。',
+  },
+  'wkf2-book-who': {
+    kidLine: '聽完故仔，撳書入面嗰隻動物。',
+    moreLine: '故仔入面有兔仔。',
+  },
+  'wkf2-book-what': {
+    kidLine: '兔仔做咗咩？撳嗰幅。',
+    moreLine: '兔仔喺草地搵紅蘿蔔。',
+  },
+  'wkf2-book-why': {
+    kidLine: '點解兔仔跳？撳嗰幅。',
+    moreLine: '因為搵到嘢食，好開心。',
+  },
+  'wkf2-look-who': {
+    kidLine: '望幅大圖，撳公園入面嗰個。',
+    moreLine: '草地上面有隻熊仔。',
+  },
+  'wkf2-look-what': {
+    kidLine: '佢哋喺邊度玩？撳嗰幅。',
+    moreLine: '喺公園草地。',
+  },
+  'wkf2-look-why': {
+    kidLine: '點解去公園？撳嗰幅。',
+    moreLine: '去跑步同玩。',
+  },
+  'wkf2-do-step': {
+    kidLine: '跟住幅圖踏步。做到爸爸媽媽撳 ★。',
+    moreLine: '一隻腳一隻腳踏，好似行軍咁。',
+  },
+  'wkf2-do-stop': {
+    kidLine: '聽到停就企定。做到撳 ★。',
+    moreLine: '好似雕像，唔好郁。',
+  },
+  'wkf2-do-stand': {
+    kidLine: '企直直望住前面。做到撳 ★。',
+    moreLine: '雙手垂低，笑住企好。',
+  },
+  'wkf2-en-name': {
+    kidLine: '撳自己嗰幅，跟住講 My name is Seth.',
+    moreLine: '企喺度嗰個就係你。',
+  },
+  'wkf2-en-like': {
+    kidLine: '撳你鍾意嗰樣，跟住講 I like。',
+    moreLine: '蘋果、貓仔、書，揀邊個都得。',
+  },
+  'wkf2-help-fall': {
+    kidLine: '同學跌親，要點幫？',
+    moreLine: '扶佢，叫老師嚟幫手。',
+  },
+  'wkf2-help-mall': {
+    kidLine: '搵唔到媽媽，要搵邊個幫手？',
+    moreLine: '搵着制服嘅職員姐姐。',
+  },
+  'wkf2-help-share': {
+    kidLine: '朋友未有禮物，你會點？',
+    moreLine: '分俾佢一齊開心。',
+  },
+  'jando2-story-first': {
+    kidLine: '故仔開頭去邊？撳嗰幅。',
+    moreLine: '兔仔先去公園。',
+  },
+  'jando2-story-next': {
+    kidLine: '跟住見到咩？撳嗰幅。',
+    moreLine: '草地有紅蘿蔔。',
+  },
+  'jando2-story-last': {
+    kidLine: '最後做咩？撳嗰幅。',
+    moreLine: '坐低食蘿蔔。',
+  },
+  'jando2-ask-why': {
+    kidLine: '揀一條「點解」問出嚟。',
+    moreLine: '三條都得，跟住黃色聲問。',
+  },
+  'jando2-care': {
+    kidLine: '同學跌親，點關心？',
+    moreLine: '扶佢，叫老師。',
+  },
+  'jando2-add': {
+    kidLine: '兩個再加一個，撳一樣多星星。',
+    moreLine: '一、二，再加一就係三。',
+  },
+  'jando2-minus': {
+    kidLine: '四個食咗一個，剩幾多？',
+    moreLine: '四減一係三。',
+  },
+  'jando2-word-zh': {
+    kidLine: '聽到蘋果，撳蘋果。',
+    moreLine: '紅紅圓圓嗰個。',
+  },
+  'jando2-word-en': {
+    kidLine: '聽到 cat，撳貓仔。',
+    moreLine: '唔使讀英文，聽完撳圖。',
   },
   'spcc-read': {
     kidLine: '望住圖，中文同英文都讀。',

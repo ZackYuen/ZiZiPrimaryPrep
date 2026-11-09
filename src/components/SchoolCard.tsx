@@ -31,25 +31,41 @@ function SchoolGlyph({ id }: { id: SchoolPlan['id'] }) {
       </svg>
     )
   }
-  if (id === 'wkf') {
+  if (id === 'wkf' || id === 'wkf2') {
     return (
       <svg className="day-glyph" viewBox="0 0 64 64" aria-hidden>
-        <rect width="64" height="64" rx="18" fill="#6BCB8B" />
+        <rect width="64" height="64" rx="18" fill={id === 'wkf2' ? '#5BBF80' : '#6BCB8B'} />
         <path d="M12 40 L32 18 L52 40 L44 40 L44 50 L20 50 L20 40z" fill="#fff" />
         <circle cx="32" cy="36" r="5" fill="#1F6B3A" />
+        {id === 'wkf2' ? (
+          <g>
+            <circle cx="50" cy="14" r="10" fill="#165C32" />
+            <text x="50" y="18" textAnchor="middle" fontSize="12" fontWeight="700" fill="#fff">
+              2
+            </text>
+          </g>
+        ) : null}
       </svg>
     )
   }
-  if (id === 'jando') {
+  if (id === 'jando' || id === 'jando2') {
     return (
       <svg className="day-glyph" viewBox="0 0 64 64" aria-hidden>
-        <rect width="64" height="64" rx="18" fill="#B8D46A" />
+        <rect width="64" height="64" rx="18" fill={id === 'jando2' ? '#A8CC5C' : '#B8D46A'} />
         <rect x="20" y="16" width="24" height="32" rx="12" fill="#7CB342" />
         <circle cx="27" cy="24" r="2.2" fill="#1B3A16" />
         <circle cx="37" cy="24" r="2.2" fill="#1B3A16" />
         <path d="M26 30 Q32 35 38 30" fill="none" stroke="#1B3A16" strokeWidth="1.8" strokeLinecap="round" />
         <circle cx="32" cy="38" r="2" fill="#2E4A1A" />
         <circle cx="32" cy="43" r="2" fill="#2E4A1A" />
+        {id === 'jando2' ? (
+          <g>
+            <circle cx="50" cy="14" r="10" fill="#2F5512" />
+            <text x="50" y="18" textAnchor="middle" fontSize="12" fontWeight="700" fill="#fff">
+              2
+            </text>
+          </g>
+        ) : null}
       </svg>
     )
   }

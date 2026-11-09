@@ -141,6 +141,8 @@ export function PracticeSession({
   const [gameSolved, setGameSolved] = useState(false)
   const [looked, setLooked] = useState(true)
   const [parentOpen, setParentOpen] = useState(false)
+  const [demoPop, setDemoPop] = useState(false)
+  const parentDidIt = !!checkedFields['做到']
 
   const item = items[index]
   const kindPad = padKind(item)
@@ -168,7 +170,8 @@ export function PracticeSession({
       mathResult === 'ok' ||
       solvedChoice ||
       (sortChecked && sortCorrect) ||
-      gameSolved,
+      gameSolved ||
+      parentDidIt,
     encourage: mathResult === 'no' || wrongAttempts > 0 || (sortChecked && !sortCorrect),
     listening: listening || listenBusy,
     looking: lookLeft != null && lookLeft > 0,
@@ -236,6 +239,7 @@ export function PracticeSession({
     setLookLeft(_activity.lookSeconds ?? null)
     setGameSolved(false)
     setLooked(!_activity.lookThen)
+    setDemoPop(false)
     if (_activity.kind === 'reorder' && _activity.fragments) {
       const shuffled = [..._activity.fragments].sort(() => Math.random() - 0.5)
       setPool(shuffled)
@@ -340,7 +344,7 @@ export function PracticeSession({
   }
 
   const awardAndMaybeNext = (autoNext = false) => {
-    const celebrated = shouldCelebrateCorrect(item.kind, isLast)
+    const celebrated = shouldCelebrateCorrect(item.kind, isLast, { parentCheck: item.parentCheck })
     if (celebrated) setShowCorrectCeleb(true)
     if (!done) {
       onMarkDone(item.id, moduleKey)
@@ -394,6 +398,7 @@ export function PracticeSession({
     if (item.kind === 'reorder') return reorderCorrect
     if (item.kind === 'sort') return sortChecked && sortCorrect
     if (item.kind === 'prompt') {
+      if (item.parentCheck) return parentDidIt
       if (!item.fields?.length) return true
       return item.fields.every((f) => checkedFields[f])
     }
@@ -689,11 +694,9 @@ export function PracticeSession({
               playSfx('flip')
               setParentOpen(true)
             }}
-            aria-label="家長須知"
+            aria-label="家長專用 · 唔計分"
           >
-            家長
-            <br />
-            須知
+            {KID.parentHint}
           </button>
         )}
         <SoundToggle />
@@ -752,9 +755,26 @@ export function PracticeSession({
             </div>
           )}
           {item.hintKidPic && !item.lookThen && (
-            <div className={`hint-pic-wrap${item.sceneChoices ? ' hint-pic-wrap--small' : ''}`}>
-              <KidPic id={item.hintKidPic} size={220} />
-            </div>
+            item.parentCheck ? (
+              <button
+                type="button"
+                className={`hint-pic-wrap parent-check__demo${demoPop ? ' is-play' : ''}${item.sceneChoices ? ' hint-pic-wrap--small' : ''}`}
+                onClick={() => {
+                  unlockAudio()
+                  playSfx('tap')
+                  setDemoPop(true)
+                  window.setTimeout(() => setDemoPop(false), 450)
+                  playQuestion()
+                }}
+                aria-label="再睇一次"
+              >
+                <KidPic id={item.hintKidPic} size={220} />
+              </button>
+            ) : (
+              <div className={`hint-pic-wrap${item.sceneChoices ? ' hint-pic-wrap--small' : ''}`}>
+                <KidPic id={item.hintKidPic} size={220} />
+              </div>
+            )
           )}
           {item.hintCount && (
             <div className="hint-pic-wrap hint-count">
@@ -863,6 +883,7 @@ export function PracticeSession({
                         setPicked(picIndex)
                         setCoachMsg('答對啦！你好努力！')
                         playSfx('correct')
+                        if (choice.say) speak(`好呀！你講吓：${choice.say}`, 'zh-HK')
                         awardAndMaybeNext(true)
                       } else {
                         playSfx('wrong')
@@ -1761,7 +1782,48 @@ export function PracticeSession({
             </>
           )}
 
-          {item.kind === 'prompt' && (
+          {item.kind === 'prompt' && item.parentCheck && (
+            <div className="parent-check">
+              <p className="parent-check__hint">爸爸媽媽睇住 · 做到撳 ★</p>
+              <div className="parent-check__row">
+                <button
+                  type="button"
+                  className="parent-check__btn parent-check__btn--ok"
+                  disabled={parentDidIt}
+                  onClick={() => {
+                    if (parentDidIt) return
+                    unlockAudio()
+                    setCheckedFields({ 做到: true })
+                    setCoachMsg('好叻！')
+                    playSfx('correct')
+                    awardAndMaybeNext(true)
+                  }}
+                  aria-label="做到"
+                >
+                  <span className="parent-check__mark">{KID.didIt}</span>
+                  <span>做到</span>
+                </button>
+                <button
+                  type="button"
+                  className="parent-check__btn parent-check__btn--retry"
+                  disabled={parentDidIt}
+                  onClick={() => {
+                    unlockAudio()
+                    playSfx('tap')
+                    setDemoPop(true)
+                    window.setTimeout(() => setDemoPop(false), 450)
+                    playQuestion()
+                  }}
+                  aria-label="再試"
+                >
+                  <span className="parent-check__mark">{KID.tryAgain}</span>
+                  <span>再試</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {item.kind === 'prompt' && !item.parentCheck && (
             <div className="prompt-fields">
               <p className="reorder__hint">同爸爸媽媽一齊 · 撳 ✓</p>
               {(item.fields ?? ['我已經試過']).map((f) => (

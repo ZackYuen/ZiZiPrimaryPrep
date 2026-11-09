@@ -6082,8 +6082,12 @@ button.picture-strip__item--choice {
 
 .session__parent-btn {
   flex: 0 0 auto;
-  font-size: 0.85rem;
-  line-height: 1.1;
+  width: 2.9rem;
+  min-width: 2.9rem;
+  height: 2.9rem;
+  padding: 0;
+  font-size: 1.15rem;
+  line-height: 1;
   font-weight: 900;
   color: #1b4f8a;
   border: 2px solid rgba(126, 168, 214, 0.55);
@@ -6198,6 +6202,81 @@ button.picture-strip__item--choice {
 
 .parent-sheet__done {
   margin-top: 1rem;
+}
+
+.parent-check {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 0.4rem;
+}
+
+.parent-check__hint {
+  margin: 0;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #5a6570;
+}
+
+.parent-check__row {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.parent-check__btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  min-height: 5.2rem;
+  border-radius: 20px;
+  font-weight: 800;
+}
+
+.parent-check__mark {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.parent-check__btn--ok {
+  background: #e7f8ec;
+  color: #165c32;
+  border: 2px solid rgba(22, 92, 50, 0.28);
+}
+
+.parent-check__btn--retry {
+  background: #fff6e4;
+  color: #8a5a12;
+  border: 2px solid rgba(138, 90, 18, 0.28);
+}
+
+.parent-check__btn:disabled {
+  opacity: 0.55;
+}
+
+.parent-check__demo {
+  display: block;
+  width: 100%;
+  cursor: pointer;
+}
+
+.parent-check__demo.is-play {
+  animation: parent-check-pop 0.45s ease;
+}
+
+@keyframes parent-check-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.07);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* ---- 男拔: counting groups, jigsaw, scene choices, chat cards ---- */

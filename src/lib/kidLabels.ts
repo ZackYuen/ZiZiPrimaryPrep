@@ -21,6 +21,8 @@ export const KID = {
   cantonese: '粵',
   english: 'EN',
   parentHint: 'P',
+  didIt: '★',
+  tryAgain: '▶',
   soundOn: '♪',
   soundOff: '×♪',
 } as const
