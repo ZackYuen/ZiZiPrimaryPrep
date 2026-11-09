@@ -1,5 +1,5 @@
 import { prepareSpokenText, toPlainSpoken, toSsml, type SpeakLang as TtsLang } from './speakText'
-import { getVoiceSettings } from './voiceSettings'
+import { EN_VOICE_OPTIONS, getVoiceSettings, YUE_VOICE_OPTIONS } from './voiceSettings'
 
 export type { TtsLang }
 
@@ -12,8 +12,8 @@ export function isGoogleTtsConfigured(): boolean {
   return getVoiceSettings().provider === 'google' && hasGoogleTtsKey()
 }
 
-const YUE_VOICES = ['yue-HK-Chirp3-HD-Kore', 'yue-HK-Standard-A']
-const EN_VOICES = ['en-US-Chirp3-HD-Kore', 'en-US-Neural2-C', 'en-US-Standard-C']
+const YUE_VOICES = YUE_VOICE_OPTIONS.map((option) => option.value)
+const EN_VOICES = EN_VOICE_OPTIONS.map((option) => option.value)
 
 const cache = new Map<string, Uint8Array>()
 const CACHE_MAX = 40

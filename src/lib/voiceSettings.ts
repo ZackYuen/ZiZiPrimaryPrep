@@ -1,5 +1,8 @@
 export type VoiceProvider = 'google' | 'system'
-export type YueGoogleVoice = 'yue-HK-Chirp3-HD-Kore' | 'yue-HK-Standard-A'
+export type YueGoogleVoice =
+  | 'yue-HK-Chirp3-HD-Leda'
+  | 'yue-HK-Chirp3-HD-Kore'
+  | 'yue-HK-Standard-A'
 export type EnGoogleVoice =
   | 'en-US-Chirp3-HD-Kore'
   | 'en-US-Neural2-C'
@@ -14,7 +17,8 @@ export type VoiceSettings = {
 }
 
 export const YUE_VOICE_OPTIONS: ReadonlyArray<{ value: YueGoogleVoice; label: string }> = [
-  { value: 'yue-HK-Chirp3-HD-Kore', label: 'Chirp3 Kore（最自然）' },
+  { value: 'yue-HK-Chirp3-HD-Leda', label: 'Chirp3 Leda（最自然）' },
+  { value: 'yue-HK-Chirp3-HD-Kore', label: 'Chirp3 Kore' },
   { value: 'yue-HK-Standard-A', label: 'Standard A（清楚穩定）' },
 ]
 
@@ -31,10 +35,16 @@ export const RATE_OPTIONS: ReadonlyArray<{ value: VoiceRate; label: string }> = 
 ]
 
 const STORAGE_KEY = 'zizi-voice-settings-v1'
+export const LEGACY_DEFAULT_YUE_VOICE = 'yue-HK-Chirp3-HD-Kore' as const
+const YUE_DEFAULT_MIGRATION_FLAG = 'yueDefaultMigratedToLeda' as const
+
+type StoredVoiceSettings = Partial<VoiceSettings> & {
+  yueDefaultMigratedToLeda?: boolean
+}
 
 export const DEFAULT_VOICE_SETTINGS: VoiceSettings = {
   provider: 'google',
-  yueVoice: 'yue-HK-Chirp3-HD-Kore',
+  yueVoice: 'yue-HK-Chirp3-HD-Leda',
   enVoice: 'en-US-Chirp3-HD-Kore',
   rate: 0.95,
 }
@@ -43,22 +53,52 @@ const YUE_VALUES = new Set(YUE_VOICE_OPTIONS.map((option) => option.value))
 const EN_VALUES = new Set(EN_VOICE_OPTIONS.map((option) => option.value))
 const RATE_VALUES = new Set(RATE_OPTIONS.map((option) => option.value))
 
-export function getVoiceSettings(): VoiceSettings {
-  if (typeof window === 'undefined') return DEFAULT_VOICE_SETTINGS
-  try {
-    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') as Partial<VoiceSettings>
+function persistVoiceSettings(settings: VoiceSettings): void {
+  globalThis.localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({
+      ...settings,
+      [YUE_DEFAULT_MIGRATION_FLAG]: true,
+    }),
+  )
+}
+
+export function resolveVoiceSettings(raw: StoredVoiceSettings = {}): {
+  settings: VoiceSettings
+  migratedLegacyYueDefault: boolean
+} {
+  const settings: VoiceSettings = {
+    provider: raw.provider === 'system' ? 'system' : 'google',
+    yueVoice: YUE_VALUES.has(raw.yueVoice as YueGoogleVoice)
+      ? (raw.yueVoice as YueGoogleVoice)
+      : DEFAULT_VOICE_SETTINGS.yueVoice,
+    enVoice: EN_VALUES.has(raw.enVoice as EnGoogleVoice)
+      ? (raw.enVoice as EnGoogleVoice)
+      : DEFAULT_VOICE_SETTINGS.enVoice,
+    rate: RATE_VALUES.has(Number(raw.rate) as VoiceRate)
+      ? (Number(raw.rate) as VoiceRate)
+      : DEFAULT_VOICE_SETTINGS.rate,
+  }
+
+  const alreadyMigrated = raw.yueDefaultMigratedToLeda === true
+  if (!alreadyMigrated && settings.yueVoice === LEGACY_DEFAULT_YUE_VOICE) {
     return {
-      provider: raw.provider === 'system' ? 'system' : 'google',
-      yueVoice: YUE_VALUES.has(raw.yueVoice as YueGoogleVoice)
-        ? (raw.yueVoice as YueGoogleVoice)
-        : DEFAULT_VOICE_SETTINGS.yueVoice,
-      enVoice: EN_VALUES.has(raw.enVoice as EnGoogleVoice)
-        ? (raw.enVoice as EnGoogleVoice)
-        : DEFAULT_VOICE_SETTINGS.enVoice,
-      rate: RATE_VALUES.has(Number(raw.rate) as VoiceRate)
-        ? (Number(raw.rate) as VoiceRate)
-        : DEFAULT_VOICE_SETTINGS.rate,
+      settings: { ...settings, yueVoice: DEFAULT_VOICE_SETTINGS.yueVoice },
+      migratedLegacyYueDefault: true,
     }
+  }
+
+  return { settings, migratedLegacyYueDefault: false }
+}
+
+export function getVoiceSettings(): VoiceSettings {
+  try {
+    const storage = globalThis.localStorage
+    if (!storage) return DEFAULT_VOICE_SETTINGS
+    const raw = JSON.parse(storage.getItem(STORAGE_KEY) || '{}') as StoredVoiceSettings
+    const { settings, migratedLegacyYueDefault } = resolveVoiceSettings(raw)
+    if (migratedLegacyYueDefault) persistVoiceSettings(settings)
+    return settings
   } catch {
     return DEFAULT_VOICE_SETTINGS
   }
@@ -66,7 +106,7 @@ export function getVoiceSettings(): VoiceSettings {
 
 export function saveVoiceSettings(settings: VoiceSettings): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
+    persistVoiceSettings(settings)
   } catch {
     /* Private browsing can block persistent storage. */
   }
