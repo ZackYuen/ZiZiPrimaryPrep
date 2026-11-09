@@ -227,6 +227,8 @@ export type Activity = {
   autoSpeak?: boolean
   /** Hide A/B/中文 captions on picture choices — parent can still hear ▶. */ 
   hideChoiceWords?: boolean
+  /** Parent watches a physical action, then taps 做到 / 再試. */
+  parentCheck?: boolean
   /** Analog clock face for clock-reading activities */
   clock?: { hour: number; minute: number }
   /** Coins shown in a purse for money-counting activities */

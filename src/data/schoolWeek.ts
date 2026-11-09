@@ -1,11 +1,13 @@
 /** Content digitized from K3 學校專項每週練習（蔡繼有、聖保羅書院小學、王錦輝、播道）,
- *  plus original 真道書院 and 男拔面試練習 tracks (kid games rewritten from home / parent-group notes). */
+ *  plus original 真道書院 and 男拔面試練習 tracks (kid games rewritten from home / parent-group notes),
+ *  plus 王錦輝／真道二輪 playable stations. */
 
 import { CHILD, type Activity } from './content.ts'
+import { jando2Plan, wkf2Plan } from './secondRound.ts'
 
 const sw = (file: string) => `school-week/${file}`
 
-export type SchoolId = 'cky' | 'spcc' | 'wkf' | 'evangel' | 'jando' | 'dbs'
+export type SchoolId = 'wkf2' | 'jando2' | 'cky' | 'spcc' | 'wkf' | 'evangel' | 'jando' | 'dbs'
 
 export type SchoolParentNote = {
   blurb: string
@@ -38,6 +40,8 @@ const introZh = `老師好，我叫${CHILD.nameZh}，今年${CHILD.ageZh}歲，�
 const introEn = `Good morning teacher. My name is ${CHILD.fullNameEn}. I am ${CHILD.age} years old. I study in ${CHILD.kindergartenEn} Kindergarten.`
 
 export const schoolPlans: SchoolPlan[] = [
+  wkf2Plan,
+  jando2Plan,
   {
     id: 'cky',
     title: '蔡繼有',

@@ -36,4 +36,9 @@ describe('shouldCelebrateCorrect', () => {
     assert.equal(shouldCelebrateCorrect('speak', false), false)
     assert.equal(shouldCelebrateCorrect('prompt', false), false)
   })
+
+  it('cheers when a parent confirms 做到 on a listen-and-do station', () => {
+    assert.equal(shouldCelebrateCorrect('prompt', false, { parentCheck: true }), true)
+    assert.equal(shouldCelebrateCorrect('prompt', true, { parentCheck: true }), false)
+  })
 })

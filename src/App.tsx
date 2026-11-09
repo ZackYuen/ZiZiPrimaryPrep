@@ -275,7 +275,7 @@ export default function App() {
         </button>
 
         <h2 className="section-label">學校專項</h2>
-        <p className="section-lead">學校專項：聽指令 · 認讀 · 心算 · 小組遊戲</p>
+        <p className="section-lead">王錦輝二輪 · 真道二輪 · 聽指令撳圖 · 小組遊戲</p>
         <div className="module-grid">
           {schoolPlans.map((school, i) => (
             <SchoolCard
