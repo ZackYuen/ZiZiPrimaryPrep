@@ -234,6 +234,18 @@ describe('真道二輪 playable stations', () => {
   })
 })
 
+describe('round-2 neighbors are green zizi + clay octopus', () => {
+  it('ships origami octopus companion sprites from the clay photo look', () => {
+    for (const file of [
+      'public/characters/octo-idle.png',
+      'public/characters/octo-cheer.png',
+      'public/characters/octo-think.png',
+    ]) {
+      assert.ok(existsSync(resolve(file)), `missing ${file}`)
+    }
+  })
+})
+
 describe('round-2 art is new plates, not 男拔／一輪 sprites', () => {
   it('keeps only star / pose chrome reused; everything else is school-week/round2', () => {
     for (const id of ['wkf2', 'jando2'] as const) {
